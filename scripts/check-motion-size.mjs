@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 // 첫 화면 움직임의 클라이언트 코드 용량 검사 (docs/04-motion.md 접근성과 성능: gzip 10KB 이하)
 //   npm run build 뒤에 node scripts/check-motion-size.mjs
-// 움직임 코드가 든 청크는 sessionStorage 키(src/components/home/intro-script.ts의 PLAYED_KEY)로 찾는다.
-// 같은 청크에 묶인 다른 코드도 함께 세므로 실제보다 크게 잰다.
+// 재생 코드(src/components/home/intro-play.ts)는 재생할 때만 불러오므로 따로 청크가 된다. 무대의 data-intro-stage 문자열로 찾는다.
+// 같은 청크에 다른 코드가 묶이면 함께 세므로, 실제보다 작게 재는 일은 없다.
 
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 
 const LIMIT = 10 * 1024;
-const MARKER = "hero-intro-played";
+const MARKER = "data-intro-stage";
 const DIR = ".next/static/chunks";
 
 function walk(dir) {

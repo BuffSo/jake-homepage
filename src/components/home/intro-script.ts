@@ -1,6 +1,6 @@
 // 첫 화면 움직임의 시작 조건 (docs/04-motion.md 구현 방식). 서버 컴포넌트(hero.tsx)와 클라이언트(hero-intro.tsx)가 같이 쓴다.
 
-/** 이번 방문에 이미 재생했는지 적어 두는 sessionStorage 키. 움직임 용량 검사(check:motion-size)도 이 문자열로 청크를 찾는다. */
+/** 이번 방문에 이미 재생했는지 적어 두는 sessionStorage 키 */
 export const PLAYED_KEY = "hero-intro-played";
 
 /** JS가 이 시간 안에 재생을 시작하지 못하면 마지막 장면을 그대로 보여 준다. */
