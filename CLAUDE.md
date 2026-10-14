@@ -80,12 +80,15 @@
 ## 명령
 
 ```bash
-npm run dev               # 개발 서버
+npm run dev               # 개발 서버 (http://localhost:3300, 다른 로컬 프로젝트의 3000~3101을 피함)
 npm run build             # 프로덕션 빌드
 npm run lint              # ESLint
 npm run typecheck         # TypeScript 검사
 npm run check:sensitive   # 추적 중인 파일 전체의 민감정보 검사
+npm run check:units       # 손으로 쓴 px 길이 검사 (docs/03-design.md 원칙 7)
+npm run check:motion-size # 빌드 뒤 첫 화면 움직임 코드 용량 검사 (gzip 10KB 이하)
 npm test                  # 스크립트 테스트 (node --test)
+npm run test:e2e          # 빌드 후 Playwright E2E (포트 3210, 데스크톱 1280과 모바일 375)
 npm run sync              # 콘텐츠 동기화 (CAREER_DIR, .sensitive-terms.local 필요)
 npm run sync -- --check   # content/synced/가 원본과 같은지 확인만
 ```

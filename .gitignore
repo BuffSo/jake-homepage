@@ -40,6 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# playwright results (ADR-0008)
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
 # local only (ADR-0006)
 .sensitive-terms.local
 .claude/settings.local.json

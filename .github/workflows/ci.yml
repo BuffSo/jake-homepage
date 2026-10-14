@@ -14,9 +14,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      # 배포(Vercel)와 같은 Node 버전으로 확인한다
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - run: npm ci
@@ -29,7 +30,27 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 길이 단위 검사
+        run: npm run check:units
+
       - run: npm test
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
+
+      - name: 움직임 코드 용량 검사
+        run: npm run check:motion-size
+
+      - name: Playwright 브라우저 설치
+        run: npx playwright install --with-deps chromium
+
+      - name: 화면 검사 (E2E)
+        run: npx playwright test
+
+      - name: E2E 보고서 올리기 (실패할 때만)
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

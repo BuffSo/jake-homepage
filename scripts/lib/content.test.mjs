@@ -1,0 +1,101 @@
+// 사이트 전용 글의 사실 검사 (ADR-0003, CLAUDE.md 콘텐츠)
+// - sources의 문장은 동기화한 이력서나 포트폴리오에 그대로 있어야 한다.
+// - 기술 층의 기술 이름은 포트폴리오 "6. 기술 스택"에 있어야 한다.
+// - 저장소에서 세는 숫자의 자리 표시는 아는 이름만 쓴다.
+
+import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { test } from "node:test";
+import { parseFrontmatter } from "../../src/lib/frontmatter.mjs";
+import { countAdrs, countCiChecks } from "../../src/lib/repo-stats.mjs";
+
+const ROOT = process.cwd();
+const squash = (s) => s.replace(/\s+/g, " ").trim();
+
+function read(relative) {
+  return parseFrontmatter(readFileSync(path.join(ROOT, relative), "utf8"), relative).data;
+}
+
+function readDir(relative) {
+  return readdirSync(path.join(ROOT, relative))
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => ({ file: f, data: read(path.join(relative, f)) }));
+}
+
+const resume = readFileSync(path.join(ROOT, "content/synced/resume.md"), "utf8");
+const portfolio = readFileSync(path.join(ROOT, "content/synced/portfolio.md"), "utf8");
+const synced = squash(`${resume}\n${portfolio}`);
+
+const home = read("content/site/home.md");
+const projects = readDir("content/site/projects");
+const aiWorks = readDir("content/site/ai");
+
+test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대로 있다", () => {
+  const owners = [{ name: "home.md", data: home }, ...projects.map((p) => ({ name: p.file, data: p.data }))];
+  for (const { name, data } of owners) {
+    for (const quote of data.sources ?? []) {
+      assert.ok(synced.includes(squash(quote)), `${name}: 원문에 없는 문장 "${quote}"`);
+    }
+  }
+});
+
+test("기술 층은 여섯 개이고, 기술 이름은 포트폴리오 기술 스택에 있다", () => {
+  const stackSection = portfolio.slice(portfolio.indexOf("## 6. 기술 스택"));
+  assert.equal(home.layers.length, 6);
+  for (const layer of home.layers) {
+    for (const item of layer.items) {
+      assert.ok(stackSection.includes(item), `기술 스택에 없는 이름 "${item}" (${layer.name})`);
+    }
+  }
+});
+
+test("층이 가리키는 서비스는 모두 있다", () => {
+  const slugs = new Set(projects.map((p) => p.data.slug));
+  for (const layer of home.layers) {
+    for (const slug of layer.usedBy) assert.ok(slugs.has(slug), `${layer.name}: 없는 서비스 ${slug}`);
+  }
+});
+
+test("서비스 글은 카드에 필요한 값을 모두 갖고, 순서가 겹치지 않는다", () => {
+  const required = ["slug", "order", "title", "summary", "headline", "period", "role", "image", "imageAlt"];
+  for (const { file, data } of projects) {
+    for (const key of required) assert.ok(data[key], `${file}: ${key} 없음`);
+    assert.equal(`${data.slug}.md`, file);
+    assert.ok(Array.isArray(data.stack) && data.stack.length > 0, `${file}: stack 없음`);
+    assert.ok(data.metric?.value && data.metric?.label, `${file}: metric 없음`);
+    assert.match(data.liveUrl, /^https:\/\//);
+  }
+  const orders = projects.map((p) => p.data.order).sort();
+  assert.deepEqual(orders, [1, 2, 3]);
+});
+
+test("AI 작업 글은 카드에 필요한 값을 모두 갖는다", () => {
+  const figures = new Set(["wiki-flow", "image", "hermes-flow", "site-steps"]);
+  for (const { file, data } of aiWorks) {
+    for (const key of ["slug", "order", "eyebrow", "title", "headline", "desc"]) {
+      assert.ok(data[key], `${file}: ${key} 없음`);
+    }
+    assert.equal(`${data.slug}.md`, file);
+    assert.ok(figures.has(data.figure), `${file}: 모르는 figure ${data.figure}`);
+    if (data.figure === "image") assert.ok(data.image && data.imageAlt, `${file}: 이미지 정보 없음`);
+    assert.ok(Array.isArray(data.links), `${file}: links 없음`);
+  }
+});
+
+test("Recueve와 Recoeve의 소스 저장소 링크는 싣지 않는다", () => {
+  const links = aiWorks.flatMap((w) => w.data.links).map((l) => l.href);
+  for (const href of links) assert.doesNotMatch(href, /github\.com\/[^/]+\/rec[ou]e?ve/i);
+});
+
+test("저장소에서 세는 숫자는 실제 파일과 맞고, 자리 표시는 아는 이름만 쓴다", () => {
+  const adrFiles = readdirSync(path.join(ROOT, "docs/adr")).filter((f) => /^\d{4}-.+\.md$/.test(f));
+  assert.equal(countAdrs(ROOT), adrFiles.length);
+  assert.ok(countCiChecks(ROOT) > 0);
+  const known = new Set(["adrCount", "ciCheckCount"]);
+  for (const { file, data } of aiWorks) {
+    for (const [, key] of `${data.metric.value}`.matchAll(/\{(\w+)\}/g)) {
+      assert.ok(known.has(key), `${file}: 모르는 자리 표시 {${key}}`);
+    }
+  }
+});
