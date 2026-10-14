@@ -13,6 +13,8 @@ export default defineConfig({
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     trace: "retain-on-failure",
+    // 기본은 움직임 줄이기라 첫 화면의 마지막 장면을 바로 본다. 움직임은 e2e/intro.spec.ts에서만 켠다.
+    reducedMotion: "reduce",
   },
   projects: [
     {

@@ -71,3 +71,11 @@
     @apply outline-2 outline-offset-2 outline-accent;
   }
 }
+
+/*
+  첫 화면 움직임 (docs/04-motion.md). 재생할 조건일 때만 히어로에 data-intro가 붙고, 그동안 글과 층을 숨긴다.
+  data-intro가 없으면 서버가 그린 마지막 장면이 그대로 보인다. 움직임 줄이기, 다시 방문, JS 실패가 모두 이쪽이다.
+*/
+[data-intro] [data-intro-part] {
+  opacity: 0;
+}

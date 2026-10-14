@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { ExternalLink } from "@/components/external-link";
+import { InlineScript } from "@/components/inline-script";
 import { getHome, getProjects } from "@/lib/content";
+import { HeroIntro } from "./hero-intro";
+import { INTRO_SCRIPT } from "./intro-script";
 import { LayerFocusProvider } from "./layer-focus";
 import { ServiceList, type ServiceItem } from "./service-list";
 import { StackLayers } from "./stack-layers";
 
 // 첫 화면의 마지막 장면 (docs/04-motion.md). 서버가 그린 이 HTML이 움직임이 끝난 모습이다.
+// data-intro-part가 붙은 것은 움직임이 재생되는 동안 숨겼다가 마지막 박자에 나타난다(hero-intro.tsx).
 // 데스크톱(lg 이상)은 글이 왼쪽, 기술 층이 오른쪽, 서비스 목록이 아래 띠다. 그보다 좁으면 위에서 아래로 쌓는다.
 export function Hero() {
   const home = getHome();
@@ -23,10 +27,14 @@ export function Hero() {
   const [lead, sub] = home.lines;
 
   return (
+    // data-intro는 인라인 스크립트가 붙이고 움직임이 끝나면 지운다. React가 이 속성을 문제 삼지 않게 한다.
     <section
+      data-hero
+      suppressHydrationWarning
       aria-labelledby="hero-title"
       className="flex flex-col gap-3 pt-1 pb-10 lg:min-h-[calc(100svh-4rem)] lg:gap-7 lg:pt-0 lg:pb-10"
     >
+      <InlineScript html={INTRO_SCRIPT} />
       <LayerFocusProvider layers={home.layers}>
         <div className="flex flex-col gap-3 lg:grow lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
           <div className="flex flex-col gap-3 lg:w-[26rem] lg:shrink-0 lg:gap-5 xl:w-[31.25rem]">
@@ -38,13 +46,15 @@ export function Hero() {
               {home.headline.slice(0, cut)} <br />
               {home.headline.slice(cut + 1)}
             </h1>
-            <div className="flex flex-col gap-1.5 lg:mt-2 lg:gap-5">
+            <div data-intro-part className="flex flex-col gap-1.5 lg:mt-2 lg:gap-5">
               <p className="text-[1.0625rem] leading-[1.4] font-semibold md:text-xl lg:text-[1.375rem]">{lead}</p>
               <p className="text-[0.8125rem] leading-[1.5] text-muted md:text-base lg:leading-[1.6]">{sub}</p>
             </div>
             <Contact email={home.contact.email} github={home.contact.github} className="hidden lg:mt-1 lg:flex" />
           </div>
-          <StackLayers layers={home.layers} />
+          <StackLayers layers={home.layers}>
+            <HeroIntro />
+          </StackLayers>
         </div>
         <ServiceList services={services} />
       </LayerFocusProvider>
@@ -57,7 +67,7 @@ export function Hero() {
 function Contact({ email, github, className }: { email: string; github: string; className: string }) {
   const link = "inline-flex min-h-6 items-center underline underline-offset-4";
   return (
-    <ul aria-label="연락" className={`flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] md:gap-x-5 md:text-[0.9375rem] ${className}`}>
+    <ul data-intro-part aria-label="연락" className={`flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] md:gap-x-5 md:text-[0.9375rem] ${className}`}>
       <li>
         <a href={`mailto:${email}`} className={link}>
           {email}

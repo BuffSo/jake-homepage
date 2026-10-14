@@ -1,18 +1,20 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { Layer } from "@/lib/content";
 import { useLayerFocus } from "./layer-focus";
 
 // 기술 층 여섯 (docs/04-motion.md 기술 층). 데스크톱은 첫 화면 오른쪽, 모바일은 소개 아래에 쌓는다.
 // 층을 누르거나 올리면 그 층을 쓰는 서비스가 목록에서 강조된다(service-list.tsx).
-export function StackLayers({ layers }: { layers: Layer[] }) {
+// children은 층 아래 오른쪽에 두는 다시 보기 버튼이다. 움직임 무대는 층 목록 자리에 얹으므로 바깥을 relative로 둔다.
+export function StackLayers({ layers, children }: { layers: Layer[]; children?: ReactNode }) {
   const { active, pinned, toggle, preview } = useLayerFocus();
 
   return (
-    <div className="flex flex-col lg:grow">
-      <ul aria-label="기술 층" className="flex flex-col gap-1 lg:gap-2">
+    <div className="relative flex flex-col lg:grow">
+      <ul data-intro-layers aria-label="기술 층" className="flex flex-col gap-1 lg:gap-2">
         {layers.map((layer) => (
-          <li key={layer.name}>
+          <li key={layer.name} data-intro-part="layer">
             <button
               type="button"
               aria-pressed={pinned?.name === layer.name}
@@ -34,7 +36,10 @@ export function StackLayers({ layers }: { layers: Layer[] }) {
           </li>
         ))}
       </ul>
-      <p className="mt-3.5 hidden text-xs text-subtle lg:block">층을 누르면 그 기술을 쓴 서비스가 표시됩니다</p>
+      <div data-intro-part className="mt-2 flex items-center justify-end gap-4 lg:mt-1.5 lg:justify-between">
+        <p className="hidden text-xs text-subtle lg:block">층을 누르면 그 기술을 쓴 서비스가 표시됩니다</p>
+        {children}
+      </div>
     </div>
   );
 }

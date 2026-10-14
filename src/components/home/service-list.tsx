@@ -19,6 +19,7 @@ export function ServiceList({ services }: { services: ServiceItem[] }) {
   return (
     <>
       <ol
+        data-intro-part
         aria-label="운영 중인 서비스"
         className="flex flex-col gap-2 border-t border-line pt-2.5 lg:grid lg:grid-cols-3 lg:gap-10 lg:pt-5"
       >
