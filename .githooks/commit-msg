@@ -1,0 +1,26 @@
+#!/bin/sh
+# 커밋 메시지에 AI 공동 작성자 줄이나 생성 도구 서명을 넣지 않는다 (ADR-0006)
+if grep -qiE '^co-authored-by:.*(claude|anthropic)|generated with \[?claude' "$1"; then
+  echo "커밋 메시지에 AI 공동 작성자 줄이나 생성 도구 서명이 있습니다. 지우고 다시 커밋하세요." >&2
+  exit 1
+fi
+
+# 첫 줄은 Conventional Commits 형식으로 쓴다 (CLAUDE.md). git이 만드는 merge, revert, fixup 메시지는 통과시킨다.
+subject=$(grep -v '^#' "$1" | head -n 1)
+case "$subject" in
+  "Merge "* | "Revert "* | "fixup! "* | "squash! "* | "amend! "*) exit 0 ;;
+esac
+
+if ! printf '%s\n' "$subject" | grep -qE '^(feat|fix|docs|refactor|test|chore|build|ci|perf|style)(\([a-z0-9-]+\))?!?: [a-z0-9]'; then
+  echo "커밋 메시지 첫 줄은 <type>(<scope>): <summary> 형식이고, summary는 영어 소문자로 시작해야 합니다 (CLAUDE.md)." >&2
+  exit 1
+fi
+
+case "$subject" in
+  *.) echo "커밋 메시지 첫 줄 끝에 마침표를 찍지 않습니다 (CLAUDE.md)." >&2; exit 1 ;;
+esac
+
+if [ "${#subject}" -gt 72 ]; then
+  echo "커밋 메시지 첫 줄은 72자 이내로 씁니다. 지금 ${#subject}자입니다 (CLAUDE.md)." >&2
+  exit 1
+fi
