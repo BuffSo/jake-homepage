@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "check:sensitive": "node scripts/check-sensitive.mjs --all",
+    "check:units": "node scripts/check-units.mjs --all",
     "sync": "node scripts/sync-content.mjs",
     "test": "node --test \"scripts/**/*.test.mjs\"",
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
