@@ -10,6 +10,8 @@
 | [0004](0004-ask-answer-policy.md) | 질문 창은 사실만 답하고, 해석과 개인 조건은 답하지 않는다 | 채택 (구현은 2차) |
 | [0005](0005-nextjs16-vercel-genys-domain.md) | Next.js 16, Vercel, genys.kr 루트 도메인 | 채택 |
 | [0006](0006-public-repo-and-privacy.md) | 처음부터 공개 저장소로 운영하고 민감정보는 네 겹으로 막는다 | 채택 |
+| [0007](0007-yaml-frontmatter.md) | 사이트 전용 글의 앞부분 데이터는 yaml 패키지로 읽는다 | 채택 |
+| [0008](0008-playwright-e2e.md) | 화면 확인은 Playwright E2E로 자동화한다 | 채택 |
 
 ## 양식
 
