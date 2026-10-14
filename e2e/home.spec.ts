@@ -81,6 +81,41 @@ test("헤더에서 Work, AI, Resume로 갈 수 있다", async ({ page }, testInf
   await expect(nav.getByRole("link", { name: "Resume" })).toHaveAttribute("href", "/resume");
 });
 
+test.describe("모바일 메뉴", () => {
+  // 헤더는 루트 레이아웃에 있어 페이지를 옮겨도 남는다. 열린 메뉴가 새 페이지를 가리지 않는지 본다.
+  test.beforeEach(async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile", "메뉴는 모바일 폭에서만 보인다");
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+  });
+
+  // 지금은 /work가 없는 페이지라 고치기 전 코드에서도 통과했다. /work가 생기는 F2부터 화면만 바뀌는 이동을 확인한다.
+  test("메뉴 링크로 이동하면 메뉴가 닫힌다", async ({ page }) => {
+    const menu = page.locator("header details");
+    await menu.locator("summary").click();
+    await expect(menu).toHaveAttribute("open", "");
+    await menu.getByRole("link", { name: "Work" }).click();
+    await expect(page).toHaveURL(/\/work$/);
+    await expect(menu).not.toHaveAttribute("open");
+  });
+
+  test("메뉴 밖을 누르거나 Esc를 누르면 닫힌다", async ({ page }) => {
+    const menu = page.locator("header details");
+    const summary = menu.locator("summary");
+
+    await summary.click();
+    await expect(menu).toHaveAttribute("open", "");
+    await page.getByRole("heading", { level: 1 }).click();
+    await expect(menu).not.toHaveAttribute("open");
+
+    await summary.click();
+    await expect(menu).toHaveAttribute("open", "");
+    await page.keyboard.press("Escape");
+    await expect(menu).not.toHaveAttribute("open");
+    await expect(summary).toBeFocused();
+  });
+});
+
 test("다크 모드에서는 어두운 바탕을 쓴다", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/");

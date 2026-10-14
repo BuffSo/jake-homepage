@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { MobileMenu } from "./mobile-menu";
 
-// 헤더 (docs/02-ia.md 공통 요소). 모바일 메뉴는 JS 없이 <details>로 연다.
+// 헤더 (docs/02-ia.md 공통 요소). 모바일은 "메뉴"로 같은 항목을 연다(mobile-menu.tsx).
 const NAV = [
   { label: "Work", href: "/work" },
   { label: "AI", href: "/ai" },
@@ -28,21 +29,7 @@ export function SiteHeader() {
         ))}
       </nav>
 
-      <details className="relative md:hidden">
-        <summary className="flex h-11 cursor-pointer list-none items-center px-1 text-sm [&::-webkit-details-marker]:hidden">
-          메뉴
-        </summary>
-        <nav
-          aria-label="주요 메뉴"
-          className="absolute right-0 z-40 mt-1 flex w-40 flex-col rounded-lg border border-line bg-bg py-1 shadow-sm"
-        >
-          {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="flex h-11 items-center px-4 text-sm">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </details>
+      <MobileMenu items={NAV} />
     </header>
   );
 }
