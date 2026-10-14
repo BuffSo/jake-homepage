@@ -1,5 +1,6 @@
 ---
 slug: recueve
+order: 1
 title: Recueve
 summary: 흩어진 관심사를 한곳에 모으는 콘텐츠 큐레이션 플랫폼
 period: 2026.09 ~ 현재
@@ -21,6 +22,8 @@ metric:
   value: 7단계
   label: AI 자동 채움 파이프라인
 liveUrl: https://recueve.com
+image: recueve
+imageAlt: Recueve 레코 상세. AI가 채운 카테고리와 설명
 howToView: 로그인 없이 모두의 레코스(https://recueve.com/recos)에서 레코와 AI가 채운 설명, 카테고리를 보실 수 있습니다.
 ---
 
