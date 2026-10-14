@@ -49,7 +49,13 @@ const config = {
     {
       source: "포트폴리오/소재희-포트폴리오.md",
       output: "portfolio.md",
-      transforms: [],
+      transforms: [
+        {
+          type: "drop-line",
+          startsWith: "| **Recoeve** | recoeve.com은",
+          reason: "사이트는 Recueve를 사이트 전용 글로 소개하므로 Recoeve 안내 줄은 뺀다 (ADR-0003)",
+        },
+      ],
     },
   ],
 };

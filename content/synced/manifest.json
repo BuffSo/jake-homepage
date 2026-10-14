@@ -17,7 +17,9 @@
     },
     {
       "output": "portfolio.md",
-      "transforms": []
+      "transforms": [
+        "drop-line | **Recoeve** | recoeve.com은"
+      ]
     }
   ]
 }
