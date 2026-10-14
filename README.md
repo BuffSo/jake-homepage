@@ -12,6 +12,7 @@
 | 요구사항과 범위 | [docs/01-prd.md](docs/01-prd.md) |
 | 페이지 구조와 콘텐츠 모델 | [docs/02-ia.md](docs/02-ia.md) |
 | 디자인 원칙 | [docs/03-design.md](docs/03-design.md) |
+| 첫 화면 움직임: 재료, 방향, 금지 목록, 박자 | [docs/04-motion.md](docs/04-motion.md) |
 | 결정 기록 (ADR) | [docs/adr/](docs/adr/) |
 | 작업 일지: AI 제안, 제 판단, 결과 | [docs/devlog/](docs/devlog/) |
 | 에이전트 작업 규칙 | [CLAUDE.md](CLAUDE.md) |
