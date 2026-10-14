@@ -9,7 +9,7 @@ const NAV = [
 
 export function SiteHeader() {
   return (
-    <header className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:px-16">
+    <header className="mx-auto flex h-14 w-full md:h-16 max-w-7xl items-center justify-between px-4 md:px-16">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-4 focus:z-50 focus:rounded-md focus:bg-fg focus:px-3 focus:py-2 focus:text-bg"

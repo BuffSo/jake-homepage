@@ -34,6 +34,8 @@
 
 /*
   글꼴 순서: 영문과 숫자는 Geist가 먼저 그리고, Geist에 없는 한글은 Pretendard가 그린다.
+  고정폭(Geist Mono) 글에 섞인 한글도 Pretendard로 그린다. 다만 한글 문장은 고정폭으로 쓰지 않는다.
+  고정폭 글꼴의 띄어쓰기는 폭이 넓어 낱말 사이가 벌어진다. 고정폭은 기술 이름, 주소, 번호에만 쓴다.
   Pretendard는 조각마다 unicode-range가 있어 페이지에 쓰인 한글 조각만 내려받는다.
 */
 @theme inline {
@@ -49,7 +51,8 @@
   --font-sans:
     var(--font-geist), "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
     "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono:
+    var(--font-geist-mono), "Pretendard Variable", Pretendard, ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @layer base {
