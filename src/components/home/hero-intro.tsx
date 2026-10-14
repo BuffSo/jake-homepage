@@ -64,7 +64,7 @@ export function HeroIntro() {
         const hero = ref.current?.closest<HTMLElement>("[data-hero]");
         if (hero) start(hero, stopRef);
       }}
-      className="h-11 shrink-0 cursor-pointer rounded-full border border-line px-4 text-[0.8125rem] hover:border-fg motion-reduce:hidden"
+      className="h-11 shrink-0 cursor-pointer rounded-full border border-fg/20 px-4 text-[0.8125rem] hover:border-fg motion-reduce:hidden"
     >
       다시 보기
     </button>

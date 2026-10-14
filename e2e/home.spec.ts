@@ -6,7 +6,17 @@ import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 // 기대값은 사이트 전용 글(content/site/)에서 읽는다. 문구를 고쳐도 테스트는 그대로 두고, 화면에 빠진 것만 잡는다.
 
 type Layer = { name: string; items: string[]; usedBy: string[] };
-type Project = { slug: string; order: number; title: string; summary: string; liveUrl: string };
+type Project = {
+  slug: string;
+  order: number;
+  title: string;
+  summary: string;
+  headline: string;
+  liveUrl: string;
+  liveLabel?: string;
+  imageAlt: string;
+};
+type AiWork = { slug: string; order: number; headline: string; links: { label: string; href: string }[] };
 
 const read = (file: string) => parseFrontmatter(readFileSync(file, "utf8"), file).data;
 const home = read("content/site/home.md") as {
@@ -14,13 +24,19 @@ const home = read("content/site/home.md") as {
   lines: string[];
   contact: { email: string; github: string };
   layers: Layer[];
+  about: { title: string; quote: string };
 };
-const projects = readdirSync("content/site/projects")
-  .map((f) => read(`content/site/projects/${f}`) as Project)
-  .sort((a, b) => a.order - b.order);
+const readDir = <T extends { order: number }>(dir: string) =>
+  readdirSync(dir)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => read(`${dir}/${f}`) as T)
+    .sort((a, b) => a.order - b.order);
+const projects = readDir<Project>("content/site/projects");
+const aiWorks = readDir<AiWork>("content/site/ai");
 
-// 아직 만들지 않은 페이지. 헤더 링크를 미리 받다가 404가 난다. F2~F4에서 페이지가 생기면 지운다.
+// 아직 만들지 않은 페이지와 그 아래 주소(/ai/jake-wiki 등). 링크를 미리 받다가 404가 난다. F2~F4에서 페이지가 생기면 지운다.
 const PENDING_ROUTES = ["/work", "/ai", "/resume"];
+const isPending = (pathname: string) => PENDING_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`));
 
 function collectErrors(page: Page) {
   const errors: string[] = [];
@@ -31,7 +47,7 @@ function collectErrors(page: Page) {
   page.on("pageerror", (err) => errors.push(err.message));
   page.on("response", (res) => {
     const { pathname } = new URL(res.url());
-    if (res.status() >= 400 && !PENDING_ROUTES.includes(pathname)) errors.push(`${res.status()} ${pathname}`);
+    if (res.status() >= 400 && !isPending(pathname)) errors.push(`${res.status()} ${pathname}`);
   });
   return errors;
 }
@@ -171,6 +187,64 @@ test.describe("기술 층 강조", () => {
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await page.mouse.move(0, 0);
     await expectHighlight(page, false);
+  });
+});
+
+test.describe("아래 섹션", () => {
+  test("서비스 카드 세 장에 화면, 제목, 서비스 링크가 있고 첫 화면 목록이 카드를 가리킨다", async ({ page }) => {
+    await page.goto("/");
+    const section = page.getByRole("region", { name: "운영 중인 서비스" });
+    const cards = section.getByRole("article");
+    await expect(cards).toHaveCount(projects.length);
+    for (const [i, project] of projects.entries()) {
+      const card = cards.nth(i);
+      await expect(card).toHaveAttribute("id", project.slug);
+      await expect(card.getByRole("img", { name: project.imageAlt })).toBeVisible();
+      await expect(card.getByRole("heading", { level: 3 })).toHaveText(project.headline);
+      const live = card.getByRole("link", { name: new RegExp(project.liveLabel ?? "서비스 열기") });
+      await expect(live).toHaveAttribute("href", project.liveUrl);
+      await expect(card.getByRole("link", { name: "자세히 보기" })).toHaveAttribute("href", `/work#${project.slug}`);
+    }
+    await expect(section.getByRole("link", { name: /포트폴리오 전체 보기/ })).toHaveAttribute("href", "/work");
+
+    // 첫 화면 목록의 이름을 누르면 해당 카드로 내려간다
+    const first = projects[0];
+    await page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("link", { name: first.title, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`#${first.slug}$`));
+    await expect(cards.first()).toBeInViewport();
+  });
+
+  test("AI 카드 네 장에 제목과 링크가 있고, 저장소에서 센 숫자가 채워져 있다", async ({ page }) => {
+    await page.goto("/");
+    const section = page.getByRole("region", { name: "AI로 일하는 방식" });
+    const cards = section.getByRole("article");
+    await expect(cards).toHaveCount(aiWorks.length);
+    for (const [i, work] of aiWorks.entries()) {
+      const card = cards.nth(i);
+      await expect(card.getByRole("heading", { level: 3 })).toHaveText(work.headline);
+      for (const link of work.links) {
+        await expect(card.getByRole("link", { name: new RegExp(link.label) })).toHaveAttribute("href", link.href);
+      }
+      await expect(card.getByRole("link", { name: "자세히 보기" })).toHaveAttribute("href", `/ai/${work.slug}`);
+    }
+    // {adrCount} 같은 자리가 그대로 남지 않았는지
+    await expect(section).not.toContainText("{");
+    await expect(section).toContainText(/ADR \d+개/);
+  });
+
+  test("About에 소개, 동료 평가, 이력서와 연락 링크가 있다", async ({ page }) => {
+    await page.goto("/");
+    const section = page.getByRole("region", { name: home.about.title });
+    await expect(section.getByText(home.about.quote)).toBeVisible();
+    await expect(section.getByRole("link", { name: "이력서 보기" })).toHaveAttribute("href", "/resume");
+    await expect(section.getByRole("link", { name: home.contact.email })).toHaveAttribute("href", `mailto:${home.contact.email}`);
+    await expect(section.getByRole("link", { name: /GitHub/ })).toHaveAttribute("href", home.contact.github);
+  });
+
+  test("이미지마다 대체 텍스트가 있다", async ({ page }) => {
+    await page.goto("/");
+    const missing = await page.locator("main img").evaluateAll((imgs) => imgs.filter((img) => !img.getAttribute("alt")).length);
+    expect(missing).toBe(0);
   });
 });
 
