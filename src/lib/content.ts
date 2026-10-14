@@ -7,6 +7,8 @@ import { parseFrontmatter } from "./frontmatter.mjs";
 import { countAdrs, countCiChecks } from "./repo-stats.mjs";
 
 const ROOT = process.cwd();
+// 글을 읽는 경로는 이 폴더 아래로 고정한다. 경로 전체를 변수로 만들면 빌드가 프로젝트 전체를 서버 출력에 넣는다.
+const SITE_DIR = path.join(process.cwd(), "content", "site");
 
 export type ProjectSlug = "recueve" | "prowith" | "lotto-ai";
 
@@ -55,24 +57,26 @@ export type AiWork = {
   links: Link[];
 };
 
+/** content/site/ 아래의 글 하나 */
 function read<T>(relative: string): T {
-  const file = path.join(ROOT, relative);
-  return parseFrontmatter(readFileSync(file, "utf8"), relative).data as T;
+  const text = readFileSync(path.join(SITE_DIR, relative), "utf8");
+  return parseFrontmatter(text, path.join("content/site", relative)).data as T;
 }
 
-function readDir<T extends { order: number }>(relative: string): T[] {
-  return readdirSync(path.join(ROOT, relative))
+/** content/site/ 아래 폴더의 글 전부, order 순서 */
+function readDir<T extends { order: number }>(folder: string): T[] {
+  return readdirSync(path.join(SITE_DIR, folder))
     .filter((f) => f.endsWith(".md"))
-    .map((f) => read<T>(path.join(relative, f)))
+    .map((f) => read<T>(path.join(folder, f)))
     .sort((a, b) => a.order - b.order);
 }
 
 export function getHome(): Home {
-  return read<Home>("content/site/home.md");
+  return read<Home>("home.md");
 }
 
 export function getProjects(): Project[] {
-  return readDir<Project>("content/site/projects");
+  return readDir<Project>("projects");
 }
 
 /** {adrCount} 같은 자리는 저장소에서 센 값으로 채운다. */
@@ -85,7 +89,7 @@ export function fillRepoStats(text: string): string {
 }
 
 export function getAiWorks(): AiWork[] {
-  return readDir<AiWork>("content/site/ai").map((work) => ({
+  return readDir<AiWork>("ai").map((work) => ({
     ...work,
     metric: { value: fillRepoStats(work.metric.value), label: work.metric.label },
   }));
