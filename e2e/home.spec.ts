@@ -5,7 +5,7 @@ import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 // 홈 화면 확인 (ADR-0008). 캡처는 test-results/에만 남고 커밋하지 않는다.
 // 기대값은 사이트 전용 글(content/site/)에서 읽는다. 문구를 고쳐도 테스트는 그대로 두고, 화면에 빠진 것만 잡는다.
 
-type Layer = { name: string; items: string[] };
+type Layer = { name: string; items: string[]; usedBy: string[] };
 type Project = { slug: string; order: number; title: string; summary: string; liveUrl: string };
 
 const read = (file: string) => parseFrontmatter(readFileSync(file, "utf8"), file).data;
@@ -122,6 +122,55 @@ test.describe("첫 화면", () => {
       const box = await page.getByRole("list", { name }).first().boundingBox();
       expect(box!.y + box!.height, name).toBeLessThanOrEqual(height);
     }
+  });
+});
+
+test.describe("기술 층 강조", () => {
+  // 모든 서비스가 쓰지는 않는 층이라야 흐려지는 서비스가 생긴다.
+  const layer = home.layers.find((l) => l.usedBy.length < projects.length)!;
+  const used = (project: Project) => layer.usedBy.includes(project.slug);
+
+  async function expectHighlight(page: Page, on: boolean) {
+    const items = page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("listitem");
+    for (const [i, project] of projects.entries()) {
+      await expect(items.nth(i)).toHaveCSS("opacity", on && !used(project) ? "0.3" : "1");
+    }
+  }
+
+  test("층을 누르면 고정되고, 그 층을 쓰지 않는 서비스가 흐려진다", async ({ page }) => {
+    await page.goto("/");
+    const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await expectHighlight(page, true);
+    const names = projects.filter(used).map((p) => p.title).join(", ");
+    await expect(page.getByText(`${layer.name} 층을 쓰는 서비스: ${names}`)).toBeAttached();
+
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await expectHighlight(page, false);
+  });
+
+  test("키보드로도 누를 수 있다", async ({ page }) => {
+    await page.goto("/");
+    const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
+    await button.press("Enter");
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await button.press("Space");
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("마우스를 올리면 잠깐 보여 주고, 떼면 돌아간다", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === "mobile", "터치 화면은 누르기만 쓴다");
+    await page.goto("/");
+    const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
+    await button.hover();
+    await expectHighlight(page, true);
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await page.mouse.move(0, 0);
+    await expectHighlight(page, false);
   });
 });
 

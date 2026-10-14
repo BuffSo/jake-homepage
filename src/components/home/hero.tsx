@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "@/components/external-link";
 import { getHome, getProjects } from "@/lib/content";
+import { LayerFocusProvider } from "./layer-focus";
 import { ServiceList, type ServiceItem } from "./service-list";
 import { StackLayers } from "./stack-layers";
 
@@ -26,25 +27,27 @@ export function Hero() {
       aria-labelledby="hero-title"
       className="flex flex-col gap-3 pt-1 pb-10 lg:min-h-[calc(100svh-4rem)] lg:gap-7 lg:pt-0 lg:pb-10"
     >
-      <div className="flex flex-col gap-3 lg:grow lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
-        <div className="flex flex-col gap-3 lg:w-[26rem] lg:shrink-0 lg:gap-5 xl:w-[31.25rem]">
-          <h1
-            id="hero-title"
-            lang="en"
-            className="text-[2.5rem] leading-[1.04] font-extrabold tracking-[-0.03em] md:text-[3.5rem] lg:text-[4rem] lg:leading-[1.02] lg:tracking-[-0.035em] xl:text-[4.75rem]"
-          >
-            {home.headline.slice(0, cut)} <br />
-            {home.headline.slice(cut + 1)}
-          </h1>
-          <div className="flex flex-col gap-1.5 lg:mt-2 lg:gap-5">
-            <p className="text-[1.0625rem] leading-[1.4] font-semibold md:text-xl lg:text-[1.375rem]">{lead}</p>
-            <p className="text-[0.8125rem] leading-[1.5] text-muted md:text-base lg:leading-[1.6]">{sub}</p>
+      <LayerFocusProvider layers={home.layers}>
+        <div className="flex flex-col gap-3 lg:grow lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
+          <div className="flex flex-col gap-3 lg:w-[26rem] lg:shrink-0 lg:gap-5 xl:w-[31.25rem]">
+            <h1
+              id="hero-title"
+              lang="en"
+              className="text-[2.5rem] leading-[1.04] font-extrabold tracking-[-0.03em] md:text-[3.5rem] lg:text-[4rem] lg:leading-[1.02] lg:tracking-[-0.035em] xl:text-[4.75rem]"
+            >
+              {home.headline.slice(0, cut)} <br />
+              {home.headline.slice(cut + 1)}
+            </h1>
+            <div className="flex flex-col gap-1.5 lg:mt-2 lg:gap-5">
+              <p className="text-[1.0625rem] leading-[1.4] font-semibold md:text-xl lg:text-[1.375rem]">{lead}</p>
+              <p className="text-[0.8125rem] leading-[1.5] text-muted md:text-base lg:leading-[1.6]">{sub}</p>
+            </div>
+            <Contact email={home.contact.email} github={home.contact.github} className="hidden lg:mt-1 lg:flex" />
           </div>
-          <Contact email={home.contact.email} github={home.contact.github} className="hidden lg:mt-1 lg:flex" />
+          <StackLayers layers={home.layers} />
         </div>
-        <StackLayers layers={home.layers} />
-      </div>
-      <ServiceList services={services} />
+        <ServiceList services={services} />
+      </LayerFocusProvider>
       <Contact email={home.contact.email} github={home.contact.github} className="flex lg:hidden" />
     </section>
   );
