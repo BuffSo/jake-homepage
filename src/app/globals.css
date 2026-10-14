@@ -1,15 +1,22 @@
 @import "tailwindcss";
+@import "./fonts/pretendard.css";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/*
+  글꼴 순서: 영문과 숫자는 Geist가 먼저 그리고, Geist에 없는 한글은 Pretendard가 그린다.
+  Pretendard는 조각마다 unicode-range가 있어 페이지에 쓰인 한글 조각만 내려받는다.
+*/
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans:
+    var(--font-geist), "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +29,4 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
