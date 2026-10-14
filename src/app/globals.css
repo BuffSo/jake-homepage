@@ -1,9 +1,35 @@
 @import "tailwindcss";
 @import "./fonts/pretendard.css";
 
+/*
+  색은 흑백에 강조색 하나 (docs/03-design.md 색). 다크 모드는 시스템 설정을 따른다.
+  대비 (WCAG): 라이트 글자 18.9:1, 보조 7.5:1, 강조 위 글자 5.4:1 / 다크 글자 16.3:1, 보조 7.6:1, 강조 위 글자 7.2:1
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #555555;
+  --subtle: #6b6b6b;
+  --line: #dddddd;
+  --line-soft: #e5e5e5;
+  --surface: #fafafa;
+  --accent: #0b7a52;
+  --on-accent: #ffffff;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1011;
+    --fg: #ededed;
+    --muted: #a3a3a3;
+    --subtle: #8f8f8f;
+    --line: #2e2f31;
+    --line-soft: #242527;
+    --surface: #17181a;
+    --accent: #2fb383;
+    --on-accent: #0f1011;
+  }
 }
 
 /*
@@ -11,22 +37,34 @@
   Pretendard는 조각마다 unicode-range가 있어 페이지에 쓰인 한글 조각만 내려받는다.
 */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-surface: var(--surface);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
   --font-sans:
     var(--font-geist), "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
     "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--fg);
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+  /* 한글은 단어 단위로 줄을 바꾼다 (docs/03-design.md 타이포그래피) */
+  body {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
 }
