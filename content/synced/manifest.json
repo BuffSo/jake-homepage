@@ -1,0 +1,23 @@
+{
+  "source": {
+    "commit": "2cba3d289c32badb59589c617f3fdb3d1528254b",
+    "dirty": false
+  },
+  "files": [
+    {
+      "output": "resume.md",
+      "transforms": [
+        "drop-table-column 전화번호",
+        "drop-line ※ 태니지먼트",
+        "replace-line - AI 도구 활용 개발 - Claude Code로",
+        "replace-line - **AI 도구 활용 개발 생산성 향상**",
+        "drop-line - 레거시 분석 시간",
+        "drop-line 🔗 https://heartlink.kr"
+      ]
+    },
+    {
+      "output": "portfolio.md",
+      "transforms": []
+    }
+  ]
+}
