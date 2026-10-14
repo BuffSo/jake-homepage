@@ -1,4 +1,4 @@
-// 푸터 (docs/02-ia.md 홈 5). 연락 방법은 About에 있으므로 여기서는 반복하지 않는다.
+// 푸터 (docs/02-ia.md 홈 5). 연락 링크는 첫 화면과 About에 있으므로 여기서는 반복하지 않는다.
 // 연도는 렌더 중에 계산하지 않는다. Cache Components에서 new Date()는 빌드 오류다.
 export function SiteFooter() {
   return (

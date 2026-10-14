@@ -1,7 +1,8 @@
 import { ButtonLink } from "@/components/button-link";
 import { getHome } from "@/lib/content";
 
-// About (docs/02-ia.md 홈 4). 누가 만들었는지 짧게 쓰고, 경력은 이력서로 보낸다. 연락 방법은 여기에만 둔다.
+// About (docs/02-ia.md 홈 4). 누가 만들었는지 짧게 쓰고, 경력은 이력서로 보낸다.
+// 연락 링크는 첫 화면(hero.tsx)과 여기에 둔다. 푸터에서는 반복하지 않는다.
 export function About() {
   const { about, contact } = getHome();
 

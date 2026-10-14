@@ -23,7 +23,8 @@ function markPlayed() {
   try {
     sessionStorage.setItem(PLAYED_KEY, "1");
   } catch {
-    // 저장소를 쓸 수 없으면 기록하지 않는다. 다음 방문에 한 번 더 재생될 뿐이다.
+    // 기록만 실패하면 다음 방문에 한 번 더 재생될 뿐이다.
+    // 저장소를 읽지도 못하는 환경은 played()(hero-intro.tsx)와 인라인 스크립트가 이미 본 것으로 보고 처음부터 재생하지 않는다.
   }
 }
 
