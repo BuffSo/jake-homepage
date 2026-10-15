@@ -1,6 +1,6 @@
 # ADR-0003: 콘텐츠 원본은 이력서·포트폴리오 md이고, 허용 목록으로 동기화한다
 
-- 상태: 채택 (동기화 스크립트는 1차에서 구현, 구현 원칙과 원본에 없는 작업 2026-10-14 추가)
+- 상태: 채택 (동기화 스크립트는 1차에서 구현, 구현 원칙과 원본에 없는 작업 2026-10-14 추가, Recueve는 2026-10-15 원본에 들어와 원본에 없는 작업에서 뺌)
 - 날짜: 2026-10-14
 
 ## 배경
@@ -58,7 +58,6 @@
 
 | 작업 | 글 |
 |---|---|
-| Recueve | `content/site/projects/recueve.md` |
 | Brain House, AI TOOLS | `content/site/sites/` |
 | Jake Wiki, 영상 제작, Jake Hermes | `content/site/ai/` |
 
