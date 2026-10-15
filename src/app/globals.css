@@ -79,3 +79,163 @@
 [data-intro] [data-intro-part] {
   opacity: 0;
 }
+
+/*
+  포트폴리오 원문 (src/components/markdown.tsx, ADR-0009). 값은 docs/03-design.md "F2에서 정한 값"이다.
+  모바일 값이 먼저이고 lg(64rem)부터 데스크톱 값을 쓴다. 테두리 두께는 Tailwind 유틸리티로만 준다.
+*/
+@layer components {
+  .md {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+  .md > :last-child {
+    margin-bottom: 0;
+  }
+  .md p,
+  .md ul,
+  .md ol,
+  .md pre,
+  .md .md-table {
+    margin: 0 0 1rem;
+  }
+  .md strong {
+    font-weight: 700;
+  }
+  .md ul,
+  .md ol {
+    padding-left: 1.25rem;
+  }
+  .md ul {
+    list-style: disc;
+  }
+  .md ol {
+    list-style: decimal;
+  }
+  .md li {
+    margin-bottom: 0.375rem;
+  }
+  .md a {
+    @apply underline underline-offset-4 hover:text-accent;
+  }
+  .md h3 {
+    @apply border-t border-line-soft;
+    margin: 2.5rem 0 0.875rem;
+    padding-top: 1.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .md h4 {
+    margin: 1.5rem 0 0.625rem;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .md blockquote {
+    @apply border-l-2 border-fg;
+    margin: 1.5rem 0;
+    padding-left: 1.25rem;
+  }
+  .md blockquote p:last-child {
+    margin-bottom: 0;
+  }
+  .md code {
+    @apply rounded bg-line-soft/70 font-mono;
+    padding: 0.0625rem 0.3125rem;
+    font-size: 0.8125rem;
+  }
+  .md pre {
+    @apply rounded-lg border border-line-soft bg-surface font-mono;
+    padding: 0.875rem 1rem;
+    overflow-x: auto;
+    font-size: 0.75rem;
+    line-height: 1.7;
+    white-space: pre;
+  }
+  .md pre code {
+    padding: 0;
+    background: none;
+    font-size: inherit;
+  }
+  .md .md-table {
+    @apply rounded-lg border border-line-soft;
+    overflow-x: auto;
+  }
+  .md table {
+    min-width: 32.5rem;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .md th {
+    @apply border-b border-line-soft bg-surface text-muted;
+    padding: 0.5625rem 0.875rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .md td {
+    @apply border-b border-line-soft;
+    padding: 0.625rem 0.875rem;
+    vertical-align: top;
+  }
+  .md tr:last-child td {
+    border-bottom: 0;
+  }
+  .md td:first-child {
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  /* "보시는 방법"처럼 상자 안의 짧은 글 */
+  .md-note {
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+
+  @media (width >= 64rem) {
+    .md {
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+    .md p,
+    .md ul,
+    .md ol,
+    .md pre,
+    .md .md-table {
+      margin-bottom: 1.125rem;
+    }
+    .md h3 {
+      margin: 3.5rem 0 1rem;
+      padding-top: 2rem;
+      font-size: 1.5rem;
+    }
+    .md h4 {
+      margin: 2rem 0 0.75rem;
+      font-size: 1.125rem;
+    }
+    .md code {
+      font-size: 0.84375rem;
+    }
+    .md pre {
+      padding: 1rem 1.25rem;
+      font-size: 0.8125rem;
+    }
+    .md table {
+      min-width: 0;
+      font-size: 0.9375rem;
+    }
+    .md th {
+      padding: 0.625rem 1rem;
+      font-size: 0.8125rem;
+    }
+    .md td {
+      padding: 0.75rem 1rem;
+    }
+    .md-note {
+      font-size: 0.9375rem;
+    }
+  }
+}
