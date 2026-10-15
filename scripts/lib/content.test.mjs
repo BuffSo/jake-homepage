@@ -8,6 +8,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 import { parseFrontmatter } from "../../src/lib/frontmatter.mjs";
+import { composeChapters } from "../../src/lib/portfolio.mjs";
 import { countAdrs, countCiChecks } from "../../src/lib/repo-stats.mjs";
 
 const ROOT = process.cwd();
@@ -28,11 +29,17 @@ const portfolio = readFileSync(path.join(ROOT, "content/synced/portfolio.md"), "
 const synced = squash(`${resume}\n${portfolio}`);
 
 const home = read("content/site/home.md");
+const work = read("content/site/work.md");
 const projects = readDir("content/site/projects");
 const aiWorks = readDir("content/site/ai");
+const sites = readDir("content/site/sites");
 
 test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대로 있다", () => {
-  const owners = [{ name: "home.md", data: home }, ...projects.map((p) => ({ name: p.file, data: p.data }))];
+  const owners = [
+    { name: "home.md", data: home },
+    { name: "work.md", data: work },
+    ...projects.map((p) => ({ name: p.file, data: p.data })),
+  ];
   for (const { name, data } of owners) {
     for (const quote of data.sources ?? []) {
       assert.ok(synced.includes(squash(quote)), `${name}: 원문에 없는 문장 "${quote}"`);
@@ -83,8 +90,42 @@ test("AI 작업 글은 카드에 필요한 값을 모두 갖는다", () => {
   }
 });
 
+test("포트폴리오 챕터는 work.md의 구성대로 만들어지고, 서비스 글과 맞는다", () => {
+  const chapters = composeChapters(portfolio, work.chapters);
+  const bySlug = new Map(projects.map((p) => [p.data.slug, p.data]));
+  const ordered = [...bySlug.values()].sort((a, b) => a.order - b.order).map((p) => p.slug);
+  assert.deepEqual(chapters.map((c) => c.slug), ordered);
+  for (const chapter of chapters) {
+    const project = bySlug.get(chapter.slug);
+    assert.equal(chapter.head.url, project.liveUrl, `${chapter.slug}: 원문 주소와 서비스 글의 liveUrl이 다름`);
+    assert.equal(chapter.head.name, project.title, `${chapter.slug}: 원문 이름과 서비스 글의 title이 다름`);
+    assert.ok(chapter.howToView, `${chapter.slug}: 보시는 방법 없음`);
+  }
+});
+
+test("챕터에는 원문 이미지와 다른 절을 가리키는 문장이 남지 않는다", () => {
+  for (const chapter of composeChapters(portfolio, work.chapters)) {
+    const text = `${chapter.body}\n${chapter.ai?.body ?? ""}`;
+    assert.doesNotMatch(text, /<img|<sub>/, `${chapter.slug}: 원문 이미지나 그 설명 줄이 남음`);
+    assert.doesNotMatch(text, /\d절 참조|앞의 하네스/, `${chapter.slug}: 다른 절을 가리키는 문장이 남음`);
+  }
+});
+
+test("의뢰받아 만든 사이트 글은 카드에 필요한 값을 모두 갖고, 순서가 겹치지 않는다", () => {
+  const required = ["slug", "order", "title", "domain", "summary", "role", "period", "commits", "imageAlt"];
+  for (const { file, data } of sites) {
+    for (const key of required) assert.ok(data[key], `${file}: ${key} 없음`);
+    assert.equal(`${data.slug}.md`, file);
+    assert.equal(data.role, "외부 의뢰");
+    assert.ok(Array.isArray(data.stack) && data.stack.length > 0, `${file}: stack 없음`);
+    assert.match(data.liveUrl, /^https:\/\//);
+    assert.match(data.sourceUrl, /^https:\/\/github\.com\//);
+  }
+  assert.deepEqual(sites.map((s) => s.data.order).sort(), [1, 2]);
+});
+
 test("Recueve와 Recoeve의 소스 저장소 링크는 싣지 않는다", () => {
-  const links = aiWorks.flatMap((w) => w.data.links).map((l) => l.href);
+  const links = [...aiWorks.flatMap((w) => w.data.links).map((l) => l.href), ...sites.map((s) => s.data.sourceUrl)];
   for (const href of links) assert.doesNotMatch(href, /github\.com\/[^/]+\/rec[ou]e?ve/i);
 });
 

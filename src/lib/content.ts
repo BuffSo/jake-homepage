@@ -4,11 +4,14 @@
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { parseFrontmatter } from "./frontmatter.mjs";
+import { composeChapters } from "./portfolio.mjs";
 import { countAdrs, countCiChecks } from "./repo-stats.mjs";
 
 const ROOT = process.cwd();
 // 글을 읽는 경로는 이 폴더 아래로 고정한다. 경로 전체를 변수로 만들면 빌드가 프로젝트 전체를 서버 출력에 넣는다.
 const SITE_DIR = path.join(process.cwd(), "content", "site");
+// 같은 이유로 동기화한 포트폴리오도 파일 하나로 고정한다.
+const PORTFOLIO = path.join(process.cwd(), "content", "synced", "portfolio.md");
 
 export type ProjectSlug = "recueve" | "prowith" | "lotto-ai";
 
@@ -57,6 +60,59 @@ export type AiWork = {
   links: Link[];
 };
 
+export type WorkPage = {
+  label: string;
+  title: string;
+  intro: string;
+  introSite: string;
+  sites: { label: string; title: string; intro: string };
+  chapters: {
+    slug: ProjectSlug;
+    detail: string;
+    ai?: string;
+    aiUntil?: string;
+    howToView: string;
+    drop?: string[];
+    replace?: { find: string; to: string }[];
+  }[];
+};
+
+/** 포트폴리오 원문으로 만든 /work 챕터 (src/lib/portfolio.mjs) */
+export type WorkChapter = {
+  slug: ProjectSlug;
+  head: {
+    name: string;
+    subtitle: string;
+    period: string;
+    role: string;
+    url: string;
+    stack: string[];
+    lead: string;
+  };
+  howToView: string;
+  body: string;
+  ai: { title: string; body: string } | null;
+};
+
+export type SiteSlug = "brainhouse" | "aitools";
+
+export type Site = {
+  slug: SiteSlug;
+  order: number;
+  title: string;
+  domain: string;
+  summary: string;
+  workflow?: string;
+  flow?: string;
+  role: string;
+  period: string;
+  commits: string;
+  stack: string[];
+  liveUrl: string;
+  sourceUrl: string;
+  imageAlt: string;
+};
+
 /** content/site/ 아래의 글 하나 */
 function read<T>(relative: string): T {
   const text = readFileSync(path.join(SITE_DIR, relative), "utf8");
@@ -77,6 +133,19 @@ export function getHome(): Home {
 
 export function getProjects(): Project[] {
   return readDir<Project>("projects");
+}
+
+export function getWork(): WorkPage {
+  return read<WorkPage>("work.md");
+}
+
+export function getSites(): Site[] {
+  return readDir<Site>("sites");
+}
+
+/** 포트폴리오 원문을 work.md의 구성대로 잘라 챕터로 만든다. 원문이 바뀌어 규칙이 맞지 않으면 빌드가 멈춘다. */
+export function getWorkChapters(): WorkChapter[] {
+  return composeChapters(readFileSync(PORTFOLIO, "utf8"), getWork().chapters) as WorkChapter[];
 }
 
 /** {adrCount} 같은 자리는 저장소에서 센 값으로 채운다. */

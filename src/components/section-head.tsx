@@ -1,11 +1,24 @@
-// 홈 섹션의 머리: 영문 머리글, 제목, 소개 한 줄 (docs/02-ia.md 홈 2~4)
-export function SectionHead({ id, label, title, intro }: { id: string; label: string; title: string; intro?: string }) {
+// 섹션 머리: 영문 머리글, 제목, 소개 한 줄 (docs/02-ia.md 홈 2~4, /work)
+// 페이지의 첫 머리는 as="h1"로 쓴다.
+export function SectionHead({
+  id,
+  label,
+  title,
+  intro,
+  as: Heading = "h2",
+}: {
+  id: string;
+  label: string;
+  title: string;
+  intro?: string;
+  as?: "h1" | "h2";
+}) {
   return (
     <div className="flex flex-col gap-2 pb-6 lg:gap-3 lg:pb-10">
       <span className="font-mono text-[0.6875rem] tracking-[0.04em] text-subtle lg:text-[0.8125rem]">{label}</span>
-      <h2 id={id} className="text-[1.75rem] font-extrabold tracking-[-0.025em] lg:text-[2.5rem]">
+      <Heading id={id} className="text-[1.75rem] font-extrabold tracking-[-0.025em] lg:text-[2.5rem]">
         {title}
-      </h2>
+      </Heading>
       {intro && <p className="text-[0.9375rem] leading-[1.6] text-muted lg:text-[1.0625rem]">{intro}</p>}
     </div>
   );

@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
+import { collectErrors } from "./helpers";
 
 // 홈 화면 확인 (ADR-0008). 캡처는 test-results/에만 남고 커밋하지 않는다.
 // 기대값은 사이트 전용 글(content/site/)에서 읽는다. 문구를 고쳐도 테스트는 그대로 두고, 화면에 빠진 것만 잡는다.
@@ -33,24 +34,6 @@ const readDir = <T extends { order: number }>(dir: string) =>
     .sort((a, b) => a.order - b.order);
 const projects = readDir<Project>("content/site/projects");
 const aiWorks = readDir<AiWork>("content/site/ai");
-
-// 아직 만들지 않은 페이지와 그 아래 주소(/ai/jake-wiki 등). 링크를 미리 받다가 404가 난다. F2~F4에서 페이지가 생기면 지운다.
-const PENDING_ROUTES = ["/work", "/ai", "/resume"];
-const isPending = (pathname: string) => PENDING_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`));
-
-function collectErrors(page: Page) {
-  const errors: string[] = [];
-  page.on("console", (msg) => {
-    // 응답 실패는 아래 response에서 주소와 함께 따로 본다.
-    if (msg.type() === "error" && !msg.text().startsWith("Failed to load resource")) errors.push(msg.text());
-  });
-  page.on("pageerror", (err) => errors.push(err.message));
-  page.on("response", (res) => {
-    const { pathname } = new URL(res.url());
-    if (res.status() >= 400 && !isPending(pathname)) errors.push(`${res.status()} ${pathname}`);
-  });
-  return errors;
-}
 
 test("홈이 열리고 콘솔 오류와 실패한 요청이 없다", async ({ page }) => {
   const errors = collectErrors(page);
@@ -89,7 +72,7 @@ test.describe("모바일 메뉴", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  // 지금은 /work가 없는 페이지라 고치기 전 코드에서도 통과했다. /work가 생기는 F2부터 화면만 바뀌는 이동을 확인한다.
+  // 화면만 바뀌는 이동이라 헤더의 메뉴는 그대로 남는다. 닫히고 새 페이지 제목이 보여야 한다.
   test("메뉴 링크로 이동하면 메뉴가 닫힌다", async ({ page }) => {
     const menu = page.locator("header details");
     await menu.locator("summary").click();
@@ -97,6 +80,7 @@ test.describe("모바일 메뉴", () => {
     await menu.getByRole("link", { name: "Work" }).click();
     await expect(page).toHaveURL(/\/work$/);
     await expect(menu).not.toHaveAttribute("open");
+    await expect(page.getByRole("heading", { level: 1, name: "포트폴리오" })).toBeInViewport();
   });
 
   test("메뉴 밖을 누르거나 Esc를 누르면 닫힌다", async ({ page }) => {
