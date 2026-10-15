@@ -37,12 +37,20 @@ const components: Components = {
   img: () => null,
 };
 
-export function MarkdownText({ children, className = "" }: { children: string; className?: string }) {
-  return (
-    <div className={`md ${className}`}>
-      <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeDropStyle]} components={components}>
-        {children}
-      </Markdown>
-    </div>
+/** bare면 바깥 div 없이 그린다. 이미 .md 안에서 다른 요소와 섞어 쓸 때 쓴다. */
+export function MarkdownText({
+  children,
+  className = "",
+  bare = false,
+}: {
+  children: string;
+  className?: string;
+  bare?: boolean;
+}) {
+  const markdown = (
+    <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeDropStyle]} components={components}>
+      {children}
+    </Markdown>
   );
+  return bare ? markdown : <div className={`md ${className}`}>{markdown}</div>;
 }

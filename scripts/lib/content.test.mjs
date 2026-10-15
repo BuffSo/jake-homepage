@@ -39,6 +39,7 @@ test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대�
     { name: "home.md", data: home },
     { name: "work.md", data: work },
     ...projects.map((p) => ({ name: p.file, data: p.data })),
+    ...aiWorks.map((w) => ({ name: `ai/${w.file}`, data: w.data })),
   ];
   for (const { name, data } of owners) {
     for (const quote of data.sources ?? []) {
@@ -77,16 +78,45 @@ test("서비스 글은 카드에 필요한 값을 모두 갖고, 순서가 겹�
   assert.deepEqual(orders, [1, 2, 3]);
 });
 
-test("AI 작업 글은 카드에 필요한 값을 모두 갖는다", () => {
-  const figures = new Set(["wiki-flow", "image", "hermes-flow", "site-steps"]);
+test("AI 작업 글은 항목에 필요한 값을 모두 갖고, 순서가 겹치지 않는다", () => {
+  const groups = new Set(read("content/site/ai-page.md").groups.map((g) => g.id));
+  const figures = new Set(["wiki-flow", "image", "hermes-flow", "site-steps", "review-flow", "mcp-flow"]);
   for (const { file, data } of aiWorks) {
-    for (const key of ["slug", "order", "eyebrow", "title", "headline", "desc"]) {
+    for (const key of ["slug", "order", "group", "eyebrow", "title", "problem", "built"]) {
       assert.ok(data[key], `${file}: ${key} 없음`);
     }
     assert.equal(`${data.slug}.md`, file);
-    assert.ok(figures.has(data.figure), `${file}: 모르는 figure ${data.figure}`);
-    if (data.figure === "image") assert.ok(data.image && data.imageAlt, `${file}: 이미지 정보 없음`);
+    assert.ok(groups.has(data.group), `${file}: 모르는 묶음 ${data.group}`);
+    assert.ok(data.metric?.value && data.metric?.label, `${file}: metric 없음`);
     assert.ok(Array.isArray(data.links), `${file}: links 없음`);
+    if (data.more) {
+      // 짧은 카드: 원문이 /work에 있는 항목. 그림과 결과는 /work에 있다.
+      assert.match(data.more, /^\/work#[a-z-]+-ai$/, `${file}: more는 /work의 AI 절이어야 함`);
+    } else {
+      assert.ok(data.headline, `${file}: headline 없음`);
+      assert.ok(figures.has(data.figure), `${file}: 모르는 figure ${data.figure}`);
+      if (data.figure === "image") assert.ok(data.image && data.imageAlt, `${file}: 이미지 정보 없음`);
+      // 개인 도구는 결과 대신 쓰는 법을 쓴다 (docs/02-ia.md /ai)
+      if (data.group === "personal") assert.ok(data.usage && !data.result, `${file}: 개인 도구는 usage만 씀`);
+      else assert.ok(data.result && !data.usage, `${file}: result 없음`);
+    }
+  }
+  const orders = aiWorks.map((w) => w.data.order).sort((a, b) => a - b);
+  assert.deepEqual(orders, orders.map((_, i) => i + 1));
+});
+
+test("홈 AI 카드는 네 장이고, 카드에 필요한 값을 갖는다", () => {
+  const homeWorks = aiWorks.filter((w) => w.data.home !== undefined);
+  assert.deepEqual(homeWorks.map((w) => w.data.home).sort(), [1, 2, 3, 4]);
+  for (const { file, data } of homeWorks) {
+    assert.ok(data.headline && data.desc && data.figure, `${file}: 홈 카드 값 없음`);
+  }
+});
+
+test("짧은 카드가 가리키는 /work의 AI 절은 실제로 있다", () => {
+  const withAi = new Set(work.chapters.filter((c) => c.ai).map((c) => `/work#${c.slug}-ai`));
+  for (const { file, data } of aiWorks.filter((w) => w.data.more)) {
+    assert.ok(withAi.has(data.more), `${file}: ${data.more}는 AI 절이 있는 챕터가 아님`);
   }
 });
 
