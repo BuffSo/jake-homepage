@@ -38,6 +38,7 @@ test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대�
   const owners = [
     { name: "home.md", data: home },
     { name: "work.md", data: work },
+    { name: "resume-page.md", data: read("content/site/resume-page.md") },
     ...projects.map((p) => ({ name: p.file, data: p.data })),
     ...aiWorks.map((w) => ({ name: `ai/${w.file}`, data: w.data })),
   ];
