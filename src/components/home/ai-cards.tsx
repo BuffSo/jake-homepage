@@ -1,7 +1,7 @@
 import Image from "next/image";
 import video from "@/assets/home/video.jpg";
 import { ButtonLink } from "@/components/button-link";
-import { getAiWorks, getHome, type AiWork } from "@/lib/content";
+import { getHome, getHomeAiWorks, type AiWork } from "@/lib/content";
 import { CARD_FRAME, CARD_FRAME_STEPS, HermesFlow, SiteSteps, WikiFlow } from "@/components/ai-figures";
 import { Metric, SectionHead } from "@/components/section-head";
 
@@ -29,7 +29,7 @@ function Figure({ work }: { work: AiWork }) {
 
 export function AiCards() {
   const { ai } = getHome().sections;
-  const works = getAiWorks();
+  const works = getHomeAiWorks();
 
   return (
     <section aria-labelledby="ai-title" className="mt-14 border-t border-line py-14 lg:mt-24 lg:py-24">
@@ -53,11 +53,13 @@ export function AiCards() {
                   <Metric {...work.metric} />
                 </div>
                 <div className="mt-1 flex flex-wrap gap-2">
-                  {work.links.map((link) => (
-                    <ButtonLink key={link.href} href={link.href} variant="solid">
-                      {link.label}
-                    </ButtonLink>
-                  ))}
+                  {work.links
+                    .filter((link) => link.home)
+                    .map((link) => (
+                      <ButtonLink key={link.href} href={link.href} variant="solid">
+                        {link.label}
+                      </ButtonLink>
+                    ))}
                   <ButtonLink href={`/ai/${work.slug}`}>자세히 보기</ButtonLink>
                 </div>
               </div>

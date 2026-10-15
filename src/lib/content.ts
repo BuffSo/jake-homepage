@@ -45,20 +45,32 @@ export type Project = {
   imageAlt: string;
 };
 
+export type AiGroup = "dev" | "product" | "beyond" | "personal";
+
+/** content/site/ai/의 글. 상세 항목은 그림과 결과(또는 쓰는 법)를, 짧은 카드는 more(/work#…)를 갖는다. */
 export type AiWork = {
   slug: string;
-  order: number;
+  order: number; // /ai 안 순서
+  group: AiGroup;
+  home?: number; // 홈 카드 순서 (홈에 싣는 넷만)
   eyebrow: string;
   title: string;
-  headline: string;
-  desc: string;
-  note?: string;
+  headline?: string;
+  desc?: string; // 홈 카드 설명
+  note?: string; // 홈 카드 아래 한 줄
+  problem: string;
+  built: string;
+  result?: string;
+  usage?: string; // 개인 도구는 결과 대신 쓰는 법
   metric: Metric;
-  figure: "wiki-flow" | "image" | "hermes-flow" | "site-steps";
+  figure?: "wiki-flow" | "image" | "hermes-flow" | "site-steps" | "review-flow" | "mcp-flow";
   image?: string;
   imageAlt?: string;
-  links: Link[];
+  links: (Link & { home?: boolean })[];
+  more?: string;
 };
+
+export type AiPage = { groups: { id: AiGroup; title: string }[] };
 
 export type WorkPage = {
   label: string;
@@ -157,9 +169,21 @@ export function fillRepoStats(text: string): string {
   return text.replace(/\{(\w+)\}/g, (whole, key: string) => (key in stats ? String(stats[key]) : whole));
 }
 
+/** /ai의 항목 전부, 페이지 순서 */
 export function getAiWorks(): AiWork[] {
   return readDir<AiWork>("ai").map((work) => ({
     ...work,
     metric: { value: fillRepoStats(work.metric.value), label: work.metric.label },
   }));
+}
+
+/** 홈 카드에 싣는 넷, 홈 순서 */
+export function getHomeAiWorks(): AiWork[] {
+  return getAiWorks()
+    .filter((work) => work.home !== undefined)
+    .sort((a, b) => a.home! - b.home!);
+}
+
+export function getAiPage(): AiPage {
+  return read<AiPage>("ai-page.md");
 }
