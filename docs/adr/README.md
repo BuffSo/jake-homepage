@@ -12,6 +12,7 @@
 | [0006](0006-public-repo-and-privacy.md) | 처음부터 공개 저장소로 운영하고 민감정보는 네 겹으로 막는다 | 채택 |
 | [0007](0007-yaml-frontmatter.md) | 사이트 전용 글의 앞부분 데이터는 yaml 패키지로 읽는다 | 채택 |
 | [0008](0008-playwright-e2e.md) | 화면 확인은 Playwright E2E로 자동화한다 | 채택 |
+| [0009](0009-markdown-renderer.md) | 포트폴리오와 이력서 원문은 react-markdown으로 그린다 | 채택 |
 
 ## 양식
 
