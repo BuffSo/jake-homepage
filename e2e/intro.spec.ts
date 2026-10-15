@@ -34,7 +34,7 @@ test.describe("움직임을 켠 경우", () => {
   test("처음 방문하면 정해진 시간 안에 재생을 마치고 마지막 장면을 남긴다", async ({ page }, testInfo) => {
     const errors: string[] = [];
     page.on("pageerror", (err) => errors.push(err.message));
-    // 응답 실패(아직 없는 페이지를 미리 받다가 난 404)는 home.spec.ts가 주소와 함께 따로 본다.
+    // 응답 실패는 home.spec.ts가 주소와 함께 따로 본다(e2e/helpers.ts collectErrors).
     page.on("console", (msg) => {
       if (msg.type() === "error" && !msg.text().startsWith("Failed to load resource")) errors.push(msg.text());
     });

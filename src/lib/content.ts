@@ -6,12 +6,14 @@ import path from "node:path";
 import { parseFrontmatter } from "./frontmatter.mjs";
 import { composeChapters } from "./portfolio.mjs";
 import { countAdrs, countCiChecks } from "./repo-stats.mjs";
+import { checkSections, splitResume } from "./resume.mjs";
 
 const ROOT = process.cwd();
 // 글을 읽는 경로는 이 폴더 아래로 고정한다. 경로 전체를 변수로 만들면 빌드가 프로젝트 전체를 서버 출력에 넣는다.
 const SITE_DIR = path.join(process.cwd(), "content", "site");
 // 같은 이유로 동기화한 포트폴리오도 파일 하나로 고정한다.
 const PORTFOLIO = path.join(process.cwd(), "content", "synced", "portfolio.md");
+const RESUME = path.join(process.cwd(), "content", "synced", "resume.md");
 
 export type ProjectSlug = "recueve" | "prowith" | "lotto-ai";
 
@@ -125,6 +127,17 @@ export type Site = {
   imageAlt: string;
 };
 
+export type ResumePage = {
+  label: string;
+  title: string;
+  description: string;
+  print: string;
+  sections: { id: string; title: string }[];
+};
+
+/** 동기화한 이력서. 머리(한 줄 소개, 이름)와 본문으로 나눈다 (src/lib/resume.mjs) */
+export type Resume = { tagline: string; name: string; body: string };
+
 /** content/site/ 아래의 글 하나 */
 function read<T>(relative: string): T {
   const text = readFileSync(path.join(SITE_DIR, relative), "utf8");
@@ -186,4 +199,15 @@ export function getHomeAiWorks(): AiWork[] {
 
 export function getAiPage(): AiPage {
   return read<AiPage>("ai-page.md");
+}
+
+export function getResumePage(): ResumePage {
+  return read<ResumePage>("resume-page.md");
+}
+
+/** 원문 이력서를 머리와 본문으로 나눈다. 원문의 절이 목차와 다르면 빌드가 멈춘다. */
+export function getResume(): Resume {
+  const resume = splitResume(readFileSync(RESUME, "utf8"));
+  checkSections(resume.body, getResumePage().sections);
+  return resume;
 }
