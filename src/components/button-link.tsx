@@ -7,8 +7,13 @@ const VARIANT = {
   outline: "border border-fg/20 hover:border-fg",
 };
 
+// 버튼 모양. 모바일은 누르기 쉽게 높이 2.75rem, 데스크톱은 시안대로 2.5rem이다.
+// 링크가 아닌 버튼(이력서 인쇄 버튼)도 같은 모양을 쓴다.
+export function buttonClass(variant: keyof typeof VARIANT = "outline", className = "") {
+  return `inline-flex h-11 items-center justify-center gap-1 rounded-full px-4 text-[0.8125rem] whitespace-nowrap lg:h-10 ${VARIANT[variant]} ${className}`;
+}
+
 // 버튼 모양의 링크. 다른 사이트로 가면 새 창으로 열고 ↗를 붙인다.
-// 모바일은 누르기 쉽게 높이 2.75rem, 데스크톱은 시안대로 2.5rem이다.
 export function ButtonLink({
   href,
   variant = "outline",
@@ -20,7 +25,7 @@ export function ButtonLink({
   className?: string;
   children: ReactNode;
 }) {
-  const style = `inline-flex h-11 items-center justify-center gap-1 rounded-full px-4 text-[0.8125rem] whitespace-nowrap lg:h-10 ${VARIANT[variant]} ${className}`;
+  const style = buttonClass(variant, className);
   if (/^https?:\/\//.test(href)) {
     return (
       <ExternalLink href={href} className={style}>

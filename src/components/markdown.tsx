@@ -1,20 +1,11 @@
-import Markdown, { type Components } from "react-markdown";
+import Markdown, { type Components, type Options } from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
+import { rehypeDropStyle, rehypeHeadingIds, remarkSoftBreaks } from "@/lib/markdown-plugins.mjs";
 import { ExternalLink } from "./external-link";
 
-// 포트폴리오 원문을 그린다 (ADR-0009). 서버 컴포넌트에서만 쓴다. 모양은 globals.css의 .md가 정한다.
+// 포트폴리오와 이력서 원문을 그린다 (ADR-0009). 서버 컴포넌트에서만 쓴다. 모양은 globals.css의 .md가 정한다.
 // 원문 HTML(<br>, <span>)은 rehype-raw로 읽고, 원문이 정한 style 속성은 버린다.
-
-type HastNode = { properties?: Record<string, unknown>; children?: HastNode[] };
-
-function rehypeDropStyle() {
-  const walk = (node: HastNode) => {
-    if (node.properties) delete node.properties.style;
-    node.children?.forEach(walk);
-  };
-  return (tree: HastNode) => walk(tree);
-}
 
 const components: Components = {
   // 다른 사이트로 가는 링크는 새 창으로 열고 ↗를 붙인다 (docs/03-design.md).
@@ -37,18 +28,29 @@ const components: Components = {
   img: () => null,
 };
 
-/** bare면 바깥 div 없이 그린다. 이미 .md 안에서 다른 요소와 섞어 쓸 때 쓴다. */
+/**
+ * bare면 바깥 div 없이 그린다. 이미 .md 안에서 다른 요소와 섞어 쓸 때 쓴다.
+ * breaks면 문단 안의 줄바꿈을 살리고, headingIds(절 제목 → id)를 주면 h2에 id를 붙인다. 지금은 이력서만 쓴다.
+ */
 export function MarkdownText({
   children,
   className = "",
   bare = false,
+  breaks = false,
+  headingIds,
 }: {
   children: string;
   className?: string;
   bare?: boolean;
+  breaks?: boolean;
+  headingIds?: Record<string, string>;
 }) {
+  const remarkPlugins: Options["remarkPlugins"] = breaks ? [remarkGfm, remarkSoftBreaks] : [remarkGfm];
+  const rehypePlugins: Options["rehypePlugins"] = [rehypeRaw, rehypeDropStyle];
+  if (headingIds) rehypePlugins.push([rehypeHeadingIds, { ids: headingIds }]);
+
   const markdown = (
-    <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeDropStyle]} components={components}>
+    <Markdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
       {children}
     </Markdown>
   );
