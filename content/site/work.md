@@ -1,0 +1,45 @@
+---
+label: WORK
+title: 포트폴리오
+intro: 직접 설계·개발·배포한 서비스 세 개입니다. 세 곳 모두 지금 열어보실 수 있습니다.
+introSite: 의뢰받아 만든 사이트 두 개도 함께 싣습니다.
+sources:
+  - 직접 설계·개발·배포한 서비스 세 개입니다. 세 곳 모두 지금 열어보실 수 있습니다.
+sites:
+  label: SITES
+  title: 의뢰받아 만든 사이트
+  intro: 회사 소개 사이트 두 곳을 의뢰받아 만들었습니다. 두 사이트 모두 소스를 공개 저장소에 두었습니다.
+chapters:
+  - slug: recueve
+    detail: 4-1. Recueve
+    ai: 3. AI 활용 - 제품
+    howToView: Recueve
+    drop:
+      - 앞의 하네스가
+    replace:
+      - find: 3절 참조
+        to: 아래 AI 활용 - 제품 참조
+  - slug: prowith
+    detail: 4-2. ProWith
+    ai: 2. AI 활용 - 개발
+    aiUntil: 개발 외의 일
+    howToView: ProWith
+    drop:
+      - '<img src="assets/prowith-genealogy-minimap.png"'
+      - <sub>추천계보 조직도
+  - slug: lotto-ai
+    detail: 4-3. GENYS Lotto AI
+    howToView: GENYS Lotto AI
+    drop:
+      - '<img src="assets/lotto-dev-account-switcher.png"'
+      - <sub>개발 모드에서만
+---
+
+<!--
+/work 페이지 글과 챕터 구성 (docs/02-ia.md /work).
+- intro는 포트폴리오 "1. 한눈에 보기"의 문장이다(sources로 테스트가 확인한다). introSite와 sites는 사이트 전용 글이다.
+- 챕터 본문은 포트폴리오 원문을 그대로 그린다(src/lib/portfolio.mjs). detail은 "4. 프로젝트 상세"의 절, ai는 이어 붙일 AI 절, aiUntil은 AI 절에서 멈출 제목, howToView는 "보시는 방법" 표의 서비스 이름이다.
+- drop과 replace는 원문의 절 순서(2 → 3 → 4)와 챕터 순서가 달라 맞지 않는 곳만 고친다. 각 규칙은 정확히 한 번 맞아야 하고, 원문에서 대상이 사라지면 빌드와 테스트가 멈춘다.
+  - Recueve: 3절 첫 문단은 앞에 나온 하네스를 가리키지만, 이 페이지에서는 Recueve가 먼저 나온다. 4-1의 "3절 참조"는 바로 아래 AI 절을 가리키게 바꾼다.
+  - ProWith, Lotto: 포트폴리오 이미지와 설명 줄은 싣지 않는다(docs/todo/20261015_07_todo_portfolio_images.md).
+-->
