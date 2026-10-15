@@ -3,7 +3,7 @@ import video from "@/assets/home/video.jpg";
 import { ButtonLink } from "@/components/button-link";
 import { getAiWorks, getHome, type AiWork } from "@/lib/content";
 import { HermesFlow, SiteSteps, WikiFlow } from "./ai-figures";
-import { Metric, SectionHead } from "./section-head";
+import { Metric, SectionHead } from "@/components/section-head";
 
 // AI로 일하는 방식 (docs/02-ia.md 홈 3). 카드 네 장, 자세한 내용은 /ai/[slug]에서 보여 준다.
 
