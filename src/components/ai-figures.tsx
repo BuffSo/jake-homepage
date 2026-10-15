@@ -1,14 +1,19 @@
-// AI 카드 위쪽의 도식 (docs/02-ia.md 홈 3). 그림 파일 대신 HTML로 그려 글자가 선명하고 다크 모드를 따른다.
-// 눈으로 보는 요약이라 스크린 리더에는 숨기고, 같은 내용은 카드 본문에 글로 있다.
+// AI 작업의 도식 (docs/02-ia.md 홈 3, /ai). 그림 파일 대신 HTML로 그려 글자가 선명하고 다크 모드를 따른다.
+// 눈으로 보는 요약이라 스크린 리더에는 숨기고, 같은 내용은 본문에 글로 있다.
+// 바깥 틀(높이, 테두리)은 쓰는 쪽이 className으로 넘긴다. 홈 카드는 CARD_FRAME을 쓴다.
 
-const FRAME = "flex h-[11.25rem] flex-col justify-center gap-3 border-b border-line bg-surface px-4 lg:h-[17.5rem] lg:gap-[1.125rem] lg:px-8";
+/** 홈 AI 카드 위쪽의 틀. 다섯 단계 도식은 모바일에서 내용만큼 높아진다. */
+export const CARD_FRAME = "h-[11.25rem] border-b border-line lg:h-[17.5rem]";
+export const CARD_FRAME_STEPS = "border-b border-line lg:h-[17.5rem]";
+
+const FRAME = "flex flex-col justify-center gap-3 bg-surface px-4 lg:gap-[1.125rem] lg:px-8";
 const BOX = "flex items-center justify-center rounded-md border-2 border-fg lg:rounded-lg";
 const CORE = "flex grow flex-col items-center justify-center gap-1 rounded-md bg-fg text-bg h-[4.375rem] lg:h-[5.5rem] lg:rounded-lg";
 
 /** Jake Wiki: 자료 → Claude → 위키 */
-export function WikiFlow() {
+export function WikiFlow({ className = "" }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={FRAME}>
+    <div aria-hidden="true" className={`${FRAME} ${className}`}>
       <div className="flex items-center gap-2 lg:gap-3.5">
         <div className="flex w-[5.75rem] shrink-0 flex-col gap-1.5 lg:w-[9.375rem] lg:gap-2">
           {["raw/", "clippings/"].map((name) => (
@@ -33,10 +38,10 @@ export function WikiFlow() {
 }
 
 /** Jake Hermes: 텔레그램 ⇄ 에이전트 ⇄ 로컬 모델, 그리고 예약 작업 */
-export function HermesFlow() {
+export function HermesFlow({ className = "" }: { className?: string }) {
   const side = `${BOX} h-[3.25rem] w-[4.875rem] shrink-0 flex-col gap-0.5 text-xs font-semibold lg:h-16 lg:w-[8.125rem] lg:text-sm`;
   return (
-    <div aria-hidden="true" className={FRAME}>
+    <div aria-hidden="true" className={`${FRAME} ${className}`}>
       <div className="flex items-center gap-1.5 lg:gap-3">
         <div className={side}>텔레그램</div>
         <span className="lg:text-lg">⇄</span>
@@ -66,9 +71,9 @@ const STEPS = [
 ];
 
 /** 이 사이트: 다섯 단계 중 검사만 강조색이다 */
-export function SiteSteps() {
+export function SiteSteps({ className = "" }: { className?: string }) {
   return (
-    <div aria-hidden="true" className="flex flex-col justify-center gap-1.5 border-b border-line bg-surface p-4 lg:h-[17.5rem] lg:px-8 lg:py-0">
+    <div aria-hidden="true" className={`flex flex-col justify-center gap-1.5 bg-surface p-4 lg:px-8 lg:py-0 ${className}`}>
       {STEPS.map((step, i) => (
         <div
           key={step.name}

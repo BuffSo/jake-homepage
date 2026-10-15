@@ -2,7 +2,7 @@ import Image from "next/image";
 import video from "@/assets/home/video.jpg";
 import { ButtonLink } from "@/components/button-link";
 import { getAiWorks, getHome, type AiWork } from "@/lib/content";
-import { HermesFlow, SiteSteps, WikiFlow } from "./ai-figures";
+import { CARD_FRAME, CARD_FRAME_STEPS, HermesFlow, SiteSteps, WikiFlow } from "@/components/ai-figures";
 import { Metric, SectionHead } from "@/components/section-head";
 
 // AI로 일하는 방식 (docs/02-ia.md 홈 3). 카드 네 장, 자세한 내용은 /ai/[slug]에서 보여 준다.
@@ -10,11 +10,11 @@ import { Metric, SectionHead } from "@/components/section-head";
 function Figure({ work }: { work: AiWork }) {
   switch (work.figure) {
     case "wiki-flow":
-      return <WikiFlow />;
+      return <WikiFlow className={CARD_FRAME} />;
     case "hermes-flow":
-      return <HermesFlow />;
+      return <HermesFlow className={CARD_FRAME} />;
     case "site-steps":
-      return <SiteSteps />;
+      return <SiteSteps className={CARD_FRAME_STEPS} />;
     case "image":
       return (
         <Image
