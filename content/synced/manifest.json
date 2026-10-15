@@ -1,6 +1,6 @@
 {
   "source": {
-    "commit": "2cba3d289c32badb59589c617f3fdb3d1528254b",
+    "commit": "8f0aed6b262203d72703dbf7918d1342935bc87f",
     "dirty": false
   },
   "files": [
@@ -8,18 +8,12 @@
       "output": "resume.md",
       "transforms": [
         "drop-table-column 전화번호",
-        "drop-line ※ 태니지먼트",
-        "replace-line - AI 도구 활용 개발 - Claude Code로",
-        "replace-line - **AI 도구 활용 개발 생산성 향상**",
-        "drop-line - 레거시 분석 시간",
-        "drop-line 🔗 https://heartlink.kr"
+        "drop-line ※ 태니지먼트"
       ]
     },
     {
       "output": "portfolio.md",
-      "transforms": [
-        "drop-line | **Recoeve** | recoeve.com은"
-      ]
+      "transforms": []
     }
   ]
 }

@@ -22,40 +22,12 @@ const config = {
           startsWith: "※ 태니지먼트",
           reason: "특정 독자를 상정한 안내 문구라 공개 페이지에서는 뺀다 (ADR-0002)",
         },
-        {
-          type: "replace-line",
-          startsWith: "- AI 도구 활용 개발 - Claude Code로",
-          with: "- AI 도구 활용 개발 - Claude Code로 레거시 코드 분석",
-          reason: "근거 없는 생산성 수치는 싣지 않는다 (CLAUDE.md 글쓰기)",
-        },
-        {
-          type: "replace-line",
-          startsWith: "- **AI 도구 활용 개발 생산성 향상**",
-          with: "- **AI 도구 활용 개발** - Claude Code로 레거시 분석과 구현",
-          reason: "근거 없는 생산성 수치는 싣지 않는다 (CLAUDE.md 글쓰기)",
-        },
-        {
-          type: "drop-line",
-          startsWith: "- 레거시 분석 시간",
-          reason: "근거 없는 생산성 수치는 싣지 않는다 (CLAUDE.md 글쓰기)",
-        },
-        {
-          type: "drop-line",
-          startsWith: "🔗 https://heartlink.kr",
-          reason: "도메인을 찾을 수 없어 링크를 걸지 않는다 (2026-10-14 확인)",
-        },
       ],
     },
     {
       source: "포트폴리오/소재희-포트폴리오.md",
       output: "portfolio.md",
-      transforms: [
-        {
-          type: "drop-line",
-          startsWith: "| **Recoeve** | recoeve.com은",
-          reason: "사이트는 Recueve를 사이트 전용 글로 소개하므로 Recoeve 안내 줄은 뺀다 (ADR-0003)",
-        },
-      ],
+      transforms: [],
     },
   ],
 };
