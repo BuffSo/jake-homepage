@@ -5,7 +5,7 @@ import { getHome, getHomeAiWorks, type AiWork } from "@/lib/content";
 import { CARD_FRAME, CARD_FRAME_STEPS, HermesFlow, SiteSteps, WikiFlow } from "@/components/ai-figures";
 import { Metric, SectionHead } from "@/components/section-head";
 
-// AI로 일하는 방식 (docs/02-ia.md 홈 3). 카드 네 장, 자세한 내용은 /ai/[slug]에서 보여 준다.
+// AI로 일하는 방식 (docs/02-ia.md 홈 3). 카드 네 장, 자세한 내용은 /ai의 해당 항목(/ai#slug)에서 보여 준다.
 
 function Figure({ work }: { work: AiWork }) {
   switch (work.figure) {
@@ -60,7 +60,7 @@ export function AiCards() {
                         {link.label}
                       </ButtonLink>
                     ))}
-                  <ButtonLink href={`/ai/${work.slug}`}>자세히 보기</ButtonLink>
+                  <ButtonLink href={`/ai#${work.slug}`}>자세히 보기</ButtonLink>
                 </div>
               </div>
             </article>

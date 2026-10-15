@@ -21,7 +21,6 @@ export function Chapter({
 }) {
   const { head } = chapter;
   const titleId = `${chapter.slug}-title`;
-  const body = chapter.ai ? `${chapter.body}\n\n### ${chapter.ai.title}\n\n${chapter.ai.body}` : chapter.body;
 
   return (
     <section
@@ -68,7 +67,18 @@ export function Chapter({
         </div>
       </div>
 
-      <MarkdownText className="mt-10 max-w-[47.5rem] lg:mt-16">{body}</MarkdownText>
+      {/* AI 절 제목에는 id를 붙인다. /ai의 짧은 카드가 /work#slug-ai로 이곳을 가리킨다. */}
+      <div className="md mt-10 max-w-[47.5rem] lg:mt-16">
+        <MarkdownText bare>{chapter.body}</MarkdownText>
+        {chapter.ai && (
+          <>
+            <h3 id={`${chapter.slug}-ai`} className="scroll-mt-4">
+              {chapter.ai.title}
+            </h3>
+            <MarkdownText bare>{chapter.ai.body}</MarkdownText>
+          </>
+        )}
+      </div>
     </section>
   );
 }

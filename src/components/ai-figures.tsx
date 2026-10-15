@@ -6,9 +6,15 @@
 export const CARD_FRAME = "h-[11.25rem] border-b border-line lg:h-[17.5rem]";
 export const CARD_FRAME_STEPS = "border-b border-line lg:h-[17.5rem]";
 
+/** /ai 상세 항목의 그림 상자 (docs/03-design.md F3) */
+export const ITEM_FRAME = "h-[12.5rem] rounded-[0.625rem] border border-line lg:h-80 lg:rounded-xl";
+export const ITEM_FRAME_STEPS = "rounded-[0.625rem] border border-line lg:h-80 lg:rounded-xl";
+
 const FRAME = "flex flex-col justify-center gap-3 bg-surface px-4 lg:gap-[1.125rem] lg:px-8";
 const BOX = "flex items-center justify-center rounded-md border-2 border-fg lg:rounded-lg";
 const CORE = "flex grow flex-col items-center justify-center gap-1 rounded-md bg-fg text-bg h-[4.375rem] lg:h-[5.5rem] lg:rounded-lg";
+const DASHED = "self-center rounded-md border-2 border-dashed border-fg px-2.5 py-1.5 text-[0.6875rem] lg:rounded-lg lg:px-3.5 lg:py-2 lg:text-xs";
+const SIDE = `${BOX} h-[3.25rem] w-[4.875rem] shrink-0 flex-col gap-0.5 text-center text-xs font-semibold lg:h-16 lg:w-[8.125rem] lg:text-sm`;
 
 /** Jake Wiki: 자료 → Claude → 위키 */
 export function WikiFlow({ className = "" }: { className?: string }) {
@@ -39,25 +45,22 @@ export function WikiFlow({ className = "" }: { className?: string }) {
 
 /** Jake Hermes: 텔레그램 ⇄ 에이전트 ⇄ 로컬 모델, 그리고 예약 작업 */
 export function HermesFlow({ className = "" }: { className?: string }) {
-  const side = `${BOX} h-[3.25rem] w-[4.875rem] shrink-0 flex-col gap-0.5 text-xs font-semibold lg:h-16 lg:w-[8.125rem] lg:text-sm`;
   return (
     <div aria-hidden="true" className={`${FRAME} ${className}`}>
       <div className="flex items-center gap-1.5 lg:gap-3">
-        <div className={side}>텔레그램</div>
+        <div className={SIDE}>텔레그램</div>
         <span className="lg:text-lg">⇄</span>
         <div className={CORE}>
           <span className="text-xs font-semibold lg:text-sm">Hermes Agent</span>
           <span className="hidden text-[0.6875rem] opacity-75 lg:block">내 컴퓨터에서 실행</span>
         </div>
         <span className="lg:text-lg">⇄</span>
-        <div className={side}>
+        <div className={SIDE}>
           로컬 모델
           <span className="hidden font-mono text-[0.6875rem] font-normal text-muted lg:block">Ollama</span>
         </div>
       </div>
-      <div className="self-center rounded-md border-2 border-dashed border-fg px-2.5 py-1.5 text-[0.6875rem] lg:rounded-lg lg:px-3.5 lg:py-2 lg:text-xs">
-        예약 작업 · 조사 결과 알림
-      </div>
+      <div className={DASHED}>예약 작업</div>
     </div>
   );
 }
@@ -88,6 +91,57 @@ export function SiteSteps({ className = "" }: { className?: string }) {
           <span className={`font-mono text-[0.6875rem] ${step.gate ? "" : "text-muted"}`}>{step.path}</span>
         </div>
       ))}
+    </div>
+  );
+}
+
+const REVIEWERS = ["규칙", "버그", "변경 이력", "이전 PR", "코드 주석"];
+
+/** 코드 리뷰 스킬: PR → 리뷰어 여섯(스펙 축은 점선) → 점수 */
+export function ReviewFlow({ className = "" }: { className?: string }) {
+  const cell = `${BOX} h-6 text-[0.6875rem] font-semibold lg:h-[1.875rem] lg:text-xs`;
+  return (
+    <div aria-hidden="true" className={`${FRAME} ${className}`}>
+      <div className="flex items-center gap-1.5 lg:gap-3">
+        <div className={`${BOX} h-[5.5rem] w-10 shrink-0 text-xs font-semibold lg:h-[7.5rem] lg:w-16 lg:text-sm`}>PR</div>
+        <span className="lg:text-lg">→</span>
+        <div className="grid grow grid-cols-2 gap-1 lg:gap-1.5">
+          {REVIEWERS.map((name) => (
+            <div key={name} className={cell}>
+              {name}
+            </div>
+          ))}
+          <div className={`${cell} border-dashed`}>스펙</div>
+        </div>
+        <span className="lg:text-lg">→</span>
+        <div className="flex h-[5.5rem] w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-md bg-fg text-bg lg:h-[7.5rem] lg:w-[6.5rem] lg:rounded-lg">
+          <span className="text-xs font-semibold lg:text-sm">점수</span>
+          <span className="text-[0.6875rem] opacity-75">80점 이상</span>
+        </div>
+      </div>
+      <span className="hidden text-center text-xs text-subtle lg:block">보고서를 먼저 보고 → PR 코멘트로 게시 · 스펙 축은 점수와 섞지 않음</span>
+    </div>
+  );
+}
+
+/** 이미지 MCP: Claude Code ⇄ MCP 서버 ⇄ Gemini 이미지 모델, 결과는 프로젝트 폴더로 */
+export function McpFlow({ className = "" }: { className?: string }) {
+  return (
+    <div aria-hidden="true" className={`${FRAME} ${className}`}>
+      <div className="flex items-center gap-1.5 lg:gap-3">
+        <div className={SIDE}>Claude Code</div>
+        <span className="lg:text-lg">⇄</span>
+        <div className={CORE}>
+          <span className="text-xs font-semibold lg:text-sm">MCP 서버</span>
+          <span className="hidden font-mono text-[0.6875rem] opacity-75 lg:block">generate · edit</span>
+        </div>
+        <span className="lg:text-lg">⇄</span>
+        <div className={SIDE}>
+          Gemini
+          <span className="hidden text-[0.6875rem] font-normal text-muted lg:block">이미지 모델</span>
+        </div>
+      </div>
+      <div className={DASHED}>프로젝트 폴더에 저장</div>
     </div>
   );
 }
