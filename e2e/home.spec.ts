@@ -17,7 +17,13 @@ type Project = {
   liveLabel?: string;
   imageAlt: string;
 };
-type AiWork = { slug: string; order: number; headline: string; links: { label: string; href: string }[] };
+type AiWork = {
+  slug: string;
+  order: number;
+  home?: number;
+  headline: string;
+  links: { label: string; href: string; home?: boolean }[];
+};
 
 const read = (file: string) => parseFrontmatter(readFileSync(file, "utf8"), file).data;
 const home = read("content/site/home.md") as {
@@ -33,7 +39,10 @@ const readDir = <T extends { order: number }>(dir: string) =>
     .map((f) => read(`${dir}/${f}`) as T)
     .sort((a, b) => a.order - b.order);
 const projects = readDir<Project>("content/site/projects");
-const aiWorks = readDir<AiWork>("content/site/ai");
+// 홈에는 home 순서가 있는 네 장만 싣는다. 나머지는 /ai에만 있다.
+const aiWorks = readDir<AiWork>("content/site/ai")
+  .filter((w) => w.home !== undefined)
+  .sort((a, b) => a.home! - b.home!);
 
 test("홈이 열리고 콘솔 오류와 실패한 요청이 없다", async ({ page }) => {
   const errors = collectErrors(page);
@@ -241,10 +250,10 @@ test.describe("아래 섹션", () => {
     for (const [i, work] of aiWorks.entries()) {
       const card = cards.nth(i);
       await expect(card.getByRole("heading", { level: 3 })).toHaveText(work.headline);
-      for (const link of work.links) {
+      for (const link of work.links.filter((l) => l.home)) {
         await expect(card.getByRole("link", { name: new RegExp(link.label) })).toHaveAttribute("href", link.href);
       }
-      await expect(card.getByRole("link", { name: "자세히 보기" })).toHaveAttribute("href", `/ai/${work.slug}`);
+      await expect(card.getByRole("link", { name: "자세히 보기" })).toHaveAttribute("href", `/ai#${work.slug}`);
     }
     // {adrCount} 같은 자리가 그대로 남지 않았는지
     await expect(section).not.toContainText("{");

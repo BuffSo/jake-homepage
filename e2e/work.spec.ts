@@ -82,7 +82,10 @@ test("챕터마다 원문의 이름, 화면, 서비스 링크, 보시는 방법,
     await expect(live).toHaveAttribute("target", "_blank");
     await expect(section.getByText("보시는 방법", { exact: true })).toBeVisible();
     if (chapter.ai) {
-      await expect(section.getByRole("heading", { level: 3, name: chapter.ai.title, exact: true })).toBeVisible();
+      // /ai의 짧은 카드가 /work#slug-ai로 이 제목을 가리킨다
+      const aiHeading = section.getByRole("heading", { level: 3, name: chapter.ai.title, exact: true });
+      await expect(aiHeading).toBeVisible();
+      await expect(aiHeading).toHaveAttribute("id", `${chapter.slug}-ai`);
     }
   }
 });
