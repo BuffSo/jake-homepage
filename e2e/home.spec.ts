@@ -74,7 +74,7 @@ test("헤더 왼쪽의 프로필 그림과 별칭 Jake가 실명 대신 홈 링�
     const avatar = homeLink.locator("img");
     await expect(avatar).toHaveAttribute("alt", "");
     await expect(avatar).toBeVisible();
-    expect(await avatar.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+    await expect.poll(() => avatar.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
     await expect(header).not.toContainText("소재희");
   }
 });
