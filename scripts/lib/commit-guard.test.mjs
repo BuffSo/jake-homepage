@@ -1,5 +1,6 @@
 // 커밋 가드 훅의 판정(scripts/lib/commit-guard.mjs) 테스트
-// 막지 않아야 할 명령은 실제로 막혔던 것들이다 (docs/todo/20261015_03_todo_commit_guard_false_positive.md).
+// 막지 않아야 할 명령에는 실제로 막혔던 두 명령(docs/todo/20261015_03_todo_commit_guard_false_positive.md)과,
+// 고치면서 함께 확인한 경우가 있다. 막아야 할 명령에는 PR 리뷰가 찾은 우회 경로를 넣었다.
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -46,4 +47,44 @@ test("감싸는 명령과 bash -c 안의 커밋도 찾는다", () => {
   assert.equal(blocks("GIT_EDITOR=true git commit -n"), true);
   assert.equal(blocks('bash -c "git commit --no-verify"'), true);
   assert.equal(blocks("zsh -lc 'cd x && git commit -n'"), true);
+});
+
+test("주석 속 따옴표와 구분자는 명령으로 보지 않는다", () => {
+  assert.equal(blocks("# don't skip hooks\ngit commit -n -m x"), true);
+  assert.equal(blocks("git add -A # it's fine\ngit commit --no-verify -m x"), true);
+  assert.equal(blocks("# 예: a && git commit -n\nnpm test"), false);
+  // $'…' 안의 \'는 따옴표를 닫지 않는다
+  assert.equal(blocks("run $'# it\\'s fine\\ngit commit -n -m x'"), false);
+});
+
+test("셸 예약어와 감싸는 명령 뒤의 커밋도 찾는다", () => {
+  assert.equal(blocks("if ! git diff --cached --quiet; then git commit -n -m x; fi"), true);
+  assert.equal(blocks("{ git commit --no-verify; }"), true);
+  assert.equal(blocks("! git commit -n"), true);
+  assert.equal(blocks("for m in a b; do git commit -n -m $m; done"), true);
+  assert.equal(blocks("timeout 60 git commit --no-verify -m x"), true);
+  assert.equal(blocks("nice -n 10 git commit -n"), true);
+  assert.equal(blocks("sudo git commit -n"), true);
+  assert.equal(blocks("/usr/bin/env git commit -n"), true);
+  assert.equal(blocks("env -i git commit -n"), true);
+});
+
+test("리다이렉트 모양이 달라도 커밋 인자를 잃지 않는다", () => {
+  assert.equal(blocks("git commit &>/dev/null -n"), true);
+  assert.equal(blocks("2>/dev/null git commit -n"), true);
+  assert.equal(blocks("git commit -q -m x 2>&1 | tail -n 3"), false);
+});
+
+test("명령 치환, 히어독으로 넘긴 셸, eval 안의 커밋도 찾는다", () => {
+  assert.equal(blocks("git commit -m $(cat msg.txt) -n"), true);
+  assert.equal(blocks("echo `git commit -n -m x`"), true);
+  assert.equal(blocks("cat <(git commit -n)"), true);
+  assert.equal(blocks("bash <<EOF\ngit commit -n -m x\nEOF"), true);
+  assert.equal(blocks('bash -norc -c "git commit -n"'), true);
+  assert.equal(blocks('eval "git commit -n"'), true);
+});
+
+test("명령 치환 안의 따옴표와 히어독은 바깥 메시지를 깨뜨리지 않는다", () => {
+  assert.equal(blocks(`git commit -m "$(printf '%s\\n' "a" "-n")"`), false);
+  assert.equal(blocks(["git commit -q -m \"$(cat <<'EOF'", "fix -n", "EOF", ')"'].join("\n")), false);
 });

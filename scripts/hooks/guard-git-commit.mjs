@@ -9,10 +9,12 @@ import { findCommits, skipsHooks } from "../lib/commit-guard.mjs";
 let raw = "";
 for await (const chunk of process.stdin) raw += chunk;
 
-// 실제로 git commit을 실행하는 자리만 본다. 판정은 scripts/lib/commit-guard.mjs에 있다.
+// 훅 건너뛰기는 실제로 git commit을 실행하는 자리의 인자에서만 찾는다. 판정은 scripts/lib/commit-guard.mjs에 있다.
 const command = JSON.parse(raw || "{}").tool_input?.command ?? "";
 const commits = findCommits(command);
-if (commits.length === 0) process.exit(0);
+// 서명 검사는 명령을 해석하지 못한 커밋도 놓치지 않게, 전처럼 git과 commit이 한 구간에 보이면 돌린다
+const looksLikeCommit = commits.length > 0 || /\bgit\b[^;&|\n]*\bcommit\b/.test(command);
+if (!looksLikeCommit) process.exit(0);
 
 function block(message) {
   console.error(message);
@@ -27,6 +29,8 @@ if (commits.some(skipsHooks)) {
 if (/co-authored-by:.*(claude|anthropic)|generated with \[?claude/i.test(command)) {
   block("커밋 메시지에 AI 공동 작성자 줄이나 생성 도구 서명을 넣지 않습니다 (ADR-0006).");
 }
+
+if (commits.length === 0) process.exit(0);
 
 const result = spawnSync("node", ["scripts/check-sensitive.mjs", "--staged"], {
   cwd: process.env.CLAUDE_PROJECT_DIR || process.cwd(),
