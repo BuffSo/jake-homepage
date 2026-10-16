@@ -10,6 +10,7 @@ import { test } from "node:test";
 import { parseFrontmatter } from "../../src/lib/frontmatter.mjs";
 import { composeChapters, findSection } from "../../src/lib/portfolio.mjs";
 import { countAdrs, countCiChecks } from "../../src/lib/repo-stats.mjs";
+import stackConfig from "../stack.config.mjs";
 
 const ROOT = process.cwd();
 const squash = (s) => s.replace(/\s+/g, " ").trim();
@@ -49,14 +50,11 @@ test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대�
   }
 });
 
-test("기술 층은 여섯 개이고, 기술 이름은 포트폴리오 기술 스택에 있다", () => {
-  const stackSection = portfolio.slice(portfolio.indexOf("## 6. 기술 스택"));
+test("기술 층은 여섯 개이고, 기술 이름은 표지 설정과 같다", () => {
+  // 기술마다 서비스 코드에서 찾을 표지가 있어야 npm run check:stack이 짝을 확인한다 (ADR-0010).
   assert.equal(home.layers.length, 6);
-  for (const layer of home.layers) {
-    for (const item of layer.items) {
-      assert.ok(stackSection.includes(item.name), `기술 스택에 없는 이름 "${item.name}" (${layer.name})`);
-    }
-  }
+  const names = home.layers.flatMap((layer) => layer.items.map((item) => item.name));
+  assert.deepEqual([...names].sort(), Object.keys(stackConfig.techs).sort());
 });
 
 test("기술이 가리키는 서비스는 모두 있다", () => {
@@ -81,22 +79,14 @@ function serviceEntries() {
   );
 }
 
-test("기술마다 쓴 서비스는 그 서비스 항목에 이름이나 근거 낱말이 있는 서비스와 정확히 같다", () => {
+test("서비스 항목에 이름이 나오는 기술은 그 서비스에 표시된다", () => {
+  // 반대 방향(층에 있으면 코드에 있다)은 서비스 코드가 필요해 로컬 npm run check:stack이 본다 (ADR-0010).
   const entries = serviceEntries();
   for (const layer of home.layers) {
     for (const item of layer.items) {
-      const words = [item.name, ...(item.evidence ?? [])];
-      const expected = [...entries].filter(([, text]) => words.some((w) => text.includes(w))).map(([slug]) => slug);
-      assert.deepEqual([...item.usedBy].sort(), expected.sort(), `${layer.name} · ${item.name}`);
-    }
-  }
-});
-
-test("근거 낱말은 실제로 어느 서비스 항목에 있다", () => {
-  const all = [...serviceEntries().values()].join("\n");
-  for (const layer of home.layers) {
-    for (const item of layer.items) {
-      for (const word of item.evidence ?? []) assert.ok(all.includes(word), `${item.name}의 근거 "${word}"가 서비스 항목에 없습니다`);
+      for (const [slug, text] of entries) {
+        if (text.includes(item.name)) assert.ok(item.usedBy.includes(slug), `${layer.name} · ${item.name}: ${slug} 항목에 이름이 있는데 표시하지 않습니다`);
+      }
     }
   }
 });
