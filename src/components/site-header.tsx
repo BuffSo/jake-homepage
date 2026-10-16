@@ -22,7 +22,7 @@ export function SiteHeader() {
         본문으로 건너뛰기
       </a>
       {/* 그림은 장식이라 대체 텍스트를 비우고, 링크 이름은 보이는 글자 "Jake"다. 누르는 높이는 2.75rem이다. */}
-      <Link href="/" className="inline-flex min-h-11 items-center gap-2.5 text-[0.9375rem] font-semibold tracking-[-0.01em] hover:text-accent md:text-base">
+      <Link href="/" className="inline-flex min-h-11 items-center gap-2.5 text-[0.9375rem] font-semibold tracking-[-0.01em] hover:text-accent lg:text-base">
         <Image src={avatar} alt="" width={28} height={28} className="size-7 rounded-full" />
         Jake
       </Link>
