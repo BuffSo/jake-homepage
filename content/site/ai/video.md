@@ -5,7 +5,7 @@ group: beyond
 home: 2
 eyebrow: VIDEO · Recueve 소개 영상
 title: 영상 제작
-headline: 편집 도구를 배우지 않고 영상을 만들었습니다.
+headline: 편집 도구를 배우지 않고 영상을 만듭니다.
 desc: Claude Code의 computer use로 에이전트가 CapCut을 조작해 나레이션을 만들고, ffmpeg로 자막과 전환, 음악을 조립했습니다. 저는 목소리와 음악을 고르고 결과를 판단했습니다.
 note: CapCut 음악은 유튜브 업로드에 쓸 수 없는 라이선스라 확인하고 바꿨습니다.
 problem: 서비스 소개 영상이 필요했지만 편집 도구를 다뤄 본 적이 없었습니다.

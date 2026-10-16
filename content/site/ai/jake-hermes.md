@@ -5,7 +5,7 @@ group: personal
 home: 3
 eyebrow: JAKE HERMES · 개인 비서
 title: Jake Hermes
-headline: 텔레그램으로 일을 맡기는 개인 비서를 띄웠습니다.
+headline: 텔레그램으로 일을 맡기는 개인 비서를 씁니다.
 desc: 오픈소스 Hermes Agent를 내 컴퓨터에서 로컬 모델로 돌리고, 텔레그램으로 대화하며 일을 맡깁니다. 정해 둔 시간에 작업을 돌리게 할 수도 있습니다.
 problem: 컴퓨터 앞에 없을 때도 일을 맡길 창구가 필요했습니다.
 built: 오픈소스 Hermes Agent를 내 컴퓨터에 설치하고, Ollama로 띄운 로컬 모델에 연결했습니다. 대화 창구는 텔레그램입니다.
