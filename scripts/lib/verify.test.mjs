@@ -34,6 +34,12 @@ test("빌드가 실패하면 빌드에 기대는 검사만 건너뛴다", () => 
   assert.deepEqual(decide(byId("e2e"), {}, [pass("build")]), { run: true });
 });
 
+test("건너뛴 이유는 앞 검사가 실패했는지, 건너뛰었는지, 돌지 않았는지 구분한다", () => {
+  const skipped = { ...byId("build"), status: "skip", reason: "테스트용" };
+  assert.deepEqual(decide(byId("e2e"), {}, [skipped]), { run: false, reason: "빌드 건너뜀" });
+  assert.deepEqual(decide(byId("e2e"), {}, []), { run: false, reason: "빌드 결과 없음" });
+});
+
 test("실패가 하나라도 있으면 1로 끝나고, 건너뜀은 실패가 아니다", () => {
   const skipped = { ...byId("sync"), status: "skip", reason: "경로 없음 (CAREER_DIR)" };
   assert.equal(exitCode([pass("test"), skipped]), 0);

@@ -25,6 +25,8 @@ export const CHECKS = [
   { id: "e2e", name: "화면 검사 (E2E)", command: "npx playwright test", after: "build" },
 ];
 
+const LABEL = { pass: "통과", fail: "실패", skip: "건너뜀" };
+
 /** 로컬 전용 검사의 명령. 경로가 없는 CI에는 단계로 두지 않는다. */
 export const LOCAL_ONLY = CHECKS.filter((check) => check.needsEnv).map((check) => check.command);
 
@@ -35,12 +37,11 @@ export function decide(check, env, results) {
   }
   if (check.after) {
     const before = results.find((result) => result.id === check.after);
-    if (before?.status !== "pass") return { run: false, reason: `${before?.name ?? check.after} 실패` };
+    if (!before) return { run: false, reason: `${CHECKS.find((c) => c.id === check.after)?.name ?? check.after} 결과 없음` };
+    if (before.status !== "pass") return { run: false, reason: `${before.name} ${LABEL[before.status]}` };
   }
   return { run: true };
 }
-
-const LABEL = { pass: "통과", fail: "실패", skip: "건너뜀" };
 
 /** 마지막에 찍는 요약 표. PR의 테스트 체크리스트에 그대로 붙일 수 있게 마크다운 표로 쓴다. */
 export function summarize(results) {
