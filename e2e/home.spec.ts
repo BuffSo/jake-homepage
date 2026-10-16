@@ -188,8 +188,10 @@ test.describe("기술 층 강조", () => {
   // 서비스마다 그 층에서 쓴 기술 (content/site/home.md의 items[].usedBy)
   const techs = (layer: Layer, project: Project) =>
     layer.items.filter((item) => item.usedBy.includes(project.slug)).map((item) => item.name);
-  // 그 층의 기술을 하나도 안 쓰는 서비스가 있어야 흐려지는 서비스가 생긴다.
-  const layer = home.layers.find((l) => projects.some((p) => techs(l, p).length === 0))!;
+  // 서비스마다 쓴 기술이 모두 다른 층(지금은 워커). 강조가 서비스별로 맞게 갈리는지 보기 좋다.
+  const layer = home.layers.find((l) => new Set(projects.map((p) => techs(l, p).join())).size === projects.length)!;
+  // 그 층의 기술을 하나도 안 쓰는 서비스가 있어야 흐려지는 서비스가 생긴다. 지금 데이터에는 없다.
+  const dimLayer = home.layers.find((l) => projects.some((p) => techs(l, p).length === 0));
   const serviceItems = (page: Page) => page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("listitem");
 
   async function expectHighlight(page: Page, target: Layer | null) {
@@ -197,14 +199,15 @@ test.describe("기술 층 강조", () => {
       const item = serviceItems(page).nth(i);
       const used = target ? techs(target, project) : [];
       await expect(item).toHaveCSS("opacity", target && used.length === 0 ? "0.3" : "1");
-      if (used.length) await expect(item.getByText(used.join(" · "), { exact: true })).toBeVisible();
+      // 가장 긴 기술 줄은 자리만 잡는 보이지 않는 사본이 있으므로 보이는 것만 센다.
+      if (used.length) await expect(item.getByText(used.join(" · "), { exact: true }).filter({ visible: true })).toHaveCount(1);
       // 쓴 기술이 보이는 동안 설명은 자리만 남고, 그 밖에는 설명이 보인다.
       if (used.length) await expect(item.getByText(project.summary)).toBeHidden();
       else await expect(item.getByText(project.summary)).toBeVisible();
     }
   }
 
-  test("층을 누르면 고정되고, 서비스마다 그 층에서 쓴 기술이 보이며 하나도 안 쓴 서비스만 흐려진다", async ({ page }) => {
+  test("층을 누르면 고정되고, 서비스마다 그 층에서 쓴 기술이 보인다", async ({ page }) => {
     await page.goto("/");
     const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
     const band = page.getByRole("list", { name: "운영 중인 서비스" });
@@ -224,6 +227,48 @@ test.describe("기술 층 강조", () => {
     await button.click();
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expectHighlight(page, null);
+  });
+
+  test("여섯 층 모두 서비스마다 그 층에서 쓴 기술이 보이고, 목록 높이가 바뀌지 않는다", async ({ page }) => {
+    await page.goto("/");
+    const band = page.getByRole("list", { name: "운영 중인 서비스" });
+    const before = (await band.boundingBox())!.height;
+    for (const target of home.layers) {
+      const button = page.getByRole("button", { name: new RegExp(`^${target.name}`) });
+      await button.click();
+      await expectHighlight(page, target);
+      expect((await band.boundingBox())!.height, target.name).toBe(before);
+      await button.click();
+    }
+  });
+
+  test("1024 폭에서 기술 줄이 두 줄이 되어도 목록 높이가 바뀌지 않는다", async ({ page }, testInfo) => {
+    // 서비스 칸이 가장 좁은 데스크톱 폭이다. 가장 긴 기술 줄의 자리를 미리 잡아 둔다(service-list.tsx).
+    test.skip(testInfo.project.name === "mobile", "데스크톱 폭 확인");
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await page.goto("/");
+    const band = page.getByRole("list", { name: "운영 중인 서비스" });
+    const before = (await band.boundingBox())!.height;
+    for (const target of home.layers) {
+      const button = page.getByRole("button", { name: new RegExp(`^${target.name}`) });
+      await button.click();
+      expect((await band.boundingBox())!.height, target.name).toBe(before);
+      for (const [i] of projects.entries()) {
+        const item = serviceItems(page).nth(i);
+        const shown = item.locator("p:not([aria-hidden])").last();
+        const domain = (await item.getByRole("link").last().boundingBox())!;
+        const box = (await shown.boundingBox())!;
+        expect(box.y + box.height, `${target.name} · ${projects[i].title}`).toBeLessThanOrEqual(domain.y + 0.5);
+      }
+      await button.click();
+    }
+  });
+
+  test("하나도 안 쓴 서비스만 흐려진다", async ({ page }) => {
+    test.skip(!dimLayer, "지금 층 데이터에는 기술을 하나도 안 쓰는 서비스가 있는 층이 없다");
+    await page.goto("/");
+    await page.getByRole("button", { name: new RegExp(`^${dimLayer!.name}`) }).click();
+    await expectHighlight(page, dimLayer!);
   });
 
   test("층 안의 기술마다 쓴 서비스가 달라도, 하나라도 쓴 서비스는 흐려지지 않는다", async ({ page }) => {
