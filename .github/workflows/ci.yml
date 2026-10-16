@@ -47,6 +47,16 @@ jobs:
       - name: 화면 검사 (E2E)
         run: npx playwright test
 
+      # 주요 화면 캡처는 통과해도 올린다. 바뀐 화면을 PR에서 바로 열어 보기 위해서다 (docs/01-prd.md F6)
+      - name: 화면 캡처 올리기
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: page-captures
+          path: test-results/captures/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: E2E 보고서 올리기 (실패할 때만)
         if: failure()
         uses: actions/upload-artifact@v7
