@@ -17,40 +17,45 @@
 | 둘째 줄 | 기획부터 디자인, 개발, 배포까지 전 과정을 다룹니다. | 첫 줄을 한국어로 받치는 사이트 문구. 사실은 이력서 자기소개 범위 |
 | 조각 | AI가 내놓는 코드와 제안을 추상화한 짧은 막대 | |
 | 관문 | 세로선 두 개와 이름: 판단, 검증 | |
-| 기술 층 | 아래 표의 여섯 층 | 포트폴리오 "6. 기술 스택" |
+| 기술 층 | 아래 표의 여섯 층 | 각 서비스의 소스 코드([ADR-0010](adr/0010-stack-from-source.md)) |
 | 보조 문장 | 속도는 AI로 내고, 판단과 검증은 AI 이전부터 쌓은 경험으로 합니다. | 이력서 자기소개("AI 코딩 도구가 등장하기 훨씬 전부터 다양한 로직을 직접 구현해 온 경험을 바탕으로") |
-| 증거 목록 | 서비스 세 개의 이름, 한 줄 설명, 라이브 링크 | 포트폴리오 "1. 한눈에 보기" |
+| 증거 목록 | 서비스 세 개의 이름, 한 줄 설명, 라이브 링크 | 포트폴리오 "1. 한눈에 보기". ProWith 설명은 "4-2"의 설정과 쇼핑몰 문장(2026-10-16) |
 | 연락 | 이메일, GitHub, 이력서 보기 | 이메일은 사이트 전용 글(`content/site/home.md`, 2026-10-16 gmail로 바꿈), GitHub은 이력서 연락처 |
 
 ### 기술 층
 
 | 층 | 기술 |
 |---|---|
-| 화면 | Next.js, React, Tailwind |
+| 화면 | Next.js, React, Tailwind, shadcn/ui |
 | API | NestJS, Node.js, TypeScript |
-| 워커 | BullMQ, AWS Lambda, EventBridge |
-| 데이터 | PostgreSQL, Redis, Prisma |
-| 인프라 | AWS, Docker, Vercel |
-| AI | Claude Code, MCP, Claude API |
+| 워커 | BullMQ, Cron, Lambda, EventBridge |
+| 데이터 | PostgreSQL, MySQL, Redis, Prisma |
+| 인프라 | AWS, Docker, Vercel, GitHub Actions |
+| AI | Claude Code, MCP, Claude API, Gemini |
 
 층을 누르면 서비스마다 그 층에서 쓴 기술이 보입니다.
 
 | 층 | Recueve | ProWith | GENYS Lotto AI |
 |---|---|---|---|
-| 화면 | Next.js · React · Tailwind | Next.js · React | Next.js · React |
+| 화면 | Next.js · React · Tailwind · shadcn/ui | Next.js · React · Tailwind · shadcn/ui | Next.js · React · Tailwind · shadcn/ui |
 | API | NestJS · Node.js · TypeScript | NestJS · Node.js · TypeScript | Node.js · TypeScript |
-| 워커 | BullMQ | (흐림) | AWS Lambda · EventBridge |
-| 데이터 | Redis · Prisma | PostgreSQL · Prisma | PostgreSQL · Redis · Prisma |
-| 인프라 | AWS · Docker · Vercel | AWS · Docker · Vercel | AWS · Vercel |
-| AI | Claude Code · MCP · Claude API | Claude Code | (흐림) |
+| 워커 | BullMQ | Cron | Lambda · EventBridge |
+| 데이터 | MySQL · Redis · Prisma | PostgreSQL · Prisma | PostgreSQL · Redis · Prisma |
+| 인프라 | AWS · Docker · Vercel · GitHub Actions | AWS · Docker · Vercel · GitHub Actions | AWS · Vercel |
+| AI | Claude Code · MCP · Claude API · Gemini | Claude Code · MCP | Claude Code |
 
-짝의 근거는 그 서비스의 이력서·포트폴리오 항목입니다. 기술 이름이 있거나, 아래 근거 낱말이 있으면 쓴 것으로 봅니다. 테스트가 짝을 양방향으로 대조합니다(`scripts/lib/content.test.mjs`).
+짝의 근거는 각 서비스의 소스 코드입니다([ADR-0010](adr/0010-stack-from-source.md), 2026-10-16). 이력서와 포트폴리오는 서비스마다 대표 기술만 적어서, 원문 낱말로 정하면 실제로 쓴 기술이 빠졌습니다.
 
-- Node.js ← NestJS, Next.js. 둘 다 Node.js 위에서 돕니다.
-- React ← Next.js. Next.js는 React 프레임워크입니다.
-- Claude API ← Haiku, Sonnet. Recueve가 쓰는 Claude 모델입니다.
-- Claude Code ← MCP. 포트폴리오 2절에 "MCP 서버를 직접 구현해 Claude Code에 연결"했다고 적혀 있습니다.
-- Tailwind는 이렇게 따라 나오지 않아 원문에 적힌 Recueve에만 둡니다.
+- 기술마다 코드에서 찾을 표지(의존성 이름, 파일 이름, 특정 파일 안의 낱말)를 `scripts/stack.config.mjs`에 둡니다. `npm run check:stack`이 세 서비스 폴더에서 찾은 결과가 위 표와 같아야 합니다.
+- 서비스 항목(이력서·포트폴리오)에 이름이 나오는 기술은 그 서비스에 반드시 표시합니다. 이 방향은 CI 테스트가 봅니다(`scripts/lib/content.test.mjs`).
+- 표지가 코드 밖의 흔적인 것도 있습니다.
+  - Vercel은 배포 설정 폴더나 README의 배포처 언급입니다.
+  - MCP는 Claude Code에 MCP 서버를 연결한 설정입니다.
+  - Gemini는 직접 만든 이미지 생성 MCP 서버(Gemini API 사용)가 Recueve를 만들며 남긴 그림입니다.
+- 워커의 Cron은 ProWith의 API 서버 안에서 도는 예약 작업입니다(`@nestjs/schedule`). 큐는 없지만 요청과 따로 도는 작업이라 워커 층에 둡니다.
+- AWS Lambda는 층 글자에서 "Lambda"로 줄였습니다. AWS는 인프라 층에 따로 있고, 360 폭 휴대폰에서 워커 층이 한 줄에 들어가게 하기 위해서입니다.
+- 층 글자는 360 폭에서도 한 줄에 들어가야 합니다. 지금 가장 긴 줄은 AI 층(39자)입니다. 그래서 TanStack Query, nginx처럼 핵심이지만 길이를 넘기는 기술은 넣지 않았습니다.
+- 지금 표에서는 어느 층을 눌러도 흐려지는 서비스가 없습니다. 흐림 동작은 데이터가 바뀔 때를 위해 남깁니다.
 
 워커 층은 API와 데이터 사이에 둡니다. 요청에 바로 답하는 서버와 뒤에서 오래 도는 작업을 나눠 설계한다는 점이 층의 순서로 드러나게 하기 위해서입니다. Redis는 큐의 저장소로도 쓰지만 캐시와 인증 토큰에도 쓰므로 데이터 층에 둡니다.
 
