@@ -13,3 +13,11 @@ export function collectErrors(page: Page) {
   });
   return errors;
 }
+
+/**
+ * 주요 화면 캡처의 경로 (docs/01-prd.md F6): test-results/captures/<이름>-<폭>.png
+ * 테스트마다 다른 출력 폴더 대신 한 폴더에 모은다. npm run verify 뒤에 바로 열어 보고, CI는 artifact로 올린다.
+ */
+export function capturePath(page: Page, name: string) {
+  return `test-results/captures/${name}-${page.viewportSize()?.width}.png`;
+}

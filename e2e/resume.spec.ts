@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 import { splitResume } from "../src/lib/resume.mjs";
-import { collectErrors } from "./helpers";
+import { capturePath, collectErrors } from "./helpers";
 
 // 이력서 화면 확인 (ADR-0008, docs/02-ia.md /resume). 캡처는 test-results/에만 남고 커밋하지 않는다.
 // 기대값은 resume-page.md와 동기화한 이력서에서 읽는다.
@@ -97,12 +97,12 @@ test("인쇄하면 화면용 요소가 빠지고 다크 모드여도 흰 바탕�
   expect(colors).toEqual({ background: "rgb(255, 255, 255)", text: "rgb(17, 17, 17)" });
 });
 
-test("캡처를 남긴다 (라이트, 다크, 인쇄)", async ({ page }, testInfo) => {
+test("캡처를 남긴다 (라이트, 다크, 인쇄)", async ({ page }) => {
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto("/resume");
-    await page.screenshot({ path: testInfo.outputPath(`resume-${scheme}.png`), fullPage: true });
+    await page.screenshot({ path: capturePath(page, `resume-${scheme}`), fullPage: true });
   }
   await page.emulateMedia({ media: "print", colorScheme: "light" });
-  await page.screenshot({ path: testInfo.outputPath("resume-print.png"), fullPage: true });
+  await page.screenshot({ path: capturePath(page, "resume-print"), fullPage: true });
 });
