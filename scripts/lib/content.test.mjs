@@ -8,7 +8,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 import { parseFrontmatter } from "../../src/lib/frontmatter.mjs";
-import { composeChapters } from "../../src/lib/portfolio.mjs";
+import { composeChapters, findSection } from "../../src/lib/portfolio.mjs";
 import { countAdrs, countCiChecks } from "../../src/lib/repo-stats.mjs";
 
 const ROOT = process.cwd();
@@ -54,15 +54,50 @@ test("기술 층은 여섯 개이고, 기술 이름은 포트폴리오 기술 �
   assert.equal(home.layers.length, 6);
   for (const layer of home.layers) {
     for (const item of layer.items) {
-      assert.ok(stackSection.includes(item), `기술 스택에 없는 이름 "${item}" (${layer.name})`);
+      assert.ok(stackSection.includes(item.name), `기술 스택에 없는 이름 "${item.name}" (${layer.name})`);
     }
   }
 });
 
-test("층이 가리키는 서비스는 모두 있다", () => {
+test("기술이 가리키는 서비스는 모두 있다", () => {
   const slugs = new Set(projects.map((p) => p.data.slug));
   for (const layer of home.layers) {
-    for (const slug of layer.usedBy) assert.ok(slugs.has(slug), `${layer.name}: 없는 서비스 ${slug}`);
+    for (const item of layer.items) {
+      for (const slug of item.usedBy) assert.ok(slugs.has(slug), `${layer.name} · ${item.name}: 없는 서비스 ${slug}`);
+    }
+  }
+});
+
+// 서비스 항목: 이력서 프로젝트 절("레큐이브 (Recueve)")과 포트폴리오 상세 절("4-1. Recueve")을 합친 글
+function serviceEntries() {
+  return new Map(
+    projects.map(({ data: project }) => {
+      const heading = resume.split("\n").find((line) => line.startsWith("### ") && line.trim().endsWith(`(${project.title})`));
+      assert.ok(heading, `이력서에 ${project.title} 항목이 없습니다`);
+      const chapter = work.chapters.find((c) => c.slug === project.slug);
+      const text = [findSection(resume, heading.slice(4).trim()).body, findSection(portfolio, chapter.detail).body].join("\n");
+      return [project.slug, text];
+    }),
+  );
+}
+
+test("기술마다 쓴 서비스는 그 서비스 항목에 이름이나 근거 낱말이 있는 서비스와 정확히 같다", () => {
+  const entries = serviceEntries();
+  for (const layer of home.layers) {
+    for (const item of layer.items) {
+      const words = [item.name, ...(item.evidence ?? [])];
+      const expected = [...entries].filter(([, text]) => words.some((w) => text.includes(w))).map(([slug]) => slug);
+      assert.deepEqual([...item.usedBy].sort(), expected.sort(), `${layer.name} · ${item.name}`);
+    }
+  }
+});
+
+test("근거 낱말은 실제로 어느 서비스 항목에 있다", () => {
+  const all = [...serviceEntries().values()].join("\n");
+  for (const layer of home.layers) {
+    for (const item of layer.items) {
+      for (const word of item.evidence ?? []) assert.ok(all.includes(word), `${item.name}의 근거 "${word}"가 서비스 항목에 없습니다`);
+    }
   }
 });
 

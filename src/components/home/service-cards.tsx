@@ -13,7 +13,7 @@ export function ServiceCards() {
   const projects = getProjects();
 
   return (
-    <section aria-labelledby="work-title" className="pt-14 lg:pt-24">
+    <section id="work" aria-labelledby="work-title" className="pt-14 lg:pt-24">
       <SectionHead id="work-title" {...work} />
       <div className="grid gap-5 lg:grid-cols-3 lg:gap-6">
         {projects.map((project) => (

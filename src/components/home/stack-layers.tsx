@@ -5,7 +5,7 @@ import type { Layer } from "@/lib/content";
 import { useLayerFocus } from "./layer-focus";
 
 // 기술 층 여섯 (docs/04-motion.md 기술 층). 데스크톱은 첫 화면 오른쪽, 모바일은 소개 아래에 쌓는다.
-// 층을 누르거나 올리면 그 층을 쓰는 서비스가 목록에서 강조된다(service-list.tsx).
+// 층을 누르거나 올리면 서비스 목록에 서비스마다 그 층에서 쓴 기술이 보인다(service-list.tsx).
 // children은 층 아래 오른쪽에 두는 다시 보기 버튼이다. 움직임 무대는 층 목록 자리에 얹으므로 바깥을 relative로 둔다.
 export function StackLayers({ layers, children }: { layers: Layer[]; children?: ReactNode }) {
   const { active, pinned, toggle, preview } = useLayerFocus();
@@ -30,14 +30,14 @@ export function StackLayers({ layers, children }: { layers: Layer[]; children?: 
             >
               <span className="shrink-0 text-sm font-semibold md:text-base">{layer.name}</span>
               <span className="font-mono text-[0.6875rem] text-muted group-data-[active=true]:text-on-accent md:text-[0.8125rem]">
-                {layer.items.join(" · ")}
+                {layer.items.map((item) => item.name).join(" · ")}
               </span>
             </button>
           </li>
         ))}
       </ul>
       <div data-intro-part className="mt-2 flex items-center justify-end gap-4 lg:mt-1.5 lg:justify-between">
-        <p className="hidden text-xs text-subtle lg:block">층을 누르면 그 기술을 쓴 서비스가 표시됩니다</p>
+        <p className="hidden text-xs text-subtle lg:block">층을 누르면 서비스마다 그 층에서 쓴 기술이 표시됩니다</p>
         {children}
       </div>
     </div>
