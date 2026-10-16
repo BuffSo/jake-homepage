@@ -106,7 +106,7 @@ test("서비스 글은 카드에 필요한 값을 모두 갖고, 순서가 겹�
 
 test("AI 작업 글은 항목에 필요한 값을 모두 갖고, 순서가 겹치지 않는다", () => {
   const groups = new Set(read("content/site/ai-page.md").groups.map((g) => g.id));
-  const figures = new Set(["wiki-flow", "image", "hermes-flow", "site-steps", "review-flow", "mcp-flow"]);
+  const figures = new Set(["wiki-flow", "image", "hermes-flow", "site-steps", "review-flow", "mcp-flow", "workbench-flow"]);
   for (const { file, data } of aiWorks) {
     for (const key of ["slug", "order", "group", "eyebrow", "title", "problem", "built"]) {
       assert.ok(data[key], `${file}: ${key} 없음`);
