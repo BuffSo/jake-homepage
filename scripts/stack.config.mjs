@@ -14,20 +14,25 @@ const config = {
   // 빌드 결과, 의존성, 백업과 개인 메모 폴더는 걷지 않는다.
   skipDirs: ["node_modules", ".git", ".next", "dist", "build", ".turbo", "coverage", ".venv", "venv", "__pycache__", "context", "db-backups", "db-archive"],
   techs: {
+    // 화면: 프레임워크와 스타일링 패키지
     "Next.js": [{ dep: "next" }],
     React: [{ dep: "react" }],
     Tailwind: [{ dep: "tailwindcss" }],
     // shadcn/ui는 패키지가 아니라 컴포넌트를 복사해 쓰는 방식이라, 설정 파일로 확인한다.
     "shadcn/ui": [{ file: name("components\\.json") }],
+    // API: 서버 프레임워크. Node.js는 패키지 매니페스트가 있으면 그 런타임에서 돈다고 본다
     NestJS: [{ dep: "@nestjs/core" }],
     "Node.js": [{ file: name("package\\.json") }],
     TypeScript: [{ dep: "typescript" }],
+    // 워커: 큐 패키지
     BullMQ: [{ dep: "bullmq" }],
     // API 서버 안에서 도는 예약 작업
     Cron: [{ dep: "@nestjs/schedule" }],
+    // Lambda 함수의 핸들러 타입
     Lambda: [{ dep: "@types/aws-lambda" }],
     // 예약 규칙은 배포 스크립트가 만든다.
     EventBridge: [{ file: name("[^/]+\\.sh"), text: /EventBridge/ }],
+    // 데이터: DB 종류는 Prisma 스키마의 provider로, Redis와 ORM은 클라이언트 패키지로 본다
     PostgreSQL: [{ file: name("schema\\.prisma"), text: /provider\s*=\s*"postgresql"/ }],
     MySQL: [{ file: name("schema\\.prisma"), text: /provider\s*=\s*"mysql"/ }],
     Redis: [{ dep: "ioredis" }, { dep: "redis" }],
@@ -37,13 +42,17 @@ const config = {
       { file: name("\\.github/workflows/[^/]+\\.ya?ml"), text: /aws-actions\// },
       { file: name("[^/]+\\.sh"), text: /\baws lambda / },
     ],
+    // 이미지를 만드는 Dockerfile
     Docker: [{ file: name("Dockerfile[^/]*") }],
     // Git 연동으로 배포하면 설정 폴더가 남고, 그렇지 않은 저장소는 README가 배포처를 적는다.
     Vercel: [{ file: name("\\.vercel/project\\.json") }, { file: name("README\\.md"), text: /Vercel/ }],
+    // 워크플로 파일
     "GitHub Actions": [{ file: name("\\.github/workflows/[^/]+\\.ya?ml") }],
+    // AI: Claude Code가 읽는 저장소 지침 파일
     "Claude Code": [{ file: name("CLAUDE\\.md") }],
     // Claude Code에 MCP 서버를 연결한 설정
     MCP: [{ file: name("\\.mcp\\.json") }, { file: name("\\.claude/settings(\\.local)?\\.json"), text: /"(enabledMcpjsonServers|mcpServers)"/ }],
+    // 제품 코드가 부르는 Anthropic SDK
     "Claude API": [{ dep: "@anthropic-ai/sdk" }],
     // 직접 만든 이미지 생성 MCP 서버가 Gemini API로 만든 그림을 이 이름으로 저장한다.
     Gemini: [{ file: name("nano-banana_[^/]+") }],
