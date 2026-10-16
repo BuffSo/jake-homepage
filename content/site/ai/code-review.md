@@ -1,6 +1,6 @@
 ---
 slug: code-review
-order: 2
+order: 3
 group: dev
 eyebrow: CODE REVIEW · 리뷰 스킬
 title: 코드 리뷰 스킬

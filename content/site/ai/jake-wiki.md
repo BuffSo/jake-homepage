@@ -1,6 +1,6 @@
 ---
 slug: jake-wiki
-order: 7
+order: 8
 group: personal
 home: 1
 eyebrow: JAKE WIKI · 개인 지식 위키

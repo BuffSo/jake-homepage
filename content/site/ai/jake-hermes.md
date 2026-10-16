@@ -1,6 +1,6 @@
 ---
 slug: jake-hermes
-order: 8
+order: 9
 group: personal
 home: 3
 eyebrow: JAKE HERMES · 개인 비서

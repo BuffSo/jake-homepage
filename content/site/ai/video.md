@@ -1,6 +1,6 @@
 ---
 slug: video
-order: 5
+order: 6
 group: beyond
 home: 2
 eyebrow: VIDEO · Recueve 소개 영상
