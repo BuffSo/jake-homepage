@@ -6,7 +6,7 @@ import { collectErrors } from "./helpers";
 // 홈 화면 확인 (ADR-0008). 캡처는 test-results/에만 남고 커밋하지 않는다.
 // 기대값은 사이트 전용 글(content/site/)에서 읽는다. 문구를 고쳐도 테스트는 그대로 두고, 화면에 빠진 것만 잡는다.
 
-type Layer = { name: string; items: string[]; usedBy: string[] };
+type Layer = { name: string; items: { name: string; usedBy: string[] }[] };
 type Project = {
   slug: string;
   order: number;
@@ -62,6 +62,16 @@ test("가로 스크롤이 생기지 않는다", async ({ page }) => {
   await page.goto("/");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("헤더 왼쪽의 층 마크는 이름 대신 홈 링크다", async ({ page }) => {
+  for (const path of ["/", "/work", "/ai", "/resume"]) {
+    await page.goto(path);
+    const homeLink = page.locator("body > header").getByRole("link", { name: "홈", exact: true });
+    await expect(homeLink).toHaveAttribute("href", "/");
+    await expect(homeLink.locator("svg")).toBeVisible();
+    await expect(page.locator("body > header")).not.toContainText("소재희");
+  }
 });
 
 test("헤더에서 Work, AI, Resume로 갈 수 있다", async ({ page }, testInfo) => {
@@ -140,7 +150,7 @@ test.describe("첫 화면", () => {
     await expect(buttons).toHaveCount(home.layers.length);
     for (const [i, layer] of home.layers.entries()) {
       await expect(buttons.nth(i)).toContainText(layer.name);
-      await expect(buttons.nth(i)).toContainText(layer.items.join(" · "));
+      await expect(buttons.nth(i)).toContainText(layer.items.map((item) => item.name).join(" · "));
     }
   });
 
@@ -170,31 +180,54 @@ test.describe("첫 화면", () => {
 });
 
 test.describe("기술 층 강조", () => {
-  // 모든 서비스가 쓰지는 않는 층이라야 흐려지는 서비스가 생긴다.
-  const layer = home.layers.find((l) => l.usedBy.length < projects.length)!;
-  const used = (project: Project) => layer.usedBy.includes(project.slug);
+  // 서비스마다 그 층에서 쓴 기술 (content/site/home.md의 items[].usedBy)
+  const techs = (layer: Layer, project: Project) =>
+    layer.items.filter((item) => item.usedBy.includes(project.slug)).map((item) => item.name);
+  // 그 층의 기술을 하나도 안 쓰는 서비스가 있어야 흐려지는 서비스가 생긴다.
+  const layer = home.layers.find((l) => projects.some((p) => techs(l, p).length === 0))!;
+  const serviceItems = (page: Page) => page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("listitem");
 
-  async function expectHighlight(page: Page, on: boolean) {
-    const items = page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("listitem");
+  async function expectHighlight(page: Page, target: Layer | null) {
     for (const [i, project] of projects.entries()) {
-      await expect(items.nth(i)).toHaveCSS("opacity", on && !used(project) ? "0.3" : "1");
+      const item = serviceItems(page).nth(i);
+      const used = target ? techs(target, project) : [];
+      await expect(item).toHaveCSS("opacity", target && used.length === 0 ? "0.3" : "1");
+      if (used.length) await expect(item.getByText(used.join(" · "), { exact: true })).toBeVisible();
+      // 쓴 기술이 보이는 동안 설명은 자리만 남고, 그 밖에는 설명이 보인다.
+      if (used.length) await expect(item.getByText(project.summary)).toBeHidden();
+      else await expect(item.getByText(project.summary)).toBeVisible();
     }
   }
 
-  test("층을 누르면 고정되고, 그 층을 쓰지 않는 서비스가 흐려진다", async ({ page }) => {
+  test("층을 누르면 고정되고, 서비스마다 그 층에서 쓴 기술이 보이며 하나도 안 쓴 서비스만 흐려진다", async ({ page }) => {
     await page.goto("/");
     const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
+    const band = page.getByRole("list", { name: "운영 중인 서비스" });
+    const before = (await band.boundingBox())!.height;
     await expect(button).toHaveAttribute("aria-pressed", "false");
 
     await button.click();
     await expect(button).toHaveAttribute("aria-pressed", "true");
-    await expectHighlight(page, true);
-    const names = projects.filter(used).map((p) => p.title).join(", ");
-    await expect(page.getByText(`${layer.name} 층을 쓰는 서비스: ${names}`)).toBeAttached();
+    await expectHighlight(page, layer);
+    // 설명 자리에 겹쳐 보이므로 목록 높이가 바뀌지 않는다.
+    expect((await band.boundingBox())!.height).toBe(before);
+    const announced = projects
+      .map((p) => `${p.title} ${techs(layer, p).length ? techs(layer, p).join(", ") : "쓰지 않음"}`)
+      .join(" / ");
+    await expect(page.getByText(`${layer.name} 층: ${announced}`)).toBeAttached();
 
     await button.click();
     await expect(button).toHaveAttribute("aria-pressed", "false");
-    await expectHighlight(page, false);
+    await expectHighlight(page, null);
+  });
+
+  test("층 안의 기술마다 쓴 서비스가 달라도, 하나라도 쓴 서비스는 흐려지지 않는다", async ({ page }) => {
+    // API 층은 TypeScript를 세 서비스가 모두 쓴다. 층 하나로 묶었을 때 GENYS Lotto AI가 흐려졌던 일을 막는다.
+    const api = home.layers.find((l) => l.name === "API")!;
+    await page.goto("/");
+    await page.getByRole("button", { name: /^API/ }).click();
+    await expectHighlight(page, api);
+    for (const [i] of projects.entries()) await expect(serviceItems(page).nth(i)).toHaveAttribute("data-state", "hit");
   });
 
   test("키보드로도 누를 수 있다", async ({ page }) => {
@@ -211,10 +244,21 @@ test.describe("기술 층 강조", () => {
     await page.goto("/");
     const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
     await button.hover();
-    await expectHighlight(page, true);
+    await expectHighlight(page, layer);
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await page.mouse.move(0, 0);
-    await expectHighlight(page, false);
+    await expectHighlight(page, null);
+  });
+});
+
+test.describe("첫 화면 아래 SCROLL 표시", () => {
+  test("첫 화면 안에 보이고, 누르면 운영 중인 서비스로 내려간다", async ({ page }) => {
+    await page.goto("/");
+    const cue = page.getByRole("link", { name: /^SCROLL/ });
+    await expect(cue).toBeInViewport();
+    await cue.click();
+    await expect(page).toHaveURL(/#work$/);
+    await expect(page.getByRole("heading", { level: 2, name: "운영 중인 서비스" })).toBeInViewport();
   });
 });
 
