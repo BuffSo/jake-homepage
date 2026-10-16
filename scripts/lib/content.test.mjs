@@ -167,6 +167,13 @@ test("챕터에는 원문 이미지와 다른 절을 가리키는 문장이 남�
   }
 });
 
+test("ProWith 상세의 첫 줄은 홈 서비스 목록의 소개와 같다", () => {
+  // 원문 첫 줄(레거시 전환)을 work.md의 replace로 바꿔, 설정과 쇼핑몰이 먼저 보이게 한다.
+  const chapter = composeChapters(portfolio, work.chapters).find((c) => c.slug === "prowith");
+  const project = projects.find((p) => p.data.slug === "prowith").data;
+  assert.equal(chapter.head.lead, project.summary);
+});
+
 test("의뢰받아 만든 사이트 글은 카드에 필요한 값을 모두 갖고, 순서가 겹치지 않는다", () => {
   const required = ["slug", "order", "title", "domain", "summary", "role", "period", "commits", "imageAlt"];
   for (const { file, data } of sites) {
