@@ -138,6 +138,13 @@ describe("applyRules", () => {
     assert.throws(() => applyRules(["같은 줄", "같은 줄"], { drop: ["같은 줄"] }), PortfolioError);
     assert.throws(() => applyRules(["참조 참조"], { replace: [{ find: "참조", to: "x" }] }), PortfolioError);
   });
+
+  test("replaceOnly의 글에는 replace만 적용하고 drop은 적용하지 않는다", () => {
+    const rules = { drop: ["레거시"], replace: [{ find: "레거시를 새로 구축한", to: "설정으로 켜고 끄는" }] };
+    const [body, lead] = applyRules(["레거시 이전 메모\n\n본문", "레거시를 새로 구축한 솔루션"], rules, { replaceOnly: [1] });
+    assert.equal(body, "본문");
+    assert.equal(lead, "설정으로 켜고 끄는 솔루션");
+  });
 });
 
 describe("shiftHeadings", () => {

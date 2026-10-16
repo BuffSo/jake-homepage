@@ -9,7 +9,7 @@ import { collectErrors } from "./helpers";
 
 type Project = { slug: string; order: number; title: string; liveUrl: string; liveLabel?: string; imageAlt: string };
 type Site = { slug: string; order: number; title: string; liveUrl: string; sourceUrl: string; imageAlt: string };
-type Chapter = { slug: string; head: { name: string; url: string }; ai: { title: string } | null };
+type Chapter = { slug: string; head: { name: string; url: string; lead: string }; ai: { title: string } | null };
 type Work = { title: string; sites: { title: string }; chapters: unknown[] };
 
 const read = (file: string) => parseFrontmatter(readFileSync(file, "utf8"), file).data;
@@ -70,12 +70,14 @@ test("홈 카드의 자세히 보기가 해당 챕터로 간다", async ({ page 
   }
 });
 
-test("챕터마다 원문의 이름, 화면, 서비스 링크, 보시는 방법, AI 절이 있다", async ({ page }) => {
+test("챕터마다 원문의 이름, 첫 줄, 화면, 서비스 링크, 보시는 방법, AI 절이 있다", async ({ page }) => {
   await page.goto("/work");
   for (const chapter of chapters) {
     const project = projectOf(chapter.slug);
     const section = page.getByRole("region", { name: chapter.head.name, exact: true });
     await expect(section).toHaveAttribute("id", chapter.slug);
+    // 첫 줄은 원문 인용이고, ProWith는 work.md 규칙으로 홈 소개와 같은 문장이다.
+    await expect(section.getByText(chapter.head.lead, { exact: true })).toBeVisible();
     await expect(section.getByRole("img", { name: project.imageAlt })).toBeVisible();
     const live = section.getByRole("link", { name: new RegExp(project.liveLabel ?? "서비스 열기") });
     await expect(live).toHaveAttribute("href", chapter.head.url);

@@ -102,15 +102,19 @@ export function howToView(md, service) {
 
 /**
  * 챕터 규칙. drop은 그 접두어로 시작하는 줄을 지우고, replace는 문자열을 바꾼다.
- * 규칙마다 여러 글(프로젝트 본문, AI 절)을 통틀어 정확히 한 번 맞아야 한다.
+ * 규칙마다 여러 글(프로젝트 본문, AI 절, 인용 한 줄)을 통틀어 정확히 한 번 맞아야 한다.
+ * replaceOnly에 든 번호의 글에는 replace만 적용한다. 인용 한 줄처럼 지워지면 안 되는 글이다.
  * @param {string[]} texts
  * @param {{ drop?: string[], replace?: { find: string, to: string }[] }} rules
+ * @param {{ replaceOnly?: number[] }} [options]
  */
-export function applyRules(texts, { drop = [], replace = [] } = {}) {
+export function applyRules(texts, { drop = [], replace = [] } = {}, { replaceOnly = [] } = {}) {
   let out = texts.map((t) => t.split("\n"));
+  const droppable = (i) => !replaceOnly.includes(i);
   for (const prefix of drop) {
-    exactlyOne(out.flat().filter((line) => line.startsWith(prefix)).length, `"${prefix}"로 시작하는 줄`);
-    out = out.map((lines) => lines.filter((line) => !line.startsWith(prefix)));
+    const hits = out.filter((_, i) => droppable(i)).flat().filter((line) => line.startsWith(prefix));
+    exactlyOne(hits.length, `"${prefix}"로 시작하는 줄`);
+    out = out.map((lines, i) => (droppable(i) ? lines.filter((line) => !line.startsWith(prefix)) : lines));
   }
   // 줄을 뺀 자리에 빈 줄이 겹치거나 앞뒤에 남지 않게 한다.
   let joined = out.map((lines) => trimLines(lines).join("\n").replace(/\n{3,}/g, "\n\n"));
@@ -141,10 +145,10 @@ export function composeChapters(md, chapters) {
     const detail = findSection(md, chapter.detail);
     const { body: detailBody, ...head } = parseDetail(detail);
     const ai = chapter.ai ? findSection(md, chapter.ai, chapter.aiUntil) : null;
-    const [body, aiBody] = applyRules([detailBody, ai?.body ?? ""], chapter);
+    const [body, aiBody, lead] = applyRules([detailBody, ai?.body ?? "", head.lead], chapter, { replaceOnly: [2] });
     return {
       slug: chapter.slug,
-      head,
+      head: { ...head, lead },
       howToView: howToView(md, chapter.howToView),
       body: shiftHeadings(body, 3 - (detail.level + 1)),
       ai: ai ? { title: ai.title.replace(/^\d+\.\s+/, ""), body: shiftHeadings(aiBody, 4 - (ai.level + 1)) } : null,

@@ -11,6 +11,7 @@
     "check:sensitive": "node scripts/check-sensitive.mjs --all",
     "check:units": "node scripts/check-units.mjs --all",
     "check:motion-size": "node scripts/check-motion-size.mjs",
+    "check:stack": "node scripts/check-stack.mjs",
     "sync": "node scripts/sync-content.mjs",
     "test": "node --test \"scripts/**/*.test.mjs\"",
     "test:e2e": "next build && playwright test",
