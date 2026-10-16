@@ -4,22 +4,26 @@
 // 종료 코드 2를 돌려주면 Claude Code가 명령을 실행하지 않고 stderr를 에이전트에게 전달한다.
 
 import { spawnSync } from "node:child_process";
+import { findCommits, skipsHooks } from "../lib/commit-guard.mjs";
 
 let raw = "";
 for await (const chunk of process.stdin) raw += chunk;
 
+// 실제로 git commit을 실행하는 자리만 본다. 판정은 scripts/lib/commit-guard.mjs에 있다.
 const command = JSON.parse(raw || "{}").tool_input?.command ?? "";
-if (!/\bgit\b[^;&|\n]*\bcommit\b/.test(command)) process.exit(0);
+const commits = findCommits(command);
+if (commits.length === 0) process.exit(0);
 
 function block(message) {
   console.error(message);
   process.exit(2);
 }
 
-if (/--no-verify|\s-n(\s|$)/.test(command)) {
+if (commits.some(skipsHooks)) {
   block("훅을 건너뛰는 커밋(--no-verify, -n)은 허용하지 않습니다. 훅에 걸린 원인을 고치세요.");
 }
 
+// 서명은 히어독 메시지 본문에도 있을 수 있어 명령 전체에서 찾는다
 if (/co-authored-by:.*(claude|anthropic)|generated with \[?claude/i.test(command)) {
   block("커밋 메시지에 AI 공동 작성자 줄이나 생성 도구 서명을 넣지 않습니다 (ADR-0006).");
 }
