@@ -102,7 +102,7 @@ export function howToView(md, service) {
 
 /**
  * 챕터 규칙. drop은 그 접두어로 시작하는 줄을 지우고, replace는 문자열을 바꾼다.
- * 규칙마다 여러 글(프로젝트 본문, AI 절)을 통틀어 정확히 한 번 맞아야 한다.
+ * 규칙마다 여러 글(프로젝트 본문, AI 절, 인용 한 줄)을 통틀어 정확히 한 번 맞아야 한다.
  * @param {string[]} texts
  * @param {{ drop?: string[], replace?: { find: string, to: string }[] }} rules
  */
@@ -141,10 +141,10 @@ export function composeChapters(md, chapters) {
     const detail = findSection(md, chapter.detail);
     const { body: detailBody, ...head } = parseDetail(detail);
     const ai = chapter.ai ? findSection(md, chapter.ai, chapter.aiUntil) : null;
-    const [body, aiBody] = applyRules([detailBody, ai?.body ?? ""], chapter);
+    const [body, aiBody, lead] = applyRules([detailBody, ai?.body ?? "", head.lead], chapter);
     return {
       slug: chapter.slug,
-      head,
+      head: { ...head, lead },
       howToView: howToView(md, chapter.howToView),
       body: shiftHeadings(body, 3 - (detail.level + 1)),
       ai: ai ? { title: ai.title.replace(/^\d+\.\s+/, ""), body: shiftHeadings(aiBody, 4 - (ai.level + 1)) } : null,
