@@ -41,7 +41,7 @@ test("표지 설정으로 서비스가 쓰는 기술을 찾는다", () => {
     "package.json": pkg({ next: "16", react: "19", ioredis: "5" }, { typescript: "5", "@types/aws-lambda": "8" }),
     "components.json": "{}",
     "prisma/schema.prisma": 'datasource db {\n  provider = "postgresql"\n}',
-    "scripts/deploy.sh": "aws lambda update-function-code\n# EventBridge 규칙",
+    "scripts/deploy.sh": "aws lambda update-function-code\naws events put-rule # EventBridge 규칙",
     ".vercel/project.json": "{}",
     "CLAUDE.md": "",
     ".mcp.json.backup": "{}",
@@ -88,6 +88,24 @@ test("확인하지 않은 서비스는 견주지 않는다", () => {
   assert.deepEqual(compareStack(LAYERS, TECHS, { a: new Set(["Next.js", "Tailwind"]) }), []);
 });
 
-test("층의 기술과 표지 설정의 기술이 다르면 알린다", () => {
-  assert.deepEqual(compareStack(LAYERS, { "Next.js": [], Redis: [] }, {}), ["Tailwind: 표지 설정에 없는 기술", "Redis: 층에 없는 기술"]);
+test("층의 기술과 표지 설정의 기술이 다르면 한 번씩만 알린다", () => {
+  const detected = { a: new Set(["Next.js"]), b: new Set(["Next.js"]) };
+  assert.deepEqual(compareStack(LAYERS, { "Next.js": [], Redis: [] }, detected), ["Tailwind: 표지 설정에 없는 기술", "Redis: 층에 없는 기술"]);
+});
+
+test("주석 줄과 빈 설정은 표지로 보지 않는다", () => {
+  const root = fixture({
+    "prisma/schema.prisma": '// provider = "mysql"\ndatasource db {\n  provider = "postgresql"\n}',
+    "scripts/deploy.sh": "# EventBridge 규칙은 콘솔에서 만든다\n# aws lambda update-function-code",
+    ".github/workflows/ci.yml": "# uses: aws-actions/configure-aws-credentials@v4",
+    ".mcp.json": "{}",
+    ".claude/settings.local.json": '{ "enabledMcpjsonServers": [] }',
+  });
+  const found = detectTechs(readService(root, config.skipDirs), config.techs);
+  assert.deepEqual([...found].sort(), ["GitHub Actions", "PostgreSQL"]);
+});
+
+test("MCP는 서버가 적힌 .mcp.json으로도 확인한다", () => {
+  const root = fixture({ ".mcp.json": '{ "mcpServers": { "context7": {} } }' });
+  assert.ok(detectTechs(readService(root, config.skipDirs), config.techs).has("MCP"));
 });

@@ -56,7 +56,8 @@ export function compareStack(layers, techs, detected) {
   const names = new Set(items.map((item) => item.name));
   for (const name of names) if (!techs[name]) problems.push(`${name}: 표지 설정에 없는 기술`);
   for (const name of Object.keys(techs)) if (!names.has(name)) problems.push(`${name}: 층에 없는 기술`);
-  for (const item of items) {
+  // 표지 설정에 없는 기술은 위에서 한 번만 알린다. 서비스마다 "표지가 없음"을 되풀이하지 않는다.
+  for (const item of items.filter((i) => techs[i.name])) {
     for (const [slug, found] of Object.entries(detected)) {
       const used = item.usedBy.includes(slug);
       if (found.has(item.name) && !used) problems.push(`${item.name} · ${slug}: 코드에 표지가 있는데 층 데이터에 없음`);
