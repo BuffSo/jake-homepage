@@ -1,11 +1,13 @@
 import Markdown, { type Components, type Options } from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import remarkCjkFriendly from "remark-cjk-friendly";
 import remarkGfm from "remark-gfm";
 import { rehypeDropStyle, rehypeHeadingIds, remarkSoftBreaks } from "@/lib/markdown-plugins.mjs";
 import { ExternalLink } from "./external-link";
 
 // 포트폴리오와 이력서 원문을 그린다 (ADR-0009). 서버 컴포넌트에서만 쓴다. 모양은 globals.css의 .md가 정한다.
 // 원문 HTML(<br>, <span>)은 rehype-raw로 읽고, 원문이 정한 style 속성은 버린다.
+// remark-cjk-friendly는 한글 조사 앞의 닫는 **도 강조로 읽게 한다. 예: **`DEMO Login`**에서
 
 const components: Components = {
   // 다른 사이트로 가는 링크는 새 창으로 열고 ↗를 붙인다 (docs/03-design.md).
@@ -45,7 +47,8 @@ export function MarkdownText({
   breaks?: boolean;
   headingIds?: Record<string, string>;
 }) {
-  const remarkPlugins: Options["remarkPlugins"] = breaks ? [remarkGfm, remarkSoftBreaks] : [remarkGfm];
+  const remarkPlugins: Options["remarkPlugins"] = [remarkGfm, remarkCjkFriendly];
+  if (breaks) remarkPlugins.push(remarkSoftBreaks);
   const rehypePlugins: Options["rehypePlugins"] = [rehypeRaw, rehypeDropStyle];
   if (headingIds) rehypePlugins.push([rehypeHeadingIds, { ids: headingIds }]);
 
