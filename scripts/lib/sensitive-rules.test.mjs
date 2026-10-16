@@ -13,7 +13,7 @@ test("줄 번호와 규칙 이름을 돌려주고 값은 가린다", () => {
 });
 
 test("공개 연락처와 예시 이메일은 통과하고, 그 밖의 이메일은 걸린다", () => {
-  assert.deepEqual(scanText("buffso@naver.com a@example.com"), []);
+  assert.deepEqual(scanText("buff4701@gmail.com buffso@naver.com a@example.com"), []);
   assert.deepEqual(
     scanText(PRIVATE_EMAIL).map((f) => f.id),
     ["email"],
