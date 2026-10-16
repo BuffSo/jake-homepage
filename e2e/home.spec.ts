@@ -118,11 +118,16 @@ test("헤더에 지금 보는 페이지가 표시된다", async ({ page }, testI
 
 test("화면만 바뀌는 이동 뒤에도 헤더의 표시가 따라온다", async ({ page }, testInfo) => {
   // 헤더는 루트 레이아웃이라 다시 그려지지 않는다. 경로가 바뀌면 표시도 옮겨 가야 한다.
-  test.skip(testInfo.project.name === "mobile", "모바일 메뉴의 이동은 아래 모바일 메뉴 테스트에서 본다");
+  // 모바일은 메뉴 링크를 누르면 메뉴가 닫히므로, 이동 뒤에 메뉴를 다시 열어 본다.
+  const open = async () => {
+    if (testInfo.project.name === "mobile") await page.getByText("메뉴", { exact: true }).click();
+  };
   await page.goto("/work");
   const nav = page.getByRole("navigation", { name: "주요 메뉴" }).locator("visible=true");
+  await open();
   await nav.getByRole("link", { name: "AI" }).click();
   await expect(page).toHaveURL(/\/ai$/);
+  await open();
   await expect(nav.getByRole("link", { name: "AI" })).toHaveAttribute("aria-current", "page");
   await expect(nav.getByRole("link", { name: "Work" })).not.toHaveAttribute("aria-current");
 });
