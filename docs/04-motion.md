@@ -24,14 +24,33 @@
 
 ### 기술 층
 
-| 층 | 기술 | 강조되는 서비스 |
-|---|---|---|
-| 화면 | Next.js, React, Tailwind | Recueve, ProWith, GENYS Lotto AI |
-| API | NestJS, Node.js, TypeScript | Recueve, ProWith |
-| 워커 | BullMQ, AWS Lambda, EventBridge | Recueve (자동 채움 워커), GENYS Lotto AI (회차 수집기) |
-| 데이터 | PostgreSQL, Redis, Prisma | Recueve, ProWith, GENYS Lotto AI |
-| 인프라 | AWS, Docker, Vercel | Recueve, ProWith, GENYS Lotto AI |
-| AI | Claude Code, MCP, Claude API | Recueve (Claude API) |
+| 층 | 기술 |
+|---|---|
+| 화면 | Next.js, React, Tailwind |
+| API | NestJS, Node.js, TypeScript |
+| 워커 | BullMQ, AWS Lambda, EventBridge |
+| 데이터 | PostgreSQL, Redis, Prisma |
+| 인프라 | AWS, Docker, Vercel |
+| AI | Claude Code, MCP, Claude API |
+
+층을 누르면 서비스마다 그 층에서 쓴 기술이 보입니다.
+
+| 층 | Recueve | ProWith | GENYS Lotto AI |
+|---|---|---|---|
+| 화면 | Next.js · React · Tailwind | Next.js · React | Next.js · React |
+| API | NestJS · Node.js · TypeScript | NestJS · Node.js · TypeScript | Node.js · TypeScript |
+| 워커 | BullMQ | (흐림) | AWS Lambda · EventBridge |
+| 데이터 | Redis · Prisma | PostgreSQL · Prisma | PostgreSQL · Redis · Prisma |
+| 인프라 | AWS · Docker · Vercel | AWS · Docker · Vercel | AWS · Vercel |
+| AI | Claude Code · MCP · Claude API | Claude Code | (흐림) |
+
+짝의 근거는 그 서비스의 이력서·포트폴리오 항목입니다. 기술 이름이 있거나, 아래 근거 낱말이 있으면 쓴 것으로 봅니다. 테스트가 짝을 양방향으로 대조합니다(`scripts/lib/content.test.mjs`).
+
+- Node.js ← NestJS, Next.js. 둘 다 Node.js 위에서 돕니다.
+- React ← Next.js. Next.js는 React 프레임워크입니다.
+- Claude API ← Haiku, Sonnet. Recueve가 쓰는 Claude 모델입니다.
+- Claude Code ← MCP. 포트폴리오 2절에 "MCP 서버를 직접 구현해 Claude Code에 연결"했다고 적혀 있습니다.
+- Tailwind는 이렇게 따라 나오지 않아 원문에 적힌 Recueve에만 둡니다.
 
 워커 층은 API와 데이터 사이에 둡니다. 요청에 바로 답하는 서버와 뒤에서 오래 도는 작업을 나눠 설계한다는 점이 층의 순서로 드러나게 하기 위해서입니다. Redis는 큐의 저장소로도 쓰지만 캐시와 인증 토큰에도 쓰므로 데이터 층에 둡니다.
 
@@ -95,7 +114,8 @@ Design 캔버스에 실제 문구로 그린 스토리보드를 캡처해 `docs/d
 
 ## 멈춘 뒤
 
-- 층을 누르거나 마우스를 올리면, 그 층의 기술을 쓴 서비스가 증거 목록에서 강조됩니다.
+- 층을 누르거나 마우스를 올리면, 증거 목록의 서비스마다 그 층에서 쓴 기술이 한 줄 설명 자리에 보입니다. 하나도 쓰지 않은 서비스는 흐려집니다.
+- 첫 화면 맨 아래 가운데의 "SCROLL" 표시는 마지막 박자에 다른 글과 함께 나타납니다. 화살표는 움직이지 않습니다.
 - 작은 "다시 보기" 버튼으로 움직임을 다시 볼 수 있습니다.
 - 같은 방문 중에 홈으로 다시 오면 움직임 없이 마지막 장면을 보여 줍니다.
 - 멈춘 뒤에는 반복되는 움직임이 없습니다.
