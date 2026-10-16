@@ -13,23 +13,25 @@ layers:
         usedBy: [recueve, prowith, lotto-ai]
       - name: React
         usedBy: [recueve, prowith, lotto-ai]
-        evidence: [Next.js]
       - name: Tailwind
-        usedBy: [recueve]
+        usedBy: [recueve, prowith, lotto-ai]
+      - name: shadcn/ui
+        usedBy: [recueve, prowith, lotto-ai]
   - name: API
     items:
       - name: NestJS
         usedBy: [recueve, prowith]
       - name: Node.js
         usedBy: [recueve, prowith, lotto-ai]
-        evidence: [NestJS, Next.js]
       - name: TypeScript
         usedBy: [recueve, prowith, lotto-ai]
   - name: 워커
     items:
       - name: BullMQ
         usedBy: [recueve]
-      - name: AWS Lambda
+      - name: Cron
+        usedBy: [prowith]
+      - name: Lambda
         usedBy: [lotto-ai]
       - name: EventBridge
         usedBy: [lotto-ai]
@@ -37,6 +39,8 @@ layers:
     items:
       - name: PostgreSQL
         usedBy: [prowith, lotto-ai]
+      - name: MySQL
+        usedBy: [recueve]
       - name: Redis
         usedBy: [recueve, lotto-ai]
       - name: Prisma
@@ -49,16 +53,18 @@ layers:
         usedBy: [recueve, prowith]
       - name: Vercel
         usedBy: [recueve, prowith, lotto-ai]
+      - name: GitHub Actions
+        usedBy: [recueve, prowith]
   - name: AI
     items:
       - name: Claude Code
-        usedBy: [recueve, prowith]
-        evidence: [MCP]
+        usedBy: [recueve, prowith, lotto-ai]
       - name: MCP
-        usedBy: [recueve]
+        usedBy: [recueve, prowith]
       - name: Claude API
         usedBy: [recueve]
-        evidence: [Haiku, Sonnet]
+      - name: Gemini
+        usedBy: [recueve]
 sections:
   work:
     label: WORK
@@ -81,14 +87,12 @@ sources:
   - 대표이사 겸 연구소장
   - 정부 기술개발 과제를 총괄책임자로 이끌어 성공 판정과 사업화까지
   - 나이와 경력, 실력에 상관없이 늘 누구에게나 일관성있게 겸손히 소통하시는 모습이 멋있었습니다.
-  - Claude Code에 연결
 ---
 
 <!--
 홈 첫 화면과 섹션 문구 (docs/02-ia.md 홈).
-기술 층의 기술 이름은 포트폴리오 "6. 기술 스택"에 있는 것만 쓴다. 기술마다 쓴 서비스(usedBy)는 docs/04-motion.md "기술 층" 표를 따른다.
-usedBy는 그 서비스의 이력서·포트폴리오 항목에 기술 이름이나 evidence 낱말이 있는 서비스와 정확히 같아야 한다(테스트가 양방향으로 대조).
-evidence: Node.js ← NestJS, Next.js(그 위에서 돈다) · React ← Next.js(React 프레임워크) · Claude API ← Haiku, Sonnet(Claude 모델)
-· Claude Code ← MCP(포트폴리오 2절 "MCP 서버를 직접 구현해 Claude Code에 연결", sources에 둠).
+기술 층의 기술마다 쓴 서비스(usedBy)는 각 서비스의 소스 코드로 확인한다(ADR-0010). 표는 docs/04-motion.md "기술 층"에 있다.
+층을 고치면 npm run check:stack을 로컬에서 돌린다. 기술마다 코드에서 찾는 표지는 scripts/stack.config.mjs에 있다.
+서비스의 이력서·포트폴리오 항목에 이름이 나오는 기술은 그 서비스에 반드시 표시한다(scripts/lib/content.test.mjs).
 sources의 문장은 동기화한 이력서와 포트폴리오에 그대로 있어야 한다 (scripts/lib/content.test.mjs).
 -->

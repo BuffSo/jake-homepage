@@ -20,8 +20,8 @@ export type ProjectSlug = "recueve" | "prowith" | "lotto-ai";
 export type Metric = { value: string; label: string };
 export type Link = { label: string; href: string };
 
-/** 기술 층의 기술 하나와 그 기술을 쓴 서비스. evidence는 서비스 항목에서 쓴 것으로 보는 다른 낱말이다 (Node.js ← NestJS) */
-export type LayerItem = { name: string; usedBy: ProjectSlug[]; evidence?: string[] };
+/** 기술 층의 기술 하나와 그 기술을 쓴 서비스. 짝은 서비스 코드로 확인한다 (ADR-0010) */
+export type LayerItem = { name: string; usedBy: ProjectSlug[] };
 export type Layer = { name: string; items: LayerItem[] };
 
 export type Home = {
