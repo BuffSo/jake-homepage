@@ -122,6 +122,16 @@ test("의뢰받아 만든 사이트 카드에 사이트 링크와 소스 링크�
   }
 });
 
+test("첫 챕터 캡처만 바로 불러오고, 나머지 캡처는 내려올 때 불러온다", async ({ page }) => {
+  await page.goto("/work");
+  // 첫 챕터 캡처는 모바일 첫 화면의 LCP 요소다 (Lighthouse 모바일 성능 90점 기준)
+  for (const [i, chapter] of chapters.entries()) {
+    const image = page.locator(`#${chapter.slug} img`).first();
+    await expect(image).toHaveAttribute("loading", i === 0 ? "eager" : "lazy");
+    await expect(image).toHaveAttribute("fetchpriority", i === 0 ? "high" : "auto");
+  }
+});
+
 test("이미지마다 대체 텍스트가 있고, 내려오면 불러온다", async ({ page }) => {
   await page.goto("/work");
   const images = page.locator("main img");
