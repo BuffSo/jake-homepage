@@ -44,7 +44,7 @@
 | 인프라 | AWS · Docker · Vercel · GitHub Actions | AWS · Docker · Vercel · GitHub Actions | AWS · Vercel |
 | AI | Claude Code · MCP · Claude API · Gemini | Claude Code · MCP | Claude Code |
 
-짝의 근거는 각 서비스의 소스 코드입니다([ADR-0010](adr/0010-stack-from-source.md), 2026-10-16). 이력서와 포트폴리오는 서비스마다 대표 기술만 적어서, 원문 낱말로 정하면 실제로 쓴 기술이 빠졌습니다.
+층에 싣는 기술 이름과 짝의 근거는 각 서비스의 소스 코드입니다([ADR-0010](adr/0010-stack-from-source.md), 2026-10-16). 이력서와 포트폴리오는 서비스마다 대표 기술만 적어서, 원문 낱말로 정하면 실제로 쓴 기술이 빠졌습니다.
 
 - 기술마다 코드에서 찾을 표지(의존성 이름, 파일 이름, 특정 파일 안의 낱말)를 `scripts/stack.config.mjs`에 둡니다. `npm run check:stack`이 세 서비스 폴더에서 찾은 결과가 위 표와 같아야 합니다.
 - 서비스 항목(이력서·포트폴리오)에 이름이 나오는 기술은 그 서비스에 반드시 표시합니다. 이 방향은 CI 테스트가 봅니다(`scripts/lib/content.test.mjs`).

@@ -199,7 +199,7 @@ test.describe("기술 층 강조", () => {
       const item = serviceItems(page).nth(i);
       const used = target ? techs(target, project) : [];
       await expect(item).toHaveCSS("opacity", target && used.length === 0 ? "0.3" : "1");
-      // 가장 긴 기술 줄은 자리만 잡는 보이지 않는 사본이 있으므로 보이는 것만 센다.
+      // 층마다의 기술 줄은 자리만 잡는 보이지 않는 사본이 있으므로 보이는 것만 센다.
       if (used.length) await expect(item.getByText(used.join(" · "), { exact: true }).filter({ visible: true })).toHaveCount(1);
       // 쓴 기술이 보이는 동안 설명은 자리만 남고, 그 밖에는 설명이 보인다.
       if (used.length) await expect(item.getByText(project.summary)).toBeHidden();
@@ -243,7 +243,7 @@ test.describe("기술 층 강조", () => {
   });
 
   test("1024 폭에서 기술 줄이 두 줄이 되어도 목록 높이가 바뀌지 않는다", async ({ page }, testInfo) => {
-    // 서비스 칸이 가장 좁은 데스크톱 폭이다. 가장 긴 기술 줄의 자리를 미리 잡아 둔다(service-list.tsx).
+    // 서비스 칸이 가장 좁은 데스크톱 폭이다. 층마다의 기술 줄을 보이지 않게 겹쳐 자리를 미리 잡아 둔다(service-list.tsx).
     test.skip(testInfo.project.name === "mobile", "데스크톱 폭 확인");
     await page.setViewportSize({ width: 1024, height: 800 });
     await page.goto("/");
