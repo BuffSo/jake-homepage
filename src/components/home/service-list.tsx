@@ -12,8 +12,8 @@ export type ServiceItem = {
   line: string;
   href: string;
   domain: string;
-  /** 모든 층 중 가장 긴 기술 줄. 이 줄이 들어갈 자리를 미리 잡는다. */
-  longestTechs: string;
+  /** 층마다 쓴 기술 줄. 모두 보이지 않게 겹쳐 가장 높은 줄의 자리를 미리 잡는다. */
+  techLines: string[];
 };
 
 // 쓴 기술 줄과 그 자리를 잡는 줄이 같은 글자를 써야 높이가 맞는다.
@@ -60,15 +60,17 @@ export function ServiceList({ services }: { services: ServiceItem[] }) {
                   {service.name}
                 </a>
               </div>
-              {/* 설명, 가장 긴 기술 줄, 쓴 기술을 한 칸에 겹친다. 칸 높이는 설명과 가장 긴 기술 줄 중 큰 쪽이다.
+              {/* 설명, 층마다의 기술 줄(보이지 않음), 쓴 기술을 한 칸에 겹친다. 칸 높이는 그중 가장 높은 줄이다.
                   쓴 기술이 보이는 동안 설명은 자리만 남는다. 그래서 층을 눌러도 목록 높이가 바뀌지 않는다. */}
               <div className="grid content-start [grid-area:line] *:col-start-1 *:row-start-1">
                 <p className="text-xs leading-[1.45] text-muted group-data-[state=hit]:invisible md:text-sm lg:leading-[1.5]">
                   {service.line}
                 </p>
-                <p aria-hidden="true" className={`invisible ${TECH_LINE}`}>
-                  {service.longestTechs}
-                </p>
+                {service.techLines.map((line) => (
+                  <p key={line} aria-hidden="true" className={`invisible ${TECH_LINE}`}>
+                    {line}
+                  </p>
+                ))}
                 {state === "hit" && <p className={TECH_LINE}>{techLine(used)}</p>}
               </div>
               <ExternalLink
