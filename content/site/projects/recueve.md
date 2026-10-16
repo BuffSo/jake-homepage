@@ -19,8 +19,8 @@ stack:
   - Vercel
 headline: 흩어진 관심사를 한곳에 모읍니다.
 metric:
-  value: 링크 하나
-  label: 붙여넣으면 AI가 카테고리 · 설명 · 노트를 채웁니다
+  value: URL → 설명 · 카테고리
+  label: 붙여넣으면 AI가 레코를 채웁니다
 liveUrl: https://recueve.com
 image: recueve
 imageAlt: Recueve 레코 상세. AI가 채운 카테고리와 설명
