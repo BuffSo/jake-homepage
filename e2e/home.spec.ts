@@ -88,6 +88,50 @@ test("헤더에서 Work, AI, Resume로 갈 수 있다", async ({ page }, testInf
   await expect(nav.getByRole("link", { name: "Resume" })).toHaveAttribute("href", "/resume");
 });
 
+test("헤더에 지금 보는 페이지가 표시된다", async ({ page }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  const nav = page.getByRole("navigation", { name: "주요 메뉴" }).locator("visible=true");
+  const open = async () => {
+    if (mobile) await page.getByText("메뉴", { exact: true }).click();
+  };
+  for (const [path, label] of [
+    ["/work", "Work"],
+    ["/ai", "AI"],
+    ["/resume", "Resume"],
+  ]) {
+    await page.goto(path);
+    await open();
+    for (const other of ["Work", "AI", "Resume"]) {
+      const link = nav.getByRole("link", { name: other });
+      if (other === label) {
+        await expect(link).toHaveAttribute("aria-current", "page");
+        await expect(link).toHaveCSS("text-decoration-line", "underline");
+      } else {
+        await expect(link).not.toHaveAttribute("aria-current");
+      }
+    }
+  }
+  await page.goto("/");
+  await open();
+  await expect(nav.locator("[aria-current]")).toHaveCount(0);
+});
+
+test("화면만 바뀌는 이동 뒤에도 헤더의 표시가 따라온다", async ({ page }, testInfo) => {
+  // 헤더는 루트 레이아웃이라 다시 그려지지 않는다. 경로가 바뀌면 표시도 옮겨 가야 한다.
+  // 모바일은 메뉴 링크를 누르면 메뉴가 닫히므로, 이동 뒤에 메뉴를 다시 열어 본다.
+  const open = async () => {
+    if (testInfo.project.name === "mobile") await page.getByText("메뉴", { exact: true }).click();
+  };
+  await page.goto("/work");
+  const nav = page.getByRole("navigation", { name: "주요 메뉴" }).locator("visible=true");
+  await open();
+  await nav.getByRole("link", { name: "AI" }).click();
+  await expect(page).toHaveURL(/\/ai$/);
+  await open();
+  await expect(nav.getByRole("link", { name: "AI" })).toHaveAttribute("aria-current", "page");
+  await expect(nav.getByRole("link", { name: "Work" })).not.toHaveAttribute("aria-current");
+});
+
 test.describe("모바일 메뉴", () => {
   // 헤더는 루트 레이아웃에 있어 페이지를 옮겨도 남는다. 열린 메뉴가 새 페이지를 가리지 않는지 본다.
   test.beforeEach(async ({ page }, testInfo) => {

@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import avatar from "@/assets/jake-avatar.png";
 import { MobileMenu } from "./mobile-menu";
+import { CurrentNavLinks, NavLinks } from "./nav-links";
 
 // 헤더 (docs/02-ia.md 공통 요소). 모바일은 "메뉴"로 같은 항목을 연다(mobile-menu.tsx).
 // 홈 링크는 실명 대신 프로필 그림과 별칭 "Jake"다. 이름은 제목, 푸터, About, 이력서에 둔다.
@@ -28,11 +30,9 @@ export function SiteHeader() {
       </Link>
 
       <nav aria-label="주요 메뉴" className="hidden gap-7 text-[0.9375rem] md:flex">
-        {NAV.map((item) => (
-          <Link key={item.href} href={item.href} className="hover:underline">
-            {item.label}
-          </Link>
-        ))}
+        <Suspense fallback={<NavLinks items={NAV} variant="bar" />}>
+          <CurrentNavLinks items={NAV} variant="bar" />
+        </Suspense>
       </nav>
 
       <MobileMenu items={NAV} />
