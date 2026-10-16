@@ -8,6 +8,7 @@ import {
   ReviewFlow,
   SiteSteps,
   WikiFlow,
+  WorkbenchFlow,
 } from "@/components/ai-figures";
 import { ButtonLink } from "@/components/button-link";
 import { Metric } from "@/components/section-head";
@@ -27,6 +28,8 @@ function Figure({ work }: { work: AiWork }) {
       return <ReviewFlow className={ITEM_FRAME} />;
     case "mcp-flow":
       return <McpFlow className={ITEM_FRAME} />;
+    case "workbench-flow":
+      return <WorkbenchFlow className={ITEM_FRAME} />;
     case "site-steps":
       return <SiteSteps className={ITEM_FRAME_STEPS} />;
     case "image":

@@ -67,7 +67,7 @@ export type AiWork = {
   result?: string;
   usage?: string; // 개인 도구는 결과 대신 쓰는 법
   metric: Metric;
-  figure?: "wiki-flow" | "image" | "hermes-flow" | "site-steps" | "review-flow" | "mcp-flow";
+  figure?: "wiki-flow" | "image" | "hermes-flow" | "site-steps" | "review-flow" | "mcp-flow" | "workbench-flow";
   image?: string;
   imageAlt?: string;
   links: (Link & { home?: boolean })[];

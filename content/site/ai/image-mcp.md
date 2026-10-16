@@ -1,6 +1,6 @@
 ---
 slug: image-mcp
-order: 6
+order: 7
 group: beyond
 eyebrow: IMAGE MCP · 이미지 생성
 title: 이미지 MCP

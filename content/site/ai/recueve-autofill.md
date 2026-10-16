@@ -1,6 +1,6 @@
 ---
 slug: recueve-autofill
-order: 4
+order: 5
 group: product
 eyebrow: RECUEVE · AI 자동 채움
 title: Recueve AI 자동 채움

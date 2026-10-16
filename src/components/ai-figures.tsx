@@ -145,3 +145,28 @@ export function McpFlow({ className = "" }: { className?: string }) {
     </div>
   );
 }
+
+/** 작업 환경: 휴대폰 ⇄ Orca(맥북의 세션들) ⇄ Aside, 아래에 함께 쓰는 도구 */
+export function WorkbenchFlow({ className = "" }: { className?: string }) {
+  return (
+    <div aria-hidden="true" className={`${FRAME} ${className}`}>
+      <div className="flex items-center gap-1.5 lg:gap-3">
+        <div className={SIDE}>
+          휴대폰
+          <span className="hidden text-[0.6875rem] font-normal text-muted lg:block">Orca 앱</span>
+        </div>
+        <span className="lg:text-lg">⇄</span>
+        <div className={CORE}>
+          <span className="text-xs font-semibold lg:text-sm">Orca</span>
+          <span className="hidden text-[0.6875rem] opacity-75 lg:block">맥북 · Claude Code 세션 여럿</span>
+        </div>
+        <span className="lg:text-lg">⇄</span>
+        <div className={SIDE}>
+          Aside
+          <span className="hidden text-[0.6875rem] font-normal text-muted lg:block">브라우저</span>
+        </div>
+      </div>
+      <span className="text-center text-[0.6875rem] text-subtle lg:text-xs">코드는 VS Code · Gemini는 Antigravity CLI</span>
+    </div>
+  );
+}
