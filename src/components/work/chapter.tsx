@@ -42,9 +42,12 @@ export function Chapter({
           </div>
         </div>
 
+        {/* 첫 챕터 캡처는 모바일 첫 화면에 보이는 LCP 요소라 바로 불러온다. 나머지는 내려올 때 불러온다. */}
         <Image
           src={PROJECT_IMAGES[chapter.slug]}
           alt={project.imageAlt}
+          loading={first ? "eager" : "lazy"}
+          fetchPriority={first ? "high" : "auto"}
           sizes="(min-width: 80rem) 35rem, (min-width: 64rem) 45vw, 100vw"
           className="mt-1 h-auto w-full rounded-[0.625rem] border border-line lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:rounded-xl"
         />
