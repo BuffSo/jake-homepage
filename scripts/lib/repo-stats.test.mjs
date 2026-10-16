@@ -30,7 +30,7 @@ test("ADR은 번호로 시작하는 md만 센다", () => {
   }
 });
 
-test("CI 검사는 npm ci 뒤의 단계만 세고, 설치와 실패할 때만 도는 단계는 빼고 센다", () => {
+test("CI 검사는 npm ci 뒤의 단계만 세고, 설치, 실패할 때만 도는 단계, 결과물 올리기는 빼고 센다", () => {
   const root = fixture({
     ".github/workflows/ci.yml": `
 jobs:
@@ -42,6 +42,9 @@ jobs:
       - name: 브라우저 설치
         run: npx playwright install --with-deps chromium
       - run: npx playwright test
+      - name: 캡처 올리기
+        if: always()
+        uses: actions/upload-artifact@v7
       - name: 보고서 올리기
         if: failure()
         uses: actions/upload-artifact@v7

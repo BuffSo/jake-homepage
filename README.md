@@ -37,6 +37,7 @@ Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Vercel
 ```bash
 npm install
 npm run dev
+npm run verify   # 검사 전부를 한 번에 돌리고 표로 요약
 ```
 
 `npm install`을 하면 커밋 전 민감정보 검사 훅이 함께 설정됩니다.

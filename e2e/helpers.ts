@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { CAPTURE_DIR } from "../scripts/lib/captures.mjs";
 
 /** 콘솔 오류, 페이지 오류, 실패한 요청을 모은다 */
 export function collectErrors(page: Page) {
@@ -12,4 +13,13 @@ export function collectErrors(page: Page) {
     if (res.status() >= 400) errors.push(`${res.status()} ${new URL(res.url()).pathname}`);
   });
   return errors;
+}
+
+/**
+ * 주요 화면 캡처의 경로 (docs/01-prd.md F6): test-results/captures/<이름>-<폭>.png
+ * 테스트마다 다른 출력 폴더 대신 한 폴더에 모은다. npm run verify 뒤에 바로 열어 보고, CI는 artifact로 올린다.
+ * 찍어야 할 목록은 scripts/lib/captures.mjs에 있고, npm run check:captures가 모두 생겼는지 본다.
+ */
+export function capturePath(page: Page, name: string) {
+  return `${CAPTURE_DIR}/${name}-${page.viewportSize()?.width}.png`;
 }

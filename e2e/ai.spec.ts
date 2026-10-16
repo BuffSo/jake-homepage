@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
-import { collectErrors } from "./helpers";
+import { capturePath, collectErrors } from "./helpers";
 
 // AI로 일하는 방식 화면 확인 (ADR-0008, docs/02-ia.md /ai). 캡처는 test-results/에만 남고 커밋하지 않는다.
 // 기대값은 사이트 전용 글(content/site/)에서 읽는다.
@@ -115,10 +115,10 @@ test("이미지마다 대체 텍스트가 있고, 내려오면 불러온다", as
   }
 });
 
-test("캡처를 남긴다 (라이트, 다크)", async ({ page }, testInfo) => {
+test("캡처를 남긴다 (라이트, 다크)", async ({ page }) => {
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto("/ai");
-    await page.screenshot({ path: testInfo.outputPath(`ai-${scheme}.png`), fullPage: true });
+    await page.screenshot({ path: capturePath(page, `ai-${scheme}`), fullPage: true });
   }
 });

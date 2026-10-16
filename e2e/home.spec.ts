@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
-import { collectErrors } from "./helpers";
+import { capturePath, collectErrors } from "./helpers";
 
 // 홈 화면 확인 (ADR-0008). 캡처는 test-results/에만 남고 커밋하지 않는다.
 // 기대값은 사이트 전용 글(content/site/)에서 읽는다. 문구를 고쳐도 테스트는 그대로 두고, 화면에 빠진 것만 잡는다.
@@ -370,10 +370,10 @@ test.describe("아래 섹션", () => {
   });
 });
 
-test("캡처를 남긴다 (라이트, 다크)", async ({ page }, testInfo) => {
+test("캡처를 남긴다 (라이트, 다크)", async ({ page }) => {
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto("/");
-    await page.screenshot({ path: testInfo.outputPath(`home-${scheme}.png`), fullPage: true });
+    await page.screenshot({ path: capturePath(page, `home-${scheme}`), fullPage: true });
   }
 });
