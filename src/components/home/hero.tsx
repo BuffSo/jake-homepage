@@ -32,7 +32,7 @@ export function Hero() {
       data-hero
       suppressHydrationWarning
       aria-labelledby="hero-title"
-      className="flex flex-col gap-3 pt-1 pb-10 lg:min-h-[calc(100svh-4rem)] lg:gap-7 lg:pt-0 lg:pb-10"
+      className="flex flex-col gap-3 pt-1 pb-4 lg:min-h-[calc(100svh-4rem)] lg:gap-7 lg:pt-0 lg:pb-5"
     >
       <InlineScript html={INTRO_SCRIPT} />
       <LayerFocusProvider layers={home.layers}>
@@ -59,7 +59,26 @@ export function Hero() {
         <ServiceList services={services} />
       </LayerFocusProvider>
       <Contact email={home.contact.email} github={home.contact.github} className="flex lg:hidden" />
+      <ScrollCue />
     </section>
+  );
+}
+
+// 첫 화면 아래 가운데의 SCROLL 표시 (docs/02-ia.md 홈 1). 첫 화면이 화면 높이에 맞아 아래 내용이 없어 보이지 않게 한다.
+// 마지막 박자에 다른 글과 함께 나타나고(data-intro-part), 멈춘 뒤에는 움직이지 않는다(docs/04-motion.md 멈춘 뒤).
+function ScrollCue() {
+  return (
+    <a
+      href="#work"
+      data-intro-part
+      className="inline-flex min-h-11 min-w-11 flex-col items-center justify-center gap-0.5 self-center font-mono text-[0.625rem] tracking-[0.12em] text-subtle hover:text-fg lg:text-[0.6875rem]"
+    >
+      SCROLL
+      <svg aria-hidden="true" viewBox="0 0 12 12" className="size-3">
+        <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span className="sr-only">운영 중인 서비스로 내려가기</span>
+    </a>
   );
 }
 
