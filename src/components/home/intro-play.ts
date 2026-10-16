@@ -195,7 +195,7 @@ export function play(hero: HTMLElement, onEnd: () => void): () => void {
       track(item, "opacity", [[2650, "0"], [2850, "1"]]);
     });
 
-    // 박자 5: 둘째 줄과 보조 문장, 다시 보기, 증거 목록, 연락 링크가 제자리에 나타난다
+    // 박자 5: 둘째 줄과 보조 문장, 다시 보기, 증거 목록, 연락 링크, SCROLL 표시가 제자리에 나타난다
     const parts = [...hero.querySelectorAll<HTMLElement>("[data-intro-part]:not([data-intro-part='layer'])")];
     parts.forEach((part, k) => {
       const t = 2500 + k * 50;

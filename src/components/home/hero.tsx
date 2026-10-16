@@ -82,7 +82,7 @@ function ScrollCue() {
   );
 }
 
-// 연락 링크. 데스크톱은 소개 아래, 모바일은 첫 화면 맨 아래에 두므로 두 번 그리고 한쪽만 보인다.
+// 연락 링크. 데스크톱은 소개 아래, 모바일은 증거 목록 아래(SCROLL 표시 위)에 두므로 두 번 그리고 한쪽만 보인다.
 function Contact({ email, github, className }: { email: string; github: string; className: string }) {
   const link = "inline-flex min-h-6 items-center underline underline-offset-4";
   return (
