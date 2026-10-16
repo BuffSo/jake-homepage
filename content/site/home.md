@@ -4,7 +4,7 @@ lines:
   - 기획부터 디자인, 개발, 배포까지 전 과정을 다룹니다.
   - 속도는 AI로 내고, 판단과 검증은 AI 이전부터 쌓은 경험으로 합니다.
 contact:
-  email: buffso@naver.com
+  email: buff4701@gmail.com
   github: https://github.com/BuffSo
 layers:
   - name: 화면
