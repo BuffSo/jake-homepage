@@ -101,6 +101,13 @@ test("사이트에서 고친 문장이 보이고, 원문 이미지는 싣지 않
   await expect(main.locator('img[src*="assets/"]')).toHaveCount(0);
 });
 
+test("보시는 방법의 굵게 표시가 한글 조사 앞에서도 닫힌다", async ({ page }) => {
+  await page.goto("/work");
+  // 원문: **`로그인` → `DEMO Login`**에서 (닫는 ** 뒤에 조사가 붙는다)
+  const note = page.locator("#prowith .md-note");
+  await expect(note.locator("strong").filter({ hasText: "DEMO Login" })).toHaveCount(1);
+});
+
 test("의뢰받아 만든 사이트 카드에 사이트 링크와 소스 링크가 있다", async ({ page }) => {
   await page.goto("/work");
   const section = page.getByRole("region", { name: work.sites.title });
