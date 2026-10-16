@@ -61,6 +61,7 @@
 ## 콘텐츠
 
 - 사실(수치, 날짜, 회사명, 기술명)은 이력서와 포트폴리오에 있는 것만 쓴다. 없는 사실을 만들지 않는다. 포트폴리오에 없는 작업(의뢰받아 만든 사이트, AI 작업)은 `content/site/`의 사이트 전용 글에 있는 사실만 쓴다(ADR-0003).
+  - 예외: 첫 화면 기술 층의 기술-서비스 짝은 각 서비스의 소스 코드로 확인한다(ADR-0010). 층 데이터를 고치면 `npm run check:stack`을 로컬에서 돌린다.
 - 콘텐츠 원본은 비공개 커리어 저장소에 있다. `content/synced/`는 동기화 결과물이라 직접 고치지 않는다(ADR-0003). 사이트 전용 글은 `content/site/`에 쓴다.
 - 외부 링크는 넣기 전에 실제로 열어 본다. HTTP 200이어도 호스팅 만료 안내 페이지일 수 있다.
 - Recoeve와 Recueve는 소스 저장소 링크나 코드를 싣지 않는다.
@@ -91,4 +92,5 @@ npm test                  # 스크립트 테스트 (node --test)
 npm run test:e2e          # 빌드 후 Playwright E2E (포트 3210, 데스크톱 1280과 모바일 375)
 npm run sync              # 콘텐츠 동기화 (CAREER_DIR, .sensitive-terms.local 필요)
 npm run sync -- --check   # content/synced/가 원본과 같은지 확인만
+npm run check:stack       # 기술 층 짝을 세 서비스 코드와 대조 (RECUEVE_DIR, PROWITH_DIR, LOTTO_DIR 필요, 없으면 건너뜀)
 ```
