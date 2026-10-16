@@ -10,10 +10,10 @@ const byId = (id) => CHECKS.find((check) => check.id === id);
 const pass = (id) => ({ ...byId(id), status: "pass", seconds: 1 });
 const fail = (id) => ({ ...byId(id), status: "fail", seconds: 1 });
 
-test("검사 열 개를 정한 순서로 돈다", () => {
+test("검사 열한 개를 정한 순서로 돈다", () => {
   assert.deepEqual(
     CHECKS.map((check) => check.id),
-    ["sensitive", "units", "test", "lint", "typecheck", "sync", "stack", "build", "motion", "e2e"],
+    ["sensitive", "units", "test", "lint", "typecheck", "sync", "stack", "build", "motion", "e2e", "captures"],
   );
 });
 
@@ -38,6 +38,8 @@ test("건너뛴 이유는 앞 검사가 실패했는지, 건너뛰었는지, 돌
   const skipped = { ...byId("build"), status: "skip", reason: "테스트용" };
   assert.deepEqual(decide(byId("e2e"), {}, [skipped]), { run: false, reason: "빌드 건너뜀" });
   assert.deepEqual(decide(byId("e2e"), {}, []), { run: false, reason: "빌드 결과 없음" });
+  // 빌드가 실패해 E2E를 건너뛰면 캡처 확인도 건너뛴다
+  assert.deepEqual(decide(byId("captures"), {}, [{ ...byId("e2e"), status: "skip" }]), { run: false, reason: "화면 검사 (E2E) 건너뜀" });
 });
 
 test("실패가 하나라도 있으면 1로 끝나고, 건너뜀은 실패가 아니다", () => {

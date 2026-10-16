@@ -47,6 +47,9 @@ jobs:
       - name: 화면 검사 (E2E)
         run: npx playwright test
 
+      - name: 화면 캡처 확인
+        run: npm run check:captures
+
       # 주요 화면 캡처는 통과해도 올린다. 바뀐 화면을 PR에서 바로 열어 보기 위해서다 (docs/01-prd.md F6)
       - name: 화면 캡처 올리기
         if: always()

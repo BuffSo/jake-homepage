@@ -23,6 +23,7 @@ export const CHECKS = [
   { id: "build", name: "빌드", command: "npm run build" },
   { id: "motion", name: "움직임 코드 용량", command: "npm run check:motion-size", after: "build" },
   { id: "e2e", name: "화면 검사 (E2E)", command: "npx playwright test", after: "build" },
+  { id: "captures", name: "화면 캡처 확인", command: "npm run check:captures", after: "e2e" },
 ];
 
 const LABEL = { pass: "통과", fail: "실패", skip: "건너뜀" };
