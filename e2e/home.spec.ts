@@ -64,13 +64,18 @@ test("가로 스크롤이 생기지 않는다", async ({ page }) => {
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
-test("헤더 왼쪽의 층 마크는 이름 대신 홈 링크다", async ({ page }) => {
+test("헤더 왼쪽의 프로필 그림과 별칭 Jake가 실명 대신 홈 링크다", async ({ page }) => {
   for (const path of ["/", "/work", "/ai", "/resume"]) {
     await page.goto(path);
-    const homeLink = page.locator("body > header").getByRole("link", { name: "홈", exact: true });
+    const header = page.locator("body > header");
+    const homeLink = header.getByRole("link", { name: "Jake", exact: true });
     await expect(homeLink).toHaveAttribute("href", "/");
-    await expect(homeLink.locator("svg")).toBeVisible();
-    await expect(page.locator("body > header")).not.toContainText("소재희");
+    // 그림은 장식이라 대체 텍스트가 비어 있고, 불러와져 보인다.
+    const avatar = homeLink.locator("img");
+    await expect(avatar).toHaveAttribute("alt", "");
+    await expect(avatar).toBeVisible();
+    expect(await avatar.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+    await expect(header).not.toContainText("소재희");
   }
 });
 
