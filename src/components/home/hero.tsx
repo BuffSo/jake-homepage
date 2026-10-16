@@ -5,6 +5,7 @@ import { getHome, getProjects } from "@/lib/content";
 import { HeroIntro } from "./hero-intro";
 import { INTRO_SCRIPT } from "./intro-script";
 import { LayerFocusProvider } from "./layer-focus";
+import { longestTechLine } from "./layer-techs";
 import { ServiceList, type ServiceItem } from "./service-list";
 import { StackLayers } from "./stack-layers";
 
@@ -20,6 +21,7 @@ export function Hero() {
     line: project.summary,
     href: project.liveUrl,
     domain: new URL(project.liveUrl).host,
+    longestTechs: longestTechLine(home.layers, project.slug),
   }));
 
   // 첫 줄은 마지막 낱말 앞에서 줄을 바꾼다 ("Idea to / production.").
