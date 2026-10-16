@@ -59,7 +59,7 @@
 | 작업 | 글 |
 |---|---|
 | Brain House, AI TOOLS | `content/site/sites/` |
-| Jake Wiki, 영상 제작, Jake Hermes | `content/site/ai/` |
+| Jake Wiki, 영상 제작, Jake Hermes, 작업 환경 | `content/site/ai/` |
 
 - 이 글에는 공개된 곳(라이브 사이트, 공개 저장소, 공개 영상)에서 확인할 수 있는 사실과 제가 확인한 사실(기간, 역할, 스택, 만든 방법)만 넣습니다.
 - 공개하지 않는 자료(개인 위키의 내용 등)는 방법만 쓰고, 내용과 화면은 싣지 않습니다.
