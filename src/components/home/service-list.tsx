@@ -8,12 +8,19 @@ export type ServiceItem = { slug: ProjectSlug; num: string; name: string; line: 
 
 // 첫 화면의 증거 목록 (docs/02-ia.md 홈 1). 번호는 아래 서비스 카드와 같고, 이름을 누르면 그 카드로 내려간다.
 // 모바일은 이름 줄 오른쪽에 주소를, 데스크톱은 설명 아래에 주소를 둔다. 읽는 순서는 둘 다 이름, 설명, 주소다.
-// 기술 층을 강조하면 그 층을 쓰는 서비스는 표식이 강조색이 되고, 나머지는 흐려진다.
+// 기술 층을 강조하면 서비스마다 그 층에서 쓴 기술이 한 줄 설명 자리에 보이고, 표식이 강조색이 된다.
+// 그 층의 기술을 하나도 쓰지 않은 서비스만 흐려진다. 층 하나에 서비스를 묶으면 기술마다 쓴 서비스가 달라 사실과 어긋난다.
 export function ServiceList({ services }: { services: ServiceItem[] }) {
   const { active, pinned } = useLayerFocus();
-  const uses = (layer: typeof active, slug: ProjectSlug) => layer?.usedBy.includes(slug) ?? false;
+  const techs = (layer: typeof active, slug: ProjectSlug) =>
+    layer?.items.filter((item) => item.usedBy.includes(slug)).map((item) => item.name) ?? [];
   const announced = pinned
-    ? `${pinned.name} 층을 쓰는 서비스: ${services.filter((s) => uses(pinned, s.slug)).map((s) => s.name).join(", ")}`
+    ? `${pinned.name} 층: ${services
+        .map((s) => {
+          const used = techs(pinned, s.slug);
+          return `${s.name} ${used.length ? used.join(", ") : "쓰지 않음"}`;
+        })
+        .join(" / ")}`
     : "";
 
   return (
@@ -24,7 +31,8 @@ export function ServiceList({ services }: { services: ServiceItem[] }) {
         className="flex flex-col gap-2 border-t border-line pt-2.5 lg:grid lg:grid-cols-3 lg:gap-10 lg:pt-5"
       >
         {services.map((service) => {
-          const state = !active ? "idle" : uses(active, service.slug) ? "hit" : "dim";
+          const used = techs(active, service.slug);
+          const state = !active ? "idle" : used.length ? "hit" : "dim";
           return (
             <li
               key={service.slug}
@@ -41,7 +49,17 @@ export function ServiceList({ services }: { services: ServiceItem[] }) {
                   {service.name}
                 </a>
               </div>
-              <p className="text-xs leading-[1.45] text-muted [grid-area:line] md:text-sm lg:leading-[1.5]">{service.line}</p>
+              {/* 쓴 기술은 설명 자리에 겹쳐 보인다. 설명은 자리만 남겨 두어 목록 높이가 바뀌지 않는다. */}
+              <div className="relative [grid-area:line]">
+                <p className="text-xs leading-[1.45] text-muted group-data-[state=hit]:invisible md:text-sm lg:leading-[1.5]">
+                  {service.line}
+                </p>
+                {state === "hit" && (
+                  <p className="absolute inset-x-0 top-0 font-mono text-[0.6875rem] leading-[1.6] md:text-[0.8125rem] lg:leading-[1.65]">
+                    {used.join(" · ")}
+                  </p>
+                )}
+              </div>
               <ExternalLink
                 href={service.href}
                 className="self-center justify-self-end font-mono text-[0.6875rem] underline underline-offset-4 [grid-area:domain] md:text-[0.8125rem] lg:justify-self-start"
