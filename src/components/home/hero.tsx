@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ExternalLink } from "@/components/external-link";
 import { InlineScript } from "@/components/inline-script";
 import { getHome, getProjects } from "@/lib/content";
@@ -62,7 +61,7 @@ export function Hero() {
               <p className="text-[1.0625rem] leading-[1.4] font-semibold md:text-xl lg:text-[1.375rem]">{lead}</p>
               <p className="text-[0.8125rem] leading-[1.5] text-muted md:text-base lg:leading-[1.6]">{sub}</p>
             </div>
-            <Contact email={home.contact.email} github={home.contact.github} className="hidden lg:mt-1 lg:flex" />
+            <Contact email={home.contact.email} github={home.contact.github} />
           </div>
           <StackLayers layers={home.layers}>
             <HeroIntro />
@@ -70,7 +69,6 @@ export function Hero() {
         </div>
         <ServiceList services={services} />
       </LayerFocusProvider>
-      <Contact email={home.contact.email} github={home.contact.github} className="flex lg:hidden" />
       <ScrollCue />
     </section>
   );
@@ -94,12 +92,13 @@ function ScrollCue() {
   );
 }
 
-// 연락 링크. 데스크톱은 소개 아래, 모바일은 증거 목록 아래(SCROLL 표시 위)에 두므로 두 번 그리고 한쪽만 보인다.
+// 연락 링크. 모든 폭에서 소개 아래에 둔다(2026-10-17). 작은 폰에서도 첫 화면에 이메일과 GitHub가 보이게 하기 위해서다.
+// 이력서는 헤더의 Resume와 About의 "이력서 보기"로 가므로 여기에는 두지 않는다.
 // 이메일과 서비스처럼 GitHub도 주소(github.com/...)로 보인다. 글자는 링크 주소에서 https://를 뗀 것이다.
-function Contact({ email, github, className }: { email: string; github: string; className: string }) {
+function Contact({ email, github }: { email: string; github: string }) {
   const link = "inline-flex min-h-6 items-center underline underline-offset-4";
   return (
-    <ul data-intro-part aria-label="연락" className={`flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] md:gap-x-5 md:text-[0.9375rem] ${className}`}>
+    <ul data-intro-part aria-label="연락" className="flex flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] md:gap-x-5 md:text-[0.9375rem] lg:mt-1">
       <li>
         <a href={`mailto:${email}`} className={link}>
           {email}
@@ -109,11 +108,6 @@ function Contact({ email, github, className }: { email: string; github: string; 
         <ExternalLink href={github} className={link}>
           {github.replace(/^https:\/\//, "")}
         </ExternalLink>
-      </li>
-      <li>
-        <Link href="/resume" className={link}>
-          이력서 보기
-        </Link>
       </li>
     </ul>
   );
