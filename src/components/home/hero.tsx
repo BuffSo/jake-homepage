@@ -30,7 +30,10 @@ export function Hero() {
 
   return (
     // data-intro는 인라인 스크립트가 붙이고 움직임이 끝나면 지운다. React가 이 속성을 문제 삼지 않게 한다.
+    // id와 tabIndex는 맨 위로 버튼이 쓴다. 첫 화면이 사라지면 버튼이 보이고, 누르면 여기에 초점이 온다(back-to-top.tsx).
     <section
+      id="hero"
+      tabIndex={-1}
       data-hero
       suppressHydrationWarning
       aria-labelledby="hero-title"

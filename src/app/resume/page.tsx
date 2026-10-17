@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackToTop } from "@/components/back-to-top";
 import { MarkdownText } from "@/components/markdown";
 import { ResumeHead } from "@/components/resume/resume-head";
 import { ResumeIndex } from "@/components/resume/resume-index";
@@ -18,18 +19,21 @@ export default function ResumePage() {
   const headingIds = Object.fromEntries(page.sections.map((section) => [section.title, section.id]));
 
   return (
-    <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 pb-18 md:px-16 lg:pb-30 print:p-0">
-      <div className="pt-10 lg:pt-18 print:pt-0">
-        <ResumeHead label={page.label} tagline={resume.tagline} name={resume.name} print={page.print} />
-      </div>
-      <ResumeIndex sections={page.sections} />
-      <MarkdownText
-        className="md-resume mt-10 max-w-[47.5rem] lg:mt-16 print:mt-[1.125rem] print:max-w-none print:border-t print:border-line-soft print:pt-[1.125rem]"
-        breaks
-        headingIds={headingIds}
-      >
-        {resume.body}
-      </MarkdownText>
-    </main>
+    <>
+      <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 pb-18 md:px-16 lg:pb-30 print:p-0">
+        <div className="pt-10 lg:pt-18 print:pt-0">
+          <ResumeHead label={page.label} tagline={resume.tagline} name={resume.name} print={page.print} />
+        </div>
+        <ResumeIndex sections={page.sections} />
+        <MarkdownText
+          className="md-resume mt-10 max-w-[47.5rem] lg:mt-16 print:mt-[1.125rem] print:max-w-none print:border-t print:border-line-soft print:pt-[1.125rem]"
+          breaks
+          headingIds={headingIds}
+        >
+          {resume.body}
+        </MarkdownText>
+      </main>
+      <BackToTop target="page-index" />
+    </>
   );
 }

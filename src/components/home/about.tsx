@@ -9,7 +9,7 @@ export function About() {
   return (
     <section
       aria-labelledby="about-title"
-      className="flex flex-col gap-5 border-t border-line pt-14 pb-16 lg:gap-7 lg:pt-24 lg:pb-[7.5rem]"
+      className="flex flex-col gap-5 border-t border-line pt-14 pb-18 lg:gap-7 lg:pt-24 lg:pb-[7.5rem]"
     >
       <span className="font-mono text-[0.6875rem] tracking-[0.04em] text-subtle lg:text-[0.8125rem]">{about.label}</span>
       <h2 id="about-title" className="text-[1.875rem] leading-[1.25] font-extrabold tracking-[-0.025em] lg:text-5xl lg:leading-[1.2]">
