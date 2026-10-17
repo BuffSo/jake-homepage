@@ -1,6 +1,6 @@
 // 첫 화면 움직임의 재생 (docs/04-motion.md). 라이브러리 없이 Web Animations API로 다섯 박자를 재생한다.
-// 서버가 그린 HTML이 마지막 장면이다. 재생할 때만 기술 층 위에 무대(조각, 관문, 사각형)를 얹고, 끝나면 무대를 지운다.
-// 움직이는 속성은 transform과 opacity뿐이다.
+// 서버가 그린 HTML이 마지막 장면이다. 재생할 때만 기술 층 위에 무대(조각, 관문, 사각형)를, 첫 줄 마지막 낱말에 그라데이션 사본을 얹고,
+// 끝나면 둘 다 지운다. 움직이는 속성은 transform, opacity, clip-path뿐이다.
 // 재생할 때만 불러온다(hero-intro.tsx). 다시 방문했거나 움직임 줄이기면 이 코드를 받지 않는다.
 // 움직임 용량 검사(check:motion-size)는 무대의 data-intro-stage 문자열로 이 코드가 든 청크를 찾는다.
 
@@ -67,6 +67,22 @@ export function play(hero: HTMLElement, onEnd: () => void): () => void {
     pointerEvents: "none",
   });
   layers.parentElement!.append(stage);
+
+  // 첫 줄 마지막 낱말의 그라데이션 사본. 재생하는 동안 낱말은 글자색이고(globals.css 첫 줄), 이 사본이 왼쪽부터 덮는다.
+  const word = hero.querySelector<HTMLElement>("[data-intro-fill]");
+  const fill = word ? document.createElement("span") : null;
+  if (word && fill) {
+    fill.setAttribute("aria-hidden", "true");
+    fill.className = "hero-brand";
+    Object.assign(fill.style, { position: "absolute", inset: "0" });
+    fill.textContent = word.textContent;
+    word.append(fill);
+  }
+  const clear = () => {
+    stage.remove();
+    fill?.remove();
+  };
+
   // 무대를 꾸미다 실패하면 무대를 걷어 내고 오류를 넘긴다. 부른 쪽(hero-intro.tsx)이 마지막 장면을 보여 준다.
   try {
     const make = (style: Partial<CSSStyleDeclaration>, text = "", parent: HTMLElement = stage) => {
@@ -78,7 +94,7 @@ export function play(hero: HTMLElement, onEnd: () => void): () => void {
     };
 
     // 원소마다 전체 시간축 위에 키프레임을 하나씩 둔다. 같은 속성을 여러 애니메이션이 덮어쓰지 않게 하기 위해서다.
-    const track = (el: Element, prop: "transform" | "opacity", steps: Step[]) => {
+    const track = (el: Element, prop: "transform" | "opacity" | "clipPath", steps: Step[]) => {
       const all: Step[] = [[0, steps[0][1]], ...steps, [TOTAL, steps[steps.length - 1][1]]];
       const frames = all.map(([ms, value]) => ({ offset: Math.min(ms, TOTAL) / TOTAL, [prop]: value, easing: ease }));
       animations.push(el.animate(frames, { duration: TOTAL * (wide ? SPEED.wide : SPEED.narrow), fill: "both" }));
@@ -195,6 +211,9 @@ export function play(hero: HTMLElement, onEnd: () => void): () => void {
       track(item, "opacity", [[2650, "0"], [2850, "1"]]);
     });
 
+    // 여섯 층이 나타나는 동안 첫 줄의 마지막 낱말에 왼쪽부터 색이 찬다
+    if (fill) track(fill, "clipPath", [[2200, "inset(0 100% 0 0)"], [2800, "inset(0 0% 0 0)"]]);
+
     // 박자 5: 둘째 줄과 보조 문장, 다시 보기, 증거 목록, 연락 링크, SCROLL 표시가 제자리에 나타난다
     const parts = [...hero.querySelectorAll<HTMLElement>("[data-intro-part]:not([data-intro-part='layer'])")];
     parts.forEach((part, k) => {
@@ -203,7 +222,7 @@ export function play(hero: HTMLElement, onEnd: () => void): () => void {
       track(part, "transform", [[t, "translateY(0.5rem)"], [t + 300, "none"]]);
     });
   } catch (error) {
-    stage.remove();
+    clear();
     animations.forEach((a) => a.cancel());
     throw error;
   }
@@ -211,7 +230,7 @@ export function play(hero: HTMLElement, onEnd: () => void): () => void {
   let stopped = false;
   const stop = () => {
     stopped = true;
-    stage.remove();
+    clear();
     animations.forEach((a) => a.cancel());
   };
   Promise.all(animations.map((a) => a.finished)).then(
