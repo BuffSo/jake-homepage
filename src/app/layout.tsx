@@ -1,15 +1,23 @@
 import type { Metadata, Viewport } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SITE_URL, pageMetadata } from "@/lib/site-meta";
 import { geist, geistMono } from "./fonts";
 import "./globals.css";
 
 // 서버가 그리는 모든 화면을 빌드 때 만든다. 요청마다 달라지는 값이 섞이면 빌드가 실패한다.
 export const ensureStatic = "navigation";
 
+// 홈의 메타데이터이자 모든 페이지의 바탕이다. 다른 페이지는 pageMetadata로 제목, 설명, 주소를 바꾼다.
+// twitter는 페이지가 정하지 않으므로 모든 페이지에 이어진다.
 export const metadata: Metadata = {
-  title: "소재희 · Idea to production.",
-  description: "기획부터 디자인, 개발, 배포까지 전 과정을 다루는 풀스택 개발자 소재희의 홈페이지입니다.",
+  metadataBase: new URL(SITE_URL),
+  ...pageMetadata({
+    title: "소재희 · Idea to production.",
+    description: "기획부터 디자인, 개발, 배포까지 전 과정을 다루는 풀스택 개발자 소재희의 홈페이지입니다.",
+    path: "/",
+  }),
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

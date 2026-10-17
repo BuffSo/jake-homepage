@@ -6,15 +6,17 @@ import { MarkdownText } from "@/components/markdown";
 import { ResumeHead } from "@/components/resume/resume-head";
 import { ResumeIndex } from "@/components/resume/resume-index";
 import { getResume, getResumePage } from "@/lib/content";
+import { pageMetadata } from "@/lib/site-meta";
 
 // 이력서 (docs/02-ia.md /resume). 머리 → 목차 → 원문 열 절 → 끝 사진. 원문 문장은 고치지 않는다.
 // 인쇄하면 헤더, 푸터, 목차, 버튼이 빠지고 한 줄 소개와 이름부터 A4로 나온다(globals.css @media print).
 const page = getResumePage();
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `${page.title} · 소재희`,
   description: page.description,
-};
+  path: "/resume",
+});
 
 export default function ResumePage() {
   const resume = getResume();

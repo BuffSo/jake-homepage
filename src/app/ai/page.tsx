@@ -5,14 +5,16 @@ import { AiShort } from "@/components/ai/ai-short";
 import { BackToTop } from "@/components/back-to-top";
 import { SectionHead } from "@/components/section-head";
 import { getAiPage, getAiWorks, getHome } from "@/lib/content";
+import { pageMetadata } from "@/lib/site-meta";
 
 // AI로 일하는 방식 (docs/02-ia.md /ai). 머리 → 목차 → 네 묶음. 머리 글은 홈 섹션과 같다.
 const { ai } = getHome().sections;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `${ai.title} · 소재희`,
   description: ai.intro,
-};
+  path: "/ai",
+});
 
 export default function AiPage() {
   const works = getAiWorks();

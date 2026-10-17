@@ -9,6 +9,7 @@
 - 소재희 개인 홈페이지(genys.kr)의 소스다. Next.js 16 App Router, TypeScript, Tailwind CSS 4로 만들고 Vercel에 배포한다.
 - 목적과 독자는 `docs/00-vision.md`, 요구사항과 범위는 `docs/01-prd.md`, 페이지 구조는 `docs/02-ia.md`, 디자인 원칙은 `docs/03-design.md`, 첫 화면 움직임은 `docs/04-motion.md`에 있다.
 - 지금까지의 결정은 `docs/adr/`에 있다. 결정을 뒤집으려면 해당 ADR을 먼저 고친다.
+- 같이 정한 규칙과 정책은 `docs/guide/`에 있다(색인 `docs/guide/README.md`). 페이지를 더하거나 공유 정보를 바꿀 때는 검색과 공유 정책 가이드를 따른다.
 
 ## 작업 순서
 
@@ -97,5 +98,6 @@ npm run test:e2e          # 빌드 후 Playwright E2E (포트 3210, 데스크톱
 npm run check:captures    # E2E 뒤 주요 화면 캡처 18장이 test-results/captures/에 모두 생겼는지 확인
 npm run sync              # 콘텐츠 동기화 (CAREER_DIR, .sensitive-terms.local 필요)
 npm run sync -- --check   # content/synced/가 원본과 같은지 확인만
+npm run og:image          # 공유 미리보기 그림(src/assets/og-image.png) 다시 만들기 (개발 서버가 떠 있어야 함)
 npm run check:stack       # 기술 층 짝을 세 서비스 코드와 대조 (RECUEVE_DIR, PROWITH_DIR, LOTTO_DIR 필요, 없으면 건너뜀)
 ```
