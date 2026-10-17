@@ -251,7 +251,7 @@ test("다크 모드에서는 어두운 바탕을 쓴다", async ({ page }) => {
 });
 
 test.describe("첫 화면", () => {
-  test("첫 줄은 두 줄로 나뉘고, 소개 두 줄과 연락 링크가 있다", async ({ page }) => {
+  test("첫 줄은 두 줄로 나뉘고, 소개 두 줄과 연락 링크가 있다", async ({ page }, testInfo) => {
     await page.goto("/");
     const hero = page.getByRole("region", { name: /^Idea to\s+production\.$/ });
     const lines = await hero.getByRole("heading", { level: 1 }).evaluate((h1) => {
@@ -260,13 +260,17 @@ test.describe("첫 화면", () => {
     expect(lines).toBe(2);
     for (const line of home.lines) await expect(hero.getByText(line)).toBeVisible();
 
-    // 연락 링크는 화면 폭에 따라 한쪽만 보인다. 보이는 쪽만 접근성 트리에 남는다.
+    // 연락 링크는 모든 폭에서 소개 아래, 기술 층 위에 한 번만 있다. 작은 폰에서도 첫 화면에 보이게 하기 위해서다.
     const contact = hero.getByRole("list", { name: "연락" });
     await expect(contact).toHaveCount(1);
+    const contactBox = (await contact.boundingBox())!;
+    const layersBox = (await hero.getByRole("list", { name: "기술 층" }).boundingBox())!;
+    if (testInfo.project.name === "mobile") expect(contactBox.y + contactBox.height).toBeLessThanOrEqual(layersBox.y);
     await expect(contact.getByRole("link", { name: home.contact.email })).toHaveAttribute("href", `mailto:${home.contact.email}`);
     // GitHub도 이메일처럼 주소로 보인다.
     await expect(contact.getByRole("link", { name: home.contact.github.replace(/^https:\/\//, "") })).toHaveAttribute("href", home.contact.github);
-    await expect(contact.getByRole("link", { name: "이력서 보기" })).toHaveAttribute("href", "/resume");
+    // 이력서는 헤더의 Resume와 About의 "이력서 보기"로 간다. 첫 화면 연락 줄에는 두지 않는다.
+    await expect(contact.getByRole("link", { name: "이력서 보기" })).toHaveCount(0);
   });
 
   test("첫 줄의 첫 낱말은 윤곽만, 마지막 낱말은 그라데이션이다", async ({ page }) => {
