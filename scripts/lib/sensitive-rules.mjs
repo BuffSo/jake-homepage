@@ -4,10 +4,9 @@
 import { existsSync, readFileSync } from "node:fs";
 
 // 공개해도 되는 이메일: 사이트에 싣는 연락처, GitHub noreply, 예시 도메인
-// 홈의 연락처는 gmail이다(2026-10-16). naver는 원본 이력서 연락처라 /resume에 남는다.
+// 연락처는 홈과 /resume 모두 gmail 하나다(2026-10-17 원본 이력서 연락처 변경).
 const ALLOWED_EMAILS = [
   /^buff4701@gmail\.com$/i,
-  /^buffso@naver\.com$/i,
   /@users\.noreply\.github\.com$/i,
   /@example\.(com|org|net)$/i,
   /^git@github\.com$/i,

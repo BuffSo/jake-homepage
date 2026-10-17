@@ -14,7 +14,7 @@ const RESUME = [
   "",
   "| 전화번호 | 이메일 | GitHub |",
   "| --- | --- | --- |",
-  `| ${PHONE} | buffso@naver.com | https://github.com/BuffSo |`,
+  `| ${PHONE} | buff4701@gmail.com | https://github.com/BuffSo |`,
   "",
   "※ 정부 과제 안내",
   "※ 태니지먼트 안내",
@@ -64,7 +64,7 @@ describe("dropTableColumn", () => {
     const out = dropTableColumn(RESUME, "전화번호");
     assert.ok(out.includes("| 이메일 | GitHub |"));
     assert.ok(out.includes("| --- | --- |"));
-    assert.ok(out.includes("| buffso@naver.com | https://github.com/BuffSo |"));
+    assert.ok(out.includes("| buff4701@gmail.com | https://github.com/BuffSo |"));
     assert.ok(!out.includes(PHONE));
     assert.ok(!out.includes("전화번호"));
   });
