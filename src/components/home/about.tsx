@@ -17,15 +17,25 @@ export function About() {
         {about.title}
       </h2>
       <p className="max-w-[48.75rem] text-base leading-[1.7] lg:text-xl">{about.body}</p>
-      <figure className="mt-1 flex max-w-[48.75rem] flex-col gap-1.5 border-l-2 border-fg pl-3.5 lg:mt-2 lg:gap-2 lg:pl-5">
-        <blockquote className="text-[0.9375rem] leading-[1.6] lg:text-lg">“{about.quote}”</blockquote>
-        {/* 출처는 이력서에서 이 문장이 든 인용으로 간다(resume-page.md의 quotes) */}
-        <figcaption className="text-xs text-subtle">
-          <Link href={about.quoteHref} className="inline-flex min-h-6 items-center underline underline-offset-4 hover:text-fg">
-            {about.quoteBy}
-          </Link>
-        </figcaption>
-      </figure>
+      {/* 팀 프로젝트 동료 평가 세 줄. 출처는 이력서에서 그 프로젝트의 Peer Review 상자로 간다(resume-page.md의 reviews) */}
+      <div className="mt-1 flex max-w-[48.75rem] flex-col gap-3 lg:mt-2 lg:gap-4">
+        <h3 className="text-xs text-subtle">{about.reviewsTitle}</h3>
+        <ul className="flex flex-col gap-4 lg:gap-5">
+          {about.reviews.map((review) => (
+            <li key={review.href}>
+              <figure className="flex flex-col gap-1.5 border-l-2 border-fg pl-3.5 lg:gap-2 lg:pl-5">
+                <blockquote className="text-[0.9375rem] leading-[1.6] lg:text-lg">“{review.quote}”</blockquote>
+                <figcaption className="text-xs text-subtle">
+                  <Link href={review.href} className="inline-flex min-h-6 items-center underline underline-offset-4 hover:text-fg">
+                    {review.by}
+                    <span className="sr-only"> 동료 평가 원문</span>
+                  </Link>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
       <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:mt-2 lg:gap-3">
         <ButtonLink href="/resume" variant="solid" className="px-5 text-sm lg:h-11">
           이력서 보기

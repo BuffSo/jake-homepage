@@ -49,33 +49,47 @@ export function rehypeHeadingIds({ ids }) {
 }
 
 /**
- * 정해 둔 글이 든 인용(blockquote)의 머리글에 id를 붙인다 (rehype). quotes는 { id, text }다.
- * 머리글은 인용 바로 앞의 문단이다(이력서의 **Peer Review**). 그리로 오면 머리글부터 보인다.
- * 다른 페이지에서 원문의 한 인용으로 바로 보내려고 쓴다(홈 About의 동료 평가 → 이력서).
- * 글이 든 인용이나 그 앞 문단을 못 찾으면 예외를 던져 빌드를 멈춘다. 링크가 갈 곳이 없는 채로 배포되지 않게 한다.
- * 한 글이 여러 인용에 들어 있거나(id가 겹친다), 한 인용에 글이 둘 이상 걸려도(머리글 하나에 id는 하나다) 멈춘다.
+ * 머리글 문단(label, 이력서의 **Peer Review**) 바로 뒤의 인용을 상자 하나(div.md-review)로 묶는다 (rehype).
+ * 원문 글은 고치지 않고 묶음만 더한다. 모양은 globals.css의 .md-review가 정한다.
+ * quotes({ id, text })는 그 글이 든 상자에 id를 붙인다. 다른 페이지에서 한 상자로 바로 보내려고 쓴다(홈 About의 동료 평가).
+ * 글이 든 상자를 못 찾으면 예외를 던져 빌드를 멈춘다. 링크가 갈 곳이 없는 채로 배포되지 않게 한다.
+ * 한 글이 여러 상자에 들어 있거나(id가 겹친다), 한 상자에 글이 둘 이상 걸려도(상자 하나에 id는 하나다) 멈춘다.
  */
-export function rehypeQuoteIds({ quotes }) {
+export function rehypeReviews({ label, quotes = [] }) {
   const text = (node) => (node.type === "text" ? node.value : (node.children ?? []).map(text).join(""));
   return (tree) => {
     const found = new Set();
     const walk = (node) => {
-      const elements = (node.children ?? []).filter((child) => child.type === "element");
-      elements.forEach((child, i) => {
-        if (child.tagName !== "blockquote") return;
-        const matches = quotes.filter((q) => text(child).includes(q.text));
-        const label = elements[i - 1];
-        if (matches.length === 0 || label?.tagName !== "p") return;
-        if (matches.length > 1) throw new Error(`한 인용에 글이 둘 이상 걸렸습니다: ${matches.map((q) => q.text).join(", ")}`);
+      if (!node.children) return;
+      const children = [];
+      for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        // 머리글과 인용 사이의 줄바꿈 글자는 건너뛰고 다음 요소를 본다
+        let j = i + 1;
+        while (node.children[j]?.type === "text" && !node.children[j].value.trim()) j++;
+        const next = node.children[j];
+        const isLabel = child.type === "element" && child.tagName === "p" && text(child).trim() === label;
+        if (!isLabel || next?.type !== "element" || next.tagName !== "blockquote") {
+          walk(child);
+          children.push(child);
+          continue;
+        }
+        const box = { type: "element", tagName: "div", properties: { className: ["md-review"] }, children: [child, next] };
+        const matches = quotes.filter((q) => text(next).includes(q.text));
+        if (matches.length > 1) throw new Error(`한 상자에 글이 둘 이상 걸렸습니다: ${matches.map((q) => q.text).join(", ")}`);
         const [quote] = matches;
-        if (found.has(quote.id)) throw new Error(`글이 든 인용이 둘 이상입니다: ${quote.text}`);
-        label.properties = { ...label.properties, id: quote.id };
-        found.add(quote.id);
-      });
-      node.children?.forEach(walk);
+        if (quote) {
+          if (found.has(quote.id)) throw new Error(`글이 든 상자가 둘 이상입니다: ${quote.text}`);
+          box.properties.id = quote.id;
+          found.add(quote.id);
+        }
+        children.push(box);
+        i = j;
+      }
+      node.children = children;
     };
     walk(tree);
     const missing = quotes.filter((q) => !found.has(q.id));
-    if (missing.length) throw new Error(`머리글이 있는 인용을 원문에서 찾지 못했습니다: ${missing.map((q) => q.text).join(", ")}`);
+    if (missing.length) throw new Error(`${label} 상자에서 찾지 못한 글입니다: ${missing.map((q) => q.text).join(", ")}`);
   };
 }

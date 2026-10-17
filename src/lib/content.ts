@@ -30,7 +30,14 @@ export type Home = {
   contact: { email: string; github: string };
   layers: Layer[];
   sections: Record<"work" | "ai", { label: string; title: string; intro: string }>;
-  about: { label: string; title: string; body: string; quote: string; quoteBy: string; quoteHref: string };
+  about: {
+    label: string;
+    title: string;
+    body: string;
+    reviewsTitle: string;
+    /** 동료 평가 세 줄. 줄인 문장은 끝에 …를 붙인다. href는 이력서의 그 프로젝트 Peer Review 상자다 */
+    reviews: { quote: string; by: string; href: string }[];
+  };
 };
 
 export type Project = {
@@ -135,7 +142,7 @@ export type ResumePage = {
   description: string;
   print: string;
   sections: { id: string; title: string }[];
-  quotes: { id: string; text: string }[];
+  reviews: { label: string; quotes: { id: string; text: string }[] };
 };
 
 /** 동기화한 이력서. 머리(한 줄 소개, 이름)와 본문으로 나눈다 (src/lib/resume.mjs) */
