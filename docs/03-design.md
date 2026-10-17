@@ -33,7 +33,7 @@
 
 강조색 위에는 `on-accent`만 씁니다. 스토리보드에서 강조 위 보조 글자로 쓴 `#CDE9DD`는 대비가 4.2:1이라 쓰지 않습니다.
 
-강조색은 첫 화면 움직임에서 관문을 통과한 조각과 그 뒤의 결과, 층을 눌렀을 때의 강조, "이 사이트" 도식의 검사 단계에만 씁니다.
+강조색은 첫 화면 움직임에서 관문을 통과한 조각과 그 뒤의 결과, 층을 눌렀을 때의 강조, "이 사이트" 도식의 검사 단계, 이력서의 동료 평가 상자 왼쪽 선에만 씁니다.
 
 ## 타이포그래피
 
@@ -198,6 +198,27 @@
 | `/work` 데스크톱 | `/work` 모바일 | `/work` 모바일 다크 | `/resume` 끝 (모바일) | 홈 끝 (모바일) |
 |---|---|---|---|---|
 | ![/work 데스크톱의 맨 위로 버튼](design/back-to-top/work-1280.png) | ![/work 모바일의 맨 위로 버튼](design/back-to-top/work-375.png) | ![/work 모바일 다크의 맨 위로 버튼](design/back-to-top/work-375-dark.png) | ![/resume 끝에서 푸터 위에 멈춘 버튼](design/back-to-top/resume-end-375.png) | ![홈 끝에서 푸터 위에 멈춘 버튼](design/back-to-top/home-end-375.png) |
+
+## 동료 평가에서 정한 값
+
+홈 About의 동료 평가 세 줄과 이력서의 동료 평가 상자입니다(2026-10-17, [02-ia.md](02-ia.md#4-about)). 캡처는 [docs/design/peer-review/](design/peer-review/)에 있습니다.
+
+| 항목 | 모바일 | 데스크톱 (`lg`, 64rem 이상) |
+|---|---|---|
+| 홈: 묶음 제목 "팀 프로젝트 동료 평가" | 0.75rem, `subtle` | 같음 |
+| 홈: 인용 | 0.9375rem, 왼쪽 선 2 `fg`, 안쪽 0.875rem | 1.125rem, 안쪽 1.25rem |
+| 홈: 인용 사이 | 1rem | 1.25rem |
+| 홈: 출처 링크 | 0.75rem, 밑줄, 높이 1.5rem | 같음 |
+| 이력서: 상자 | `surface` 바탕, 왼쪽 선 2 `accent`, 오른쪽 모서리 0.5rem, 안쪽 1rem 1.25rem | 같음 |
+| 이력서: 머리글과 인용 사이 | 0.5rem | 같음 |
+| 이력서 인쇄: 상자 | 바탕 없음, 왼쪽 선 2 `accent`, 안쪽 왼쪽 0.75rem | - |
+
+- 홈은 세 인용을 위아래로 쌓습니다. 문장 길이가 달라 세 칸으로 나누면 높이가 들쭉날쭉합니다. About의 글 폭(48.75rem) 안에 둡니다.
+- 이력서 상자는 사이트에 이미 있는 면 바탕과 강조색만 씁니다. 상자 안 인용은 왼쪽 선을 빼고 상자의 선 하나만 남깁니다.
+
+| 홈 About (1280) | 홈 About (375) | 이력서 상자 (1280) | 이력서 상자 (375 다크) |
+|---|---|---|---|
+| ![홈 About의 동료 평가 세 줄](design/peer-review/home-about-1280.png) | ![모바일 홈 About의 동료 평가 세 줄](design/peer-review/home-about-375.png) | ![이력서의 동료 평가 상자](design/peer-review/resume-review-1280.png) | ![다크 모드 모바일 이력서의 동료 평가 상자](design/peer-review/resume-review-375-dark.png) |
 
 ## 작업 순서
 

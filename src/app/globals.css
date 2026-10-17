@@ -227,9 +227,23 @@
     @apply border-line-soft;
     margin: 2.5rem 0;
   }
-  /* 다른 페이지에서 바로 오는 인용의 머리글(rehypeQuoteIds). 절 제목처럼 1rem 위에 멈춘다. */
-  .md-resume p[id] {
+  /*
+    동료 평가 상자 (rehypeReviews, docs/03-design.md "동료 평가에서 정한 값"). 원문의 머리글(Peer Review)과 인용을 묶은 것이다.
+    프로젝트 소개 인용과 구분되게 면 바탕에 강조색 왼쪽 선을 쓴다. 홈 About에서 바로 오면 절 제목처럼 1rem 위에 멈춘다.
+  */
+  .md-resume .md-review {
+    @apply rounded-r-lg border-l-2 border-accent bg-surface;
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
     scroll-margin-top: 1rem;
+  }
+  .md-resume .md-review > p:first-child {
+    margin-bottom: 0.5rem;
+  }
+  .md-resume .md-review blockquote {
+    border-left: 0;
+    margin: 0;
+    padding-left: 0;
   }
   .md-resume h2 {
     scroll-margin-top: 1rem;
@@ -364,6 +378,15 @@
       margin: 0.375rem 0 0.5rem;
       padding-left: 0.75rem;
     }
+    /* 동료 평가 상자는 바탕 없이 강조색 선만 남긴다 */
+    .md-resume .md-review {
+      background: none;
+      margin: 0.375rem 0 0.5rem;
+      padding: 0 0 0 0.75rem;
+    }
+    .md-resume .md-review > p:first-child {
+      margin-bottom: 0.25rem;
+    }
     .md-resume code {
       font-size: 0.6875rem;
       print-color-adjust: exact;
@@ -397,6 +420,7 @@
     .md-resume li,
     .md-resume p,
     .md-resume blockquote,
+    .md-resume .md-review,
     .md-resume tr {
       break-inside: avoid;
     }

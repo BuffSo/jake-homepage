@@ -50,12 +50,16 @@ test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대�
   }
 });
 
-test("홈 About의 동료 평가 링크는 이력서에서 같은 문장이 든 인용으로 간다", () => {
-  // 인용이 원문에 있는지는 빌드가 본다(rehypeQuoteIds). 여기서는 두 글의 짝이 맞는지만 본다.
-  const { quotes } = read("content/site/resume-page.md");
-  const quote = quotes.find((q) => home.about.quoteHref === `/resume#${q.id}`);
-  assert.ok(quote, `resume-page.md의 quotes에 없는 링크: ${home.about.quoteHref}`);
-  assert.equal(quote.text, home.about.quote);
+test("홈 About의 동료 평가 링크는 이력서에서 같은 문장이 든 Peer Review 상자로 간다", () => {
+  // 글이 원문의 상자에 있는지는 빌드가 본다(rehypeReviews). 여기서는 두 글의 짝이 맞는지만 본다.
+  // 홈에서 줄인 문장은 끝에 …를 붙이고, 이력서 쪽에는 … 앞까지만 둔다.
+  const { quotes } = read("content/site/resume-page.md").reviews;
+  assert.equal(home.about.reviews.length, 3);
+  for (const review of home.about.reviews) {
+    const quote = quotes.find((q) => review.href === `/resume#${q.id}`);
+    assert.ok(quote, `resume-page.md의 reviews.quotes에 없는 링크: ${review.href}`);
+    assert.equal(quote.text, review.quote.replace(/ …$/, ""));
+  }
 });
 
 test("기술 층은 여섯 개이고, 기술 이름은 표지 설정과 같다", () => {
