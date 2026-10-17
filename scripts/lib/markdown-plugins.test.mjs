@@ -105,7 +105,7 @@ describe("rehypeStackTables", () => {
     const html = stacked(table(["이메일", "GitHub", "홈페이지"], [["a@b.c", "gh", "home"]]));
     assert.match(html, /<table class="md-stack" role="table">/);
     assert.match(html, /<td role="cell"><span class="md-label" aria-hidden="true">이메일<\/span>/);
-    assert.match(html, /<span class="md-label" aria-hidden="true">홈페이지<\/span>home<\/td>/);
+    assert.match(html, /<span class="md-label" aria-hidden="true">홈페이지<\/span><span class="md-value">home<\/span><\/td>/);
     assert.match(html, /<th role="columnheader">GitHub<\/th>/);
     assert.equal((html.match(/role="row"/g) ?? []).length, 2);
     assert.equal((html.match(/role="rowgroup"/g) ?? []).length, 2);
@@ -115,6 +115,14 @@ describe("rehypeStackTables", () => {
     const html = stacked(table(["기간", "학교", "전공", "졸업논문"], [["1", "2", "3", "4"], ["5", "6", "7", "8"]]));
     assert.match(html, /class="md-stack"/);
     assert.equal((html.match(/class="md-label"/g) ?? []).length, 8);
+  });
+
+  test("글자와 굵은 글자, 링크가 섞인 칸도 이름표 하나와 값 하나만 둔다", () => {
+    // 칸이 격자라서, 값을 감싸지 않으면 섞인 조각마다 격자 항목이 되어 이름표 칸으로 떨어진다
+    const html = stacked(table(["기간", "학교", "전공", "졸업논문"], [["1", "앞 **굵게** 뒤", "[링크](https://x.y) 뒤", "4"]]));
+    const cells = [...html.matchAll(/<td role="cell">(.*?)<\/td>/g)].map((m) => m[1]);
+    for (const cell of cells) assert.match(cell, /^<span class="md-label" aria-hidden="true">[^<]*<\/span><span class="md-value">.*<\/span>$/);
+    assert.match(cells[1], /<span class="md-value">앞 <strong>굵게<\/strong> 뒤<\/span>/);
   });
 
   test("여러 행에 세 칸 이하인 표(수상)는 그대로 둔다", () => {
