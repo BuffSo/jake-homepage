@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { rehypeDropStyle, rehypeHeadingIds, rehypeQuoteIds, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
+import { rehypeDropStyle, rehypeHeadingIds, rehypeReviews, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
 
 // 원문 마크다운 플러그인 (src/lib/markdown-plugins.mjs). 사이트와 같은 react-markdown으로 그려 HTML을 본다.
 
@@ -53,33 +53,39 @@ describe("rehypeHeadingIds", () => {
   });
 });
 
-describe("rehypeQuoteIds", () => {
-  const quotes = [{ id: "peer-review", text: "겸손히 소통" }];
+describe("rehypeReviews", () => {
+  const label = "Peer Review";
+  const quotes = [{ id: "peer-review-docthru", text: "겸손히 소통" }];
+  const reviews = (options) => ({ remark: [remarkSoftBreaks], rehype: [[rehypeReviews, { label, ...options }]] });
 
-  test("정해 둔 글이 든 인용의 머리글(바로 앞 문단)에만 id를 붙인다", () => {
-    const md = '**Peer Review**\n\n> "다른 평가"\n\n---\n\n**Peer Review**\n\n> "앞 문장"\n> "늘 겸손히 소통하시는 모습"';
-    const html = render(md, { remark: [remarkSoftBreaks], rehype: [[rehypeQuoteIds, { quotes }]] });
-    assert.equal((html.match(/id="peer-review"/g) ?? []).length, 1);
-    assert.ok(html.includes('<hr/>\n<p id="peer-review"><strong>Peer Review</strong></p>'));
+  test("머리글 바로 뒤의 인용을 상자로 묶고, 정해 둔 글이 든 상자에만 id를 붙인다", () => {
+    const md = '> 프로젝트 소개\n\n**Peer Review**\n\n> "다른 평가"\n\n---\n\n**Peer Review**\n\n> "앞 문장"\n> "늘 겸손히 소통하시는 모습"';
+    const html = render(md, reviews({ quotes }));
+    assert.equal((html.match(/<div class="md-review"/g) ?? []).length, 2);
+    assert.ok(html.includes('<div class="md-review" id="peer-review-docthru"><p><strong>Peer Review</strong></p><blockquote>'));
+    // 머리글이 없는 인용(프로젝트 소개)은 묶지 않는다
+    assert.ok(html.startsWith("<blockquote>\n<p>프로젝트 소개</p>\n</blockquote>"));
   });
 
-  test("글이 든 인용이 없으면 멈춘다", () => {
-    assert.throws(() => render("**Peer Review**\n\n> 다른 평가\n\n겸손히 소통 (인용 밖)", { rehype: [[rehypeQuoteIds, { quotes }]] }), /겸손히 소통/);
+  test("머리글 뒤에 인용이 없으면 묶지 않는다", () => {
+    const html = render("**Peer Review**\n\n- 목록", reviews());
+    assert.ok(!html.includes("md-review"));
   });
 
-  test("한 글이 여러 인용에 들어 있으면 id가 겹치므로 멈춘다", () => {
+  test("정해 둔 글이 든 상자가 없으면 멈춘다", () => {
+    const md = "**Peer Review**\n\n> 다른 평가\n\n> 늘 겸손히 소통 (머리글 없는 인용)";
+    assert.throws(() => render(md, reviews({ quotes })), /찾지 못한 글입니다: 겸손히 소통/);
+  });
+
+  test("한 글이 여러 상자에 들어 있으면 id가 겹치므로 멈춘다", () => {
     const md = "**Peer Review**\n\n> 늘 겸손히 소통\n\n**Peer Review**\n\n> 역시 겸손히 소통";
-    assert.throws(() => render(md, { rehype: [[rehypeQuoteIds, { quotes }]] }), /둘 이상입니다: 겸손히 소통/);
+    assert.throws(() => render(md, reviews({ quotes })), /둘 이상입니다: 겸손히 소통/);
   });
 
-  test("한 인용에 글이 둘 이상 걸리면 멈춘다", () => {
+  test("한 상자에 글이 둘 이상 걸리면 멈춘다", () => {
     const both = [...quotes, { id: "lead", text: "리드를 잘" }];
     const md = "**Peer Review**\n\n> 리드를 잘 하셨습니다\n> 늘 겸손히 소통";
-    assert.throws(() => render(md, { rehype: [[rehypeQuoteIds, { quotes: both }]] }), /둘 이상 걸렸습니다/);
-  });
-
-  test("인용 앞에 머리글 문단이 없으면 멈춘다", () => {
-    assert.throws(() => render("### 제목\n\n> 늘 겸손히 소통", { rehype: [[rehypeQuoteIds, { quotes }]] }), /겸손히 소통/);
+    assert.throws(() => render(md, reviews({ quotes: both })), /둘 이상 걸렸습니다/);
   });
 });
 

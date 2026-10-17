@@ -62,6 +62,22 @@ test("원문의 줄바꿈이 살아 있다 (강점 다섯 줄)", async ({ page }
   await expect(strengths.locator("br")).toHaveCount(4);
 });
 
+test("동료 평가(Peer Review)는 다른 인용과 구분되는 상자로 보인다", async ({ page }) => {
+  await page.goto("/resume");
+  const boxes = page.locator(".md-resume .md-review");
+  // 원문의 Peer Review 머리글마다 상자가 하나씩 있다
+  await expect(boxes).toHaveCount(resume.body.match(/^\*\*Peer Review\*\*$/gm)!.length);
+  const style = (locator: typeof boxes) =>
+    locator.evaluate((el) => ({ background: getComputedStyle(el).backgroundColor, line: getComputedStyle(el).borderLeftColor }));
+  const box = await style(boxes.first());
+  const accent = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--accent").trim());
+  expect(box.background).not.toBe("rgba(0, 0, 0, 0)");
+  expect(box.line).toBe(`rgb(${accent.match(/\w\w/g)!.map((h) => parseInt(h, 16)).join(", ")})`);
+  // 프로젝트 소개 인용은 상자 밖에 그대로 있다
+  const plain = page.locator(".md-resume blockquote:not(.md-review blockquote)").first();
+  expect((await style(plain)).line).not.toBe(box.line);
+});
+
 test("전화번호 형식의 글자가 없다", async ({ page }) => {
   await page.goto("/resume");
   const text = await page.locator("body").innerText();
@@ -89,6 +105,8 @@ test("인쇄하면 화면용 요소가 빠지고 다크 모드여도 흰 바탕�
   await expect(page.getByRole("button", { name: resumePage.print })).toBeHidden();
   await expect(page.getByText(resumePage.label, { exact: true })).toBeHidden();
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  // 동료 평가 상자는 인쇄에서 바탕 없이 선만 남는다
+  expect(await page.locator(".md-review").first().evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
 
   const colors = await page.evaluate(() => ({
     background: getComputedStyle(document.documentElement).backgroundColor,
