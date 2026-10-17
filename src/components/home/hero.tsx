@@ -25,7 +25,10 @@ export function Hero() {
   }));
 
   // 첫 줄은 마지막 낱말 앞에서 줄을 바꾼다 ("Idea to / production.").
-  const cut = home.headline.lastIndexOf(" ");
+  // 첫 낱말은 윤곽만, 가운데 낱말은 회색, 마지막 낱말은 그라데이션이다(globals.css 첫 줄).
+  const words = home.headline.split(" ");
+  const [first, last] = [words[0], words[words.length - 1]];
+  const middle = words.slice(1, -1).join(" ");
   const [lead, sub] = home.lines;
 
   return (
@@ -48,8 +51,12 @@ export function Hero() {
               lang="en"
               className="text-[2.5rem] leading-[1.04] font-extrabold tracking-[-0.03em] md:text-[3.5rem] lg:text-[4rem] lg:leading-[1.02] lg:tracking-[-0.035em] xl:text-[4.75rem]"
             >
-              {home.headline.slice(0, cut)} <br />
-              {home.headline.slice(cut + 1)}
+              <span className="hero-outline">{first}</span>
+              {middle && <span className="text-subtle"> {middle}</span>} <br />
+              {/* inline-block이라야 재생 때 얹는 그라데이션 사본이 글자에 정확히 겹친다(intro-play.ts) */}
+              <span data-intro-fill className="hero-brand relative inline-block">
+                {last}
+              </span>
             </h1>
             <div data-intro-part className="flex flex-col gap-1.5 lg:mt-2 lg:gap-5">
               <p className="text-[1.0625rem] leading-[1.4] font-semibold md:text-xl lg:text-[1.375rem]">{lead}</p>

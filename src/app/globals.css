@@ -2,8 +2,10 @@
 @import "./fonts/pretendard.css";
 
 /*
-  색은 흑백에 강조색 하나 (docs/03-design.md 색). 다크 모드는 시스템 설정을 따른다.
+  색은 흑백과 강조색 하나이고, 첫 화면 첫 줄의 마지막 낱말만 brand 세 색 그라데이션이다 (docs/03-design.md 색).
+  다크 모드는 시스템 설정을 따른다.
   대비 (WCAG): 라이트 글자 18.9:1, 보조 7.5:1, 강조 위 글자 5.4:1 / 다크 글자 16.3:1, 보조 7.6:1, 강조 위 글자 7.2:1
+  brand 바탕 대비: 라이트 5.36, 5.19, 5.70 / 다크 7.16, 7.54, 7.00
 */
 :root {
   --bg: #ffffff;
@@ -15,6 +17,9 @@
   --surface: #fafafa;
   --accent: #0b7a52;
   --on-accent: #ffffff;
+  --brand-1: #0b7a52;
+  --brand-2: #0969da;
+  --brand-3: #7c3aed;
   color-scheme: light dark;
 }
 
@@ -29,6 +34,9 @@
     --surface: #17181a;
     --accent: #2fb383;
     --on-accent: #0f1011;
+    --brand-1: #2fb383;
+    --brand-2: #58a6ff;
+    --brand-3: #a78bfa;
   }
 }
 
@@ -102,6 +110,30 @@
 */
 [data-intro] [data-intro-part] {
   opacity: 0;
+}
+
+/*
+  첫 줄 (docs/03-design.md F1 수정). 첫 낱말은 윤곽만, 마지막 낱말은 brand 세 색 그라데이션이다.
+  아직 윤곽뿐인 아이디어가 색이 찬 서비스가 된다는 뜻이다. 윤곽 두께는 글자 크기를 따라 em으로 쓴다.
+  재생하는 동안 마지막 낱말은 글자색으로 두고, 마지막 박자에 그라데이션 사본이 왼쪽부터 덮는다(intro-play.ts).
+*/
+@layer components {
+  .hero-outline {
+    color: transparent;
+    -webkit-text-stroke: 0.03em var(--fg);
+  }
+
+  .hero-brand {
+    color: transparent;
+    background-image: linear-gradient(90deg, var(--brand-1), var(--brand-2) 55%, var(--brand-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+[data-intro] [data-intro-fill] {
+  color: var(--fg);
+  background-image: none;
 }
 
 /*
