@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackToTop } from "@/components/back-to-top";
 import { SectionHead } from "@/components/section-head";
 import { Chapter } from "@/components/work/chapter";
 import { SiteCards } from "@/components/work/site-cards";
@@ -30,27 +31,30 @@ export default function WorkPage() {
   ];
 
   return (
-    <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 md:px-16">
-      <div className="pt-10 lg:pt-18">
-        <SectionHead
-          as="h1"
-          id="work-title"
-          label={work.label}
-          title={work.title}
-          intro={`${work.intro} ${work.introSite}`}
-        />
-      </div>
-      <WorkIndex items={index} />
-      {chapters.map((chapter, i) => (
-        <Chapter
-          key={chapter.slug}
-          chapter={chapter}
-          project={projects.get(chapter.slug)!}
-          total={chapters.length}
-          first={i === 0}
-        />
-      ))}
-      <SiteCards head={work.sites} sites={sites} />
-    </main>
+    <>
+      <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 md:px-16">
+        <div className="pt-10 lg:pt-18">
+          <SectionHead
+            as="h1"
+            id="work-title"
+            label={work.label}
+            title={work.title}
+            intro={`${work.intro} ${work.introSite}`}
+          />
+        </div>
+        <WorkIndex items={index} />
+        {chapters.map((chapter, i) => (
+          <Chapter
+            key={chapter.slug}
+            chapter={chapter}
+            project={projects.get(chapter.slug)!}
+            total={chapters.length}
+            first={i === 0}
+          />
+        ))}
+        <SiteCards head={work.sites} sites={sites} />
+      </main>
+      <BackToTop target="page-index" />
+    </>
   );
 }

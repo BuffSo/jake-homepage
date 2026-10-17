@@ -1,9 +1,10 @@
 // 페이지 목차 (docs/02-ia.md /work). 화면에 고정하지 않는다.
+// 목차가 화면 위로 사라지면 맨 위로 버튼이 보이고, 누르면 목차에 초점이 온다(back-to-top.tsx).
 type Item = { href: string; num: string; name: string; note: string };
 
 export function WorkIndex({ items }: { items: Item[] }) {
   return (
-    <nav aria-label="이 페이지의 목차" className="border-t border-b border-t-fg border-b-line">
+    <nav id="page-index" tabIndex={-1} aria-label="이 페이지의 목차" className="border-t border-b border-t-fg border-b-line">
       <ul className="grid lg:grid-cols-4">
         {items.map((item, i) => (
           <li key={item.href} className={i > 0 ? "border-t border-line-soft lg:border-t-0 lg:border-l" : ""}>

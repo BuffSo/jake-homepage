@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ButtonLink } from "@/components/button-link";
 import { getHome } from "@/lib/content";
 
@@ -9,7 +10,7 @@ export function About() {
   return (
     <section
       aria-labelledby="about-title"
-      className="flex flex-col gap-5 border-t border-line pt-14 pb-16 lg:gap-7 lg:pt-24 lg:pb-[7.5rem]"
+      className="flex flex-col gap-5 border-t border-line pt-14 pb-18 lg:gap-7 lg:pt-24 lg:pb-[7.5rem]"
     >
       <span className="font-mono text-[0.6875rem] tracking-[0.04em] text-subtle lg:text-[0.8125rem]">{about.label}</span>
       <h2 id="about-title" className="text-[1.875rem] leading-[1.25] font-extrabold tracking-[-0.025em] lg:text-5xl lg:leading-[1.2]">
@@ -18,7 +19,12 @@ export function About() {
       <p className="max-w-[48.75rem] text-base leading-[1.7] lg:text-xl">{about.body}</p>
       <figure className="mt-1 flex max-w-[48.75rem] flex-col gap-1.5 border-l-2 border-fg pl-3.5 lg:mt-2 lg:gap-2 lg:pl-5">
         <blockquote className="text-[0.9375rem] leading-[1.6] lg:text-lg">“{about.quote}”</blockquote>
-        <figcaption className="text-xs text-subtle">{about.quoteBy}</figcaption>
+        {/* 출처는 이력서에서 이 문장이 든 인용으로 간다(resume-page.md의 quotes) */}
+        <figcaption className="text-xs text-subtle">
+          <Link href={about.quoteHref} className="inline-flex min-h-6 items-center underline underline-offset-4 hover:text-fg">
+            {about.quoteBy}
+          </Link>
+        </figcaption>
       </figure>
       <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:mt-2 lg:gap-3">
         <ButtonLink href="/resume" variant="solid" className="px-5 text-sm lg:h-11">

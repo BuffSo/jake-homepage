@@ -31,7 +31,7 @@ const home = read("content/site/home.md") as {
   lines: string[];
   contact: { email: string; github: string };
   layers: Layer[];
-  about: { title: string; quote: string };
+  about: { title: string; quote: string; quoteBy: string; quoteHref: string };
 };
 const readDir = <T extends { order: number }>(dir: string) =>
   readdirSync(dir)
@@ -405,6 +405,18 @@ test.describe("아래 섹션", () => {
     await expect(section.getByRole("link", { name: "이력서 보기" })).toHaveAttribute("href", "/resume");
     await expect(section.getByRole("link", { name: home.contact.email })).toHaveAttribute("href", `mailto:${home.contact.email}`);
     await expect(section.getByRole("link", { name: /GitHub/ })).toHaveAttribute("href", home.contact.github);
+  });
+
+  test("동료 평가의 출처를 누르면 이력서에서 그 문장이 든 인용의 머리글로 간다", async ({ page }) => {
+    await page.goto("/");
+    const section = page.getByRole("region", { name: home.about.title });
+    await section.getByRole("link", { name: home.about.quoteBy }).click();
+    await expect(page).toHaveURL(new RegExp(`${home.about.quoteHref}$`));
+    const label = page.locator(home.about.quoteHref.slice(home.about.quoteHref.indexOf("#")));
+    await expect(label).toHaveText("Peer Review");
+    await expect(label.locator("+ blockquote")).toContainText(home.about.quote);
+    // 머리글이 화면 맨 위 근처(절 제목과 같은 1rem 아래)에 멈춘다
+    await expect.poll(async () => Math.round((await label.boundingBox())!.y)).toBe(16);
   });
 
   test("이미지마다 대체 텍스트가 있다", async ({ page }) => {

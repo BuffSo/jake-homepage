@@ -50,6 +50,14 @@ test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대�
   }
 });
 
+test("홈 About의 동료 평가 링크는 이력서에서 같은 문장이 든 인용으로 간다", () => {
+  // 인용이 원문에 있는지는 빌드가 본다(rehypeQuoteIds). 여기서는 두 글의 짝이 맞는지만 본다.
+  const { quotes } = read("content/site/resume-page.md");
+  const quote = quotes.find((q) => home.about.quoteHref === `/resume#${q.id}`);
+  assert.ok(quote, `resume-page.md의 quotes에 없는 링크: ${home.about.quoteHref}`);
+  assert.equal(quote.text, home.about.quote);
+});
+
 test("기술 층은 여섯 개이고, 기술 이름은 표지 설정과 같다", () => {
   // 기술마다 서비스 코드에서 찾을 표지가 있어야 npm run check:stack이 짝을 확인한다 (ADR-0010).
   assert.equal(home.layers.length, 6);
