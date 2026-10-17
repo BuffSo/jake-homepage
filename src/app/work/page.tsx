@@ -5,15 +5,17 @@ import { Chapter } from "@/components/work/chapter";
 import { SiteCards } from "@/components/work/site-cards";
 import { WorkIndex } from "@/components/work/work-index";
 import { getProjects, getSites, getWork, getWorkChapters } from "@/lib/content";
+import { pageMetadata } from "@/lib/site-meta";
 
 // 포트폴리오 (docs/02-ia.md /work). 머리 → 목차 → 서비스 챕터 → 의뢰받아 만든 사이트.
 // 서비스 챕터는 동기화한 포트폴리오 원문을 그대로 그린다 (src/lib/portfolio.mjs).
 const work = getWork();
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `${work.title} · 소재희`,
   description: work.intro,
-};
+  path: "/work",
+});
 
 export default function WorkPage() {
   const chapters = getWorkChapters();
