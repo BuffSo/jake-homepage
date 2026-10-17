@@ -6,9 +6,9 @@
 
 ## 연락처
 
-| 이메일           | GitHub                    |
-| ---------------- | ------------------------- |
-| buffso@naver.com | https://github.com/BuffSo |
+| 이메일             | GitHub                    | 홈페이지         |
+| ------------------ | ------------------------- | ---------------- |
+| buff4701@gmail.com | https://github.com/BuffSo | https://genys.kr |
 
 ---
 
