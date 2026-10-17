@@ -141,6 +141,7 @@ export type ResumePage = {
   title: string;
   description: string;
   print: string;
+  endPhotoAlt: string;
   sections: { id: string; title: string }[];
   reviews: { label: string; quotes: { id: string; text: string }[] };
 };
