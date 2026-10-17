@@ -116,7 +116,7 @@ export function ReviewFlow({ className = "" }: { className?: string }) {
         <span className="lg:text-lg">→</span>
         <div className="flex h-[5.5rem] w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-md bg-fg text-bg lg:h-[7.5rem] lg:w-[6.5rem] lg:rounded-lg">
           <span className="text-xs font-semibold lg:text-sm">점수</span>
-          <span className="text-[0.6875rem] opacity-75">80점 이상</span>
+          <span className="text-[0.6875rem] opacity-75">50점 이상</span>
         </div>
       </div>
       <span className="hidden text-center text-xs text-subtle lg:block">보고서를 먼저 보고 → PR 코멘트로 게시 · 스펙 축은 점수와 섞지 않음</span>

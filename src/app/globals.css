@@ -214,8 +214,9 @@
     background: none;
     font-size: inherit;
   }
+  /* 표 안 링크의 화면 읽기용 "(새 창)"은 position: absolute라, 상자에 위치 기준이 없으면 스크롤 상자를 빠져나가 페이지를 넓힌다. */
   .md .md-table {
-    @apply rounded-lg border border-line-soft;
+    @apply relative rounded-lg border border-line-soft;
     overflow-x: auto;
   }
   .md table {
@@ -300,7 +301,8 @@
     @apply text-muted;
     font-size: 0.875rem;
   }
-  /* 표 최소 폭은 네 칸 이상(학력)만 둔다. 두 칸짜리 연락처 표는 화면 폭에 맞춘다. */
+  /* 표 최소 폭은 네 칸 이상(학력)만 둔다. 연락처와 수상 표는 화면 폭에 맞추되, 칸 안의 주소를 끊지 않으므로
+     좁은 화면에서 다 들어가지 않으면 상자 안에서 넘긴다(375 폭의 연락처 표). */
   .md-resume table {
     min-width: 0;
   }
