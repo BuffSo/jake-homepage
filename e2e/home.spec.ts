@@ -343,6 +343,9 @@ test.describe("기술 층 강조", () => {
     await expect(button).toHaveAttribute("aria-pressed", "true");
     await expectHighlight(page, layer);
 
+    // 스크롤 직후(0.1초 안)의 누름은 스크롤을 멈춘 것으로 보고 세지 않는다(stack-layers.tsx). 맨 위로 돌아가 멈춘 뒤 탭한다.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(200);
     await page.getByRole("heading", { level: 1 }).tap();
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expectHighlight(page, null);
@@ -418,8 +421,10 @@ test.describe("기술 층 강조", () => {
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expectHighlight(page, null);
 
-    // 층 밖을 마우스로 눌러도 풀린다
+    // 층 밖을 마우스로 눌러도 풀린다. 오른쪽 클릭으로는 풀리지 않는다.
     await button.press("Enter");
+    await page.getByRole("heading", { level: 1 }).click({ button: "right" });
+    await expect(button).toHaveAttribute("aria-pressed", "true");
     await page.getByRole("heading", { level: 1 }).click();
     await expect(button).toHaveAttribute("aria-pressed", "false");
   });
