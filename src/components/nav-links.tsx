@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type Item = { label: string; href: string };
+type Item = { label: string; href: string; note?: string };
 type Props = {
   items: Item[];
   /** bar: 데스크톱 헤더의 가로 메뉴, menu: 모바일 메뉴의 세로 목록 */
@@ -13,25 +13,32 @@ type Props = {
 
 // 헤더 메뉴의 링크 (docs/02-ia.md 공통 요소). 지금 보는 페이지에는 aria-current와 밑줄을 붙인다.
 // 데스크톱은 굵기를 바꾸지 않는다. 페이지를 옮길 때 항목 폭이 달라져 메뉴가 흔들리지 않게 하기 위해서다.
-const LINK_CLASS = {
-  bar: { base: "hover:underline", current: "underline decoration-2 underline-offset-4" },
-  menu: { base: "flex h-11 items-center px-4 text-sm", current: "font-semibold underline underline-offset-4" },
+// 모바일은 줄마다 왼쪽에 이름, 오른쪽에 페이지 제목(note)을 둔다. 표시는 이름 글자에만 붙인다.
+// 링크에 밑줄을 주면 안의 페이지 제목까지 밑줄이 번진다.
+const BAR = { base: "hover:underline", current: "underline decoration-2 underline-offset-4" };
+const MENU = {
+  row: "flex h-14 items-center justify-between gap-4 border-t border-line-soft px-4 first:border-t-0",
+  label: "text-base",
+  current: "font-semibold underline decoration-2 underline-offset-4",
+  note: "text-sm text-subtle",
 };
 
 /** 경로를 읽지 않고 그리는 링크. 경로를 알기 전(Suspense 대체 화면)에는 표시 없이 그린다. */
 export function NavLinks({ items, variant, onNavigate, current }: Props & { current?: string }) {
-  const { base, current: currentClass } = LINK_CLASS[variant];
   return items.map((item) => {
     const isCurrent = item.href === current;
+    const common = { href: item.href, onClick: onNavigate, "aria-current": isCurrent ? ("page" as const) : undefined };
+    if (variant === "bar") {
+      return (
+        <Link key={item.href} {...common} className={isCurrent ? `${BAR.base} ${BAR.current}` : BAR.base}>
+          {item.label}
+        </Link>
+      );
+    }
     return (
-      <Link
-        key={item.href}
-        href={item.href}
-        onClick={onNavigate}
-        aria-current={isCurrent ? "page" : undefined}
-        className={isCurrent ? `${base} ${currentClass}` : base}
-      >
-        {item.label}
+      <Link key={item.href} {...common} className={MENU.row}>
+        <span className={isCurrent ? `${MENU.label} ${MENU.current}` : MENU.label}>{item.label}</span>
+        {item.note && <span className={MENU.note}>{item.note}</span>}
       </Link>
     );
   });
