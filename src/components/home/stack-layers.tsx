@@ -40,12 +40,15 @@ export function StackLayers({ layers, children }: { layers: Layer[]; children?: 
       if (e.key === "Escape") release();
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    // 화면을 확대한 상태의 스크롤은 visualViewport에서만 온다
+    window.visualViewport?.addEventListener("scroll", onScroll, { passive: true });
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("pointercancel", onPointerCancel);
     document.addEventListener("pointerup", onPointerUp);
     document.addEventListener("keydown", onKeyDown);
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.visualViewport?.removeEventListener("scroll", onScroll);
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("pointercancel", onPointerCancel);
       document.removeEventListener("pointerup", onPointerUp);
