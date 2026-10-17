@@ -7,7 +7,13 @@ import { capturePath, collectErrors } from "./helpers";
 // 이력서 화면 확인 (ADR-0008, docs/02-ia.md /resume). 캡처는 test-results/에만 남고 커밋하지 않는다.
 // 기대값은 resume-page.md와 동기화한 이력서에서 읽는다.
 
-type ResumePage = { title: string; label: string; print: string; sections: { id: string; title: string }[] };
+type ResumePage = {
+  title: string;
+  label: string;
+  print: string;
+  endPhotoAlt: string;
+  sections: { id: string; title: string }[];
+};
 
 const resumePage = parseFrontmatter(readFileSync("content/site/resume-page.md", "utf8"), "resume-page.md").data as ResumePage;
 const resume = splitResume(readFileSync("content/synced/resume.md", "utf8"));
@@ -76,6 +82,26 @@ test("동료 평가(Peer Review)는 다른 인용과 구분되는 상자로 보�
   // 프로젝트 소개 인용은 상자 밖에 그대로 있다
   const plain = page.locator(".md-resume blockquote:not(.md-review blockquote)").first();
   expect((await style(plain)).line).not.toBe(box.line);
+});
+
+test("본문 끝, 푸터 위에 사진 한 장이 있고 인쇄에서는 빠진다", async ({ page }) => {
+  await page.goto("/resume");
+  const photo = page.getByRole("img", { name: resumePage.endPhotoAlt });
+  await photo.scrollIntoViewIfNeeded();
+  await expect(photo).toBeVisible();
+  await expect.poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+
+  const box = (await photo.boundingBox())!;
+  const body = (await page.locator(".md-resume").boundingBox())!;
+  const footer = (await page.locator("body > footer").boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(body.y + body.height);
+  expect(box.y + box.height).toBeLessThanOrEqual(footer.y);
+  // 원본이 960px라 레티나에서도 선명한 30rem까지만 넓히고, 16:9로 자른다
+  expect(box.width).toBeLessThanOrEqual(480);
+  expect(box.width / box.height).toBeCloseTo(16 / 9, 1);
+
+  await page.emulateMedia({ media: "print" });
+  await expect(photo).toBeHidden();
 });
 
 test("전화번호 형식의 글자가 없다", async ({ page }) => {
