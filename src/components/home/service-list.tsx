@@ -21,7 +21,8 @@ const TECH_LINE = "font-mono text-[0.6875rem] leading-[1.6] md:text-[0.8125rem] 
 
 // 첫 화면의 증거 목록 (docs/02-ia.md 홈 1). 번호는 아래 서비스 카드와 같고, 이름을 누르면 그 카드로 내려간다.
 // 모바일은 이름 줄 오른쪽에 주소를, 데스크톱은 설명 아래에 주소를 둔다. 읽는 순서는 둘 다 이름, 설명, 주소다.
-// 기술 층을 강조하면 서비스마다 그 층에서 쓴 기술이 한 줄 설명 자리에 보이고, 표식이 강조색이 된다.
+// 기술 층을 강조하면 서비스마다 그 층에서 쓴 기술이 한 줄 설명 자리에 보이고, 기술과 표식이 누른 층과 같은 강조색이 된다.
+// 평소의 설명은 무채색이다.
 // 그 층의 기술을 하나도 쓰지 않은 서비스만 흐려진다. 층 하나에 서비스를 묶으면 기술마다 쓴 서비스가 달라 사실과 어긋난다.
 export function ServiceList({ services }: { services: ServiceItem[] }) {
   const { active, pinned } = useLayerFocus();
@@ -71,7 +72,7 @@ export function ServiceList({ services }: { services: ServiceItem[] }) {
                     {line}
                   </p>
                 ))}
-                {state === "hit" && <p className={TECH_LINE}>{techLine(used)}</p>}
+                {state === "hit" && <p className={`text-accent ${TECH_LINE}`}>{techLine(used)}</p>}
               </div>
               <ExternalLink
                 href={service.href}

@@ -214,6 +214,18 @@ test.describe("첫 화면", () => {
     await expect(contact.getByRole("link", { name: "이력서 보기" })).toHaveAttribute("href", "/resume");
   });
 
+  test("첫 줄의 첫 낱말은 윤곽만, 마지막 낱말은 그라데이션이다", async ({ page }) => {
+    await page.goto("/");
+    const h1 = page.getByRole("heading", { level: 1 });
+    const words = home.headline.split(" ");
+    const first = h1.getByText(words[0], { exact: true });
+    await expect(first).toHaveCSS("color", "rgba(0, 0, 0, 0)");
+    expect(parseFloat(await first.evaluate((el) => getComputedStyle(el).webkitTextStrokeWidth))).toBeGreaterThan(0);
+    const last = h1.getByText(words[words.length - 1], { exact: true });
+    await expect(last).toHaveCSS("background-image", /linear-gradient/);
+    await expect(last).toHaveCSS("background-clip", "text");
+  });
+
   test("기술 층 여섯이 순서대로 버튼으로 있다", async ({ page }) => {
     await page.goto("/");
     const buttons = page.getByRole("list", { name: "기술 층" }).getByRole("button");
@@ -259,27 +271,52 @@ test.describe("기술 층 강조", () => {
   const dimLayer = home.layers.find((l) => projects.some((p) => techs(l, p).length === 0));
   const serviceItems = (page: Page) => page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("listitem");
 
+  // 강조색 토큰(#rrggbb)을 계산된 색 표기(rgb(r, g, b))로 바꾼다.
+  async function accentColor(page: Page) {
+    const hex = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--accent").trim());
+    return `rgb(${hex.match(/\w\w/g)!.map((h) => parseInt(h, 16)).join(", ")})`;
+  }
+
   async function expectHighlight(page: Page, target: Layer | null) {
+    const accent = await accentColor(page);
     for (const [i, project] of projects.entries()) {
       const item = serviceItems(page).nth(i);
       const used = target ? techs(target, project) : [];
       await expect(item).toHaveCSS("opacity", target && used.length === 0 ? "0.3" : "1");
-      // 층마다의 기술 줄은 자리만 잡는 보이지 않는 사본이 있으므로 보이는 것만 센다.
-      if (used.length) await expect(item.getByText(used.join(" · "), { exact: true }).filter({ visible: true })).toHaveCount(1);
-      // 쓴 기술이 보이는 동안 설명은 자리만 남고, 그 밖에는 설명이 보인다.
-      if (used.length) await expect(item.getByText(project.summary)).toBeHidden();
-      else await expect(item.getByText(project.summary)).toBeVisible();
+      // 층마다의 기술 줄은 자리만 잡는 보이지 않는 사본이 있으므로 보이는 것만 센다. 쓴 기술은 누른 층과 같은 강조색이다.
+      const line = item.getByText(used.join(" · "), { exact: true }).filter({ visible: true });
+      if (used.length) await expect(line).toHaveCount(1);
+      if (used.length) await expect(line).toHaveCSS("color", accent);
+      // 쓴 기술이 보이는 동안 설명은 자리만 남고, 그 밖에는 설명이 무채색으로 보인다.
+      const summary = item.getByText(project.summary);
+      if (used.length) await expect(summary).toBeHidden();
+      else await expect(summary).toBeVisible();
+      if (!used.length) await expect(summary).not.toHaveCSS("color", accent);
     }
   }
 
-  test("층을 누르면 고정되고, 서비스마다 그 층에서 쓴 기술이 보인다", async ({ page }) => {
+  const layerButton = (page: Page, target: Layer) => page.getByRole("button", { name: new RegExp(`^${target.name}`) });
+  // 층을 보이게 한다. 데스크톱은 마우스를 올리고(눌러도 고정하지 않는다), 모바일은 탭해서 고정한다.
+  async function show(page: Page, target: Layer, mobile: boolean) {
+    const button = layerButton(page, target);
+    if (mobile) await button.tap();
+    else await button.hover();
+  }
+  // 보이던 층을 돌린다. 데스크톱은 마우스를 치우고, 모바일은 같은 층을 다시 탭한다.
+  async function hide(page: Page, target: Layer, mobile: boolean) {
+    if (mobile) await layerButton(page, target).tap();
+    else await page.mouse.move(0, 0);
+  }
+
+  test("모바일은 층을 탭하면 고정되고, 서비스마다 그 층에서 쓴 기술이 보인다", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile", "마우스가 없는 화면만 탭으로 고정한다");
     await page.goto("/");
-    const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
+    const button = layerButton(page, layer);
     const band = page.getByRole("list", { name: "운영 중인 서비스" });
     const before = (await band.boundingBox())!.height;
     await expect(button).toHaveAttribute("aria-pressed", "false");
 
-    await button.click();
+    await button.tap();
     await expect(button).toHaveAttribute("aria-pressed", "true");
     await expectHighlight(page, layer);
     // 설명 자리에 겹쳐 보이므로 목록 높이가 바뀌지 않는다.
@@ -289,21 +326,47 @@ test.describe("기술 층 강조", () => {
       .join(" / ");
     await expect(page.getByText(`${layer.name} 층: ${announced}`)).toBeAttached();
 
-    await button.click();
+    await button.tap();
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expectHighlight(page, null);
   });
 
-  test("여섯 층 모두 서비스마다 그 층에서 쓴 기술이 보이고, 목록 높이가 바뀌지 않는다", async ({ page }) => {
+  test("모바일은 층 밖을 탭하면 풀리고, 스크롤로는 풀리지 않으며, 다른 층을 탭하면 그 층으로 바뀐다", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile", "마우스가 없는 화면만 탭으로 고정한다");
+    await page.goto("/");
+    const button = layerButton(page, layer);
+
+    await button.tap();
+    // 층을 누른 뒤 아래 서비스 목록을 보려고 스크롤해도 풀리지 않는다(층 밖에서 누르고 뗀 것만 본다)
+    await page.mouse.wheel(0, 200);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await expectHighlight(page, layer);
+
+    // 스크롤 직후(0.1초 안)의 누름은 스크롤을 멈춘 것으로 보고 세지 않는다(stack-layers.tsx). 맨 위로 돌아가 멈춘 뒤 탭한다.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(200);
+    await page.getByRole("heading", { level: 1 }).tap();
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await expectHighlight(page, null);
+
+    const other = home.layers.find((l) => l.name !== layer.name)!;
+    await button.tap();
+    await layerButton(page, other).tap();
+    await expect(layerButton(page, other)).toHaveAttribute("aria-pressed", "true");
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("여섯 층 모두 서비스마다 그 층에서 쓴 기술이 보이고, 목록 높이가 바뀌지 않는다", async ({ page }, testInfo) => {
+    const mobile = testInfo.project.name === "mobile";
     await page.goto("/");
     const band = page.getByRole("list", { name: "운영 중인 서비스" });
     const before = (await band.boundingBox())!.height;
     for (const target of home.layers) {
-      const button = page.getByRole("button", { name: new RegExp(`^${target.name}`) });
-      await button.click();
+      await show(page, target, mobile);
       await expectHighlight(page, target);
       expect((await band.boundingBox())!.height, target.name).toBe(before);
-      await button.click();
+      await hide(page, target, mobile);
     }
   });
 
@@ -315,8 +378,7 @@ test.describe("기술 층 강조", () => {
     const band = page.getByRole("list", { name: "운영 중인 서비스" });
     const before = (await band.boundingBox())!.height;
     for (const target of home.layers) {
-      const button = page.getByRole("button", { name: new RegExp(`^${target.name}`) });
-      await button.click();
+      await show(page, target, false);
       expect((await band.boundingBox())!.height, target.name).toBe(before);
       for (const [i] of projects.entries()) {
         const item = serviceItems(page).nth(i);
@@ -325,41 +387,67 @@ test.describe("기술 층 강조", () => {
         const box = (await shown.boundingBox())!;
         expect(box.y + box.height, `${target.name} · ${projects[i].title}`).toBeLessThanOrEqual(domain.y + 0.5);
       }
-      await button.click();
+      await hide(page, target, false);
     }
   });
 
-  test("하나도 안 쓴 서비스만 흐려진다", async ({ page }) => {
+  test("하나도 안 쓴 서비스만 흐려진다", async ({ page }, testInfo) => {
     test.skip(!dimLayer, "지금 층 데이터에는 기술을 하나도 안 쓰는 서비스가 있는 층이 없다");
     await page.goto("/");
-    await page.getByRole("button", { name: new RegExp(`^${dimLayer!.name}`) }).click();
+    await show(page, dimLayer!, testInfo.project.name === "mobile");
     await expectHighlight(page, dimLayer!);
   });
 
-  test("층 안의 기술마다 쓴 서비스가 달라도, 하나라도 쓴 서비스는 흐려지지 않는다", async ({ page }) => {
+  test("층 안의 기술마다 쓴 서비스가 달라도, 하나라도 쓴 서비스는 흐려지지 않는다", async ({ page }, testInfo) => {
     // API 층은 TypeScript를 세 서비스가 모두 쓴다. 층 하나로 묶었을 때 GENYS Lotto AI가 흐려졌던 일을 막는다.
     const api = home.layers.find((l) => l.name === "API")!;
     await page.goto("/");
-    await page.getByRole("button", { name: /^API/ }).click();
+    await show(page, api, testInfo.project.name === "mobile");
     await expectHighlight(page, api);
     for (const [i] of projects.entries()) await expect(serviceItems(page).nth(i)).toHaveAttribute("data-state", "hit");
   });
 
-  test("키보드로도 누를 수 있다", async ({ page }) => {
+  test("키보드로 누르면 고정되고, 다시 누르거나 Esc를 누르면 풀린다", async ({ page }) => {
     await page.goto("/");
-    const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
+    const button = layerButton(page, layer);
     await button.press("Enter");
     await expect(button).toHaveAttribute("aria-pressed", "true");
     await button.press("Space");
     await expect(button).toHaveAttribute("aria-pressed", "false");
+
+    await button.press("Enter");
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await page.keyboard.press("Escape");
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await expectHighlight(page, null);
+
+    // 층 밖을 마우스로 눌러도 풀린다. 오른쪽 클릭으로는 풀리지 않는다.
+    await button.press("Enter");
+    await page.getByRole("heading", { level: 1 }).click({ button: "right" });
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("heading", { level: 1 }).click();
+    await expect(button).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("마우스를 올리면 잠깐 보여 주고, 떼면 돌아간다", async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name === "mobile", "터치 화면은 누르기만 쓴다");
+  test("마우스로 층을 누른 채 밖에서 떼어도, 다음 키보드 Enter는 고정한다", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === "mobile", "마우스 동작 확인");
     await page.goto("/");
-    const button = page.getByRole("button", { name: new RegExp(`^${layer.name}`) });
+    const button = layerButton(page, layer);
+    await button.hover();
+    await page.mouse.down();
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
+    await button.press("Enter");
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("데스크톱은 마우스를 올리면 보여 주고 떼면 돌아가며, 눌러도 고정하지 않는다", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === "mobile", "터치 화면은 탭으로 고정한다");
+    await page.goto("/");
+    const button = layerButton(page, layer);
     await button.hover();
     await expectHighlight(page, layer);
+    await button.click();
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await page.mouse.move(0, 0);
     await expectHighlight(page, null);

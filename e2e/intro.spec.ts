@@ -27,6 +27,8 @@ async function recordIntro(page: Page) {
 }
 
 const hero = (page: Page) => page.locator("[data-hero]");
+// 첫 줄의 마지막 낱말. 재생하는 동안은 글자색이고, 마지막 박자에 그라데이션 사본이 왼쪽부터 덮는다.
+const fillWord = (page: Page) => page.locator("[data-intro-fill]");
 
 test.describe("움직임을 켠 경우", () => {
   test.use({ reducedMotion: "no-preference" });
@@ -54,6 +56,15 @@ test.describe("움직임을 켠 경우", () => {
     expect(errors).toEqual([]);
   });
 
+  test("재생하는 동안 첫 줄 마지막 낱말은 글자색이고, 끝나면 그라데이션이 차 있고 사본이 남지 않는다", async ({ page }) => {
+    await page.goto("/");
+    await expect(hero(page)).toHaveAttribute("data-intro", "playing");
+    await expect(fillWord(page)).toHaveCSS("background-image", "none");
+    await expect(hero(page)).not.toHaveAttribute("data-intro", { timeout: 6000 });
+    await expect(fillWord(page)).toHaveCSS("background-image", /linear-gradient/);
+    await expect(fillWord(page).locator("[aria-hidden]")).toHaveCount(0);
+  });
+
   test("같은 방문에서 다시 열면 재생하지 않는다", async ({ page }) => {
     await page.goto("/");
     await expect(hero(page)).not.toHaveAttribute("data-intro", { timeout: 6000 });
@@ -71,11 +82,13 @@ test.describe("움직임을 켠 경우", () => {
   });
 
   test("JS가 재생을 시작하지 못하면 3초 뒤 마지막 장면을 보여 준다", async ({ page }) => {
-    await page.route("**/_next/static/chunks/**", (route) => route.abort());
+    // CSS는 같은 폴더에 있으므로 JS만 막는다. 마지막 장면의 모양(첫 줄 그라데이션)까지 보기 위해서다.
+    await page.route("**/_next/static/chunks/**/*.js", (route) => route.abort());
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(hero(page)).toHaveAttribute("data-intro", "pending");
     await expect(hero(page)).not.toHaveAttribute("data-intro", { timeout: 5000 });
     await expect(page.getByText(home.lines[0])).toBeVisible();
+    await expect(fillWord(page)).toHaveCSS("background-image", /linear-gradient/);
   });
 });
 
@@ -84,4 +97,6 @@ test("움직임 줄이기면 재생하지 않고 다시 보기도 감춘다", as
   expect(await hero(page).evaluate((el) => el.hasAttribute("data-intro"))).toBe(false);
   await expect(page.getByText(home.lines[0])).toBeVisible();
   await expect(page.getByRole("button", { name: "다시 보기" })).toBeHidden();
+  // 첫 줄의 색은 처음부터 차 있다
+  await expect(fillWord(page)).toHaveCSS("background-image", /linear-gradient/);
 });
