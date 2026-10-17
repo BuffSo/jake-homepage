@@ -79,6 +79,27 @@ test("헤더 왼쪽의 프로필 그림과 별칭 Jake가 실명 대신 홈 링�
   }
 });
 
+test("탭 아이콘(favicon.ico, icon.png)과 홈 화면 아이콘(apple-icon.png)이 있다", async ({ page, request }) => {
+  await page.goto("/");
+  const icons = [
+    { rel: "icon", sizes: "48x48", type: "image/x-icon" },
+    { rel: "icon", sizes: "192x192", type: "image/png" },
+    { rel: "apple-touch-icon", sizes: "180x180", type: "image/png" },
+  ];
+  for (const { rel, sizes, type } of icons) {
+    const href = await page.locator(`head link[rel="${rel}"][sizes="${sizes}"]`).getAttribute("href");
+    const response = await request.get(href!);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain(type);
+  }
+
+  // 탭 아이콘은 16, 32, 48 세 크기를 한 파일에 담는다 (Next.js 기본 아이콘을 바꿨다)
+  const ico = await (await request.get("/favicon.ico")).body();
+  const count = ico.readUInt16LE(4);
+  const sizes = Array.from({ length: count }, (_, i) => ico[6 + 16 * i]).sort((a, b) => a - b);
+  expect(sizes).toEqual([16, 32, 48]);
+});
+
 test("헤더에서 Work, AI, Resume로 갈 수 있다", async ({ page }, testInfo) => {
   await page.goto("/");
   if (testInfo.project.name === "mobile") await page.getByText("메뉴").click();
