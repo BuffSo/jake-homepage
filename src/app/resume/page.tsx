@@ -34,6 +34,7 @@ export default function ResumePage() {
           breaks
           headingIds={headingIds}
           reviews={page.reviews}
+          stackTables
         >
           {resume.body}
         </MarkdownText>

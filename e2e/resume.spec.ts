@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 import { splitResume } from "../src/lib/resume.mjs";
 import { capturePath, collectErrors } from "./helpers";
@@ -40,6 +40,47 @@ test("가로 스크롤이 생기지 않는다", async ({ page }) => {
   await page.goto("/resume");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("연락처와 학력 표는 좁은 화면에서 행마다 상자로, 넓은 화면과 인쇄에서는 표로 보인다", async ({ page }, testInfo) => {
+  // docs/guide/UI_모바일_표_20261017.md. 이력서의 표는 연락처, 학력, 수상 순서로 셋이다.
+  await page.goto("/resume");
+  const tables = page.locator(".md-resume .md-table");
+  await expect(tables).toHaveCount(3);
+  const [contact, education, awards] = [0, 1, 2].map((i) => tables.nth(i));
+  const stacked: [Locator, string[]][] = [
+    [contact, ["이메일", "GitHub", "홈페이지"]],
+    [education, ["기간", "학교", "전공", "졸업논문"]],
+  ];
+  const display = (box: Locator) => box.locator("table").evaluate((t) => getComputedStyle(t).display);
+
+  if (testInfo.project.name === "mobile") {
+    // 상자 안에서 옆으로 넘기지 않고, 칸마다 열 머리글 이름표가 보인다
+    for (const [box, labels] of stacked) {
+      expect(await box.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+      expect(await display(box)).toBe("block");
+      for (const label of labels) await expect(box.locator(".md-label", { hasText: label }).first()).toBeVisible();
+    }
+  } else {
+    for (const [box] of stacked) {
+      expect(await display(box)).toBe("table");
+      await expect(box.locator(".md-label").first()).toBeHidden();
+    }
+  }
+  // 수상은 여러 행에 세 칸이라 어느 폭에서나 표이고 이름표가 없다
+  expect(await display(awards)).toBe("table");
+  await expect(awards.locator(".md-label")).toHaveCount(0);
+
+  // 표 구조는 접근성 트리에 남고, 칸 이름에 이름표 글자가 섞이지 않는다(이름표는 aria-hidden)
+  await expect(page.getByRole("table")).toHaveCount(3);
+  await expect(page.getByRole("cell", { name: /^\S+@\S+$/ })).toHaveCount(1);
+
+  // 인쇄는 화면 폭과 관계없이 표다
+  await page.emulateMedia({ media: "print" });
+  for (const [box] of stacked) {
+    expect(await display(box)).toBe("table");
+    await expect(box.locator(".md-label").first()).toBeHidden();
+  }
 });
 
 test("목차 열 개가 해당 절로 간다", async ({ page }) => {

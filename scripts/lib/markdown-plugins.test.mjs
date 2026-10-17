@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { rehypeDropStyle, rehypeHeadingIds, rehypeReviews, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
+import { rehypeDropStyle, rehypeHeadingIds, rehypeReviews, rehypeStackTables, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
 
 // 원문 마크다운 플러그인 (src/lib/markdown-plugins.mjs). 사이트와 같은 react-markdown으로 그려 HTML을 본다.
 
@@ -94,5 +94,39 @@ describe("rehypeDropStyle", () => {
     const tree = { type: "root", children: [{ type: "element", properties: { style: "color:red", id: "a" }, children: [] }] };
     rehypeDropStyle()(tree);
     assert.deepEqual(tree.children[0].properties, { id: "a" });
+  });
+});
+
+describe("rehypeStackTables", () => {
+  const table = (heads, rows) => [`| ${heads.join(" | ")} |`, `| ${heads.map(() => "---").join(" | ")} |`, ...rows.map((r) => `| ${r.join(" | ")} |`)].join("\n");
+  const stacked = (md) => render(md, { rehype: [rehypeStackTables] });
+
+  test("본문 행이 하나뿐인 표(연락처)는 상자 대상이 되고, 칸마다 열 머리글 이름표가 붙는다", () => {
+    const html = stacked(table(["이메일", "GitHub", "홈페이지"], [["a@b.c", "gh", "home"]]));
+    assert.match(html, /<table class="md-stack" role="table">/);
+    assert.match(html, /<td role="cell"><span class="md-label" aria-hidden="true">이메일<\/span>/);
+    assert.match(html, /<span class="md-label" aria-hidden="true">홈페이지<\/span><span class="md-value">home<\/span><\/td>/);
+    assert.match(html, /<th role="columnheader">GitHub<\/th>/);
+    assert.equal((html.match(/role="row"/g) ?? []).length, 2);
+    assert.equal((html.match(/role="rowgroup"/g) ?? []).length, 2);
+  });
+
+  test("네 칸 이상인 표(학력)는 행이 여럿이어도 상자 대상이다", () => {
+    const html = stacked(table(["기간", "학교", "전공", "졸업논문"], [["1", "2", "3", "4"], ["5", "6", "7", "8"]]));
+    assert.match(html, /class="md-stack"/);
+    assert.equal((html.match(/class="md-label"/g) ?? []).length, 8);
+  });
+
+  test("글자와 굵은 글자, 링크가 섞인 칸도 이름표 하나와 값 하나만 둔다", () => {
+    // 칸이 격자라서, 값을 감싸지 않으면 섞인 조각마다 격자 항목이 되어 이름표 칸으로 떨어진다
+    const html = stacked(table(["기간", "학교", "전공", "졸업논문"], [["1", "앞 **굵게** 뒤", "[링크](https://x.y) 뒤", "4"]]));
+    const cells = [...html.matchAll(/<td role="cell">(.*?)<\/td>/g)].map((m) => m[1]);
+    for (const cell of cells) assert.match(cell, /^<span class="md-label" aria-hidden="true">[^<]*<\/span><span class="md-value">.*<\/span>$/);
+    assert.match(cells[1], /<span class="md-value">앞 <strong>굵게<\/strong> 뒤<\/span>/);
+  });
+
+  test("여러 행에 세 칸 이하인 표(수상)는 그대로 둔다", () => {
+    const md = table(["연도", "수상명", "수여기관"], [["2011", "상", "기관"], ["2012", "상", "기관"]]);
+    assert.equal(stacked(md), render(md));
   });
 });

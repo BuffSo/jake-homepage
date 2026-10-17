@@ -93,3 +93,51 @@ export function rehypeReviews({ label, quotes = [] }) {
     if (missing.length) throw new Error(`${label} 상자에서 찾지 못한 글입니다: ${missing.map((q) => q.text).join(", ")}`);
   };
 }
+
+/**
+ * 좁은 화면에서 넘치는 이력서 표를 행마다 상자로 그릴 수 있게 표시한다 (docs/guide/UI_모바일_표_20261017.md).
+ * 네 칸 이상이거나 본문 행이 하나뿐인 표(연락처, 학력)를 고른다. 여러 행에 세 칸 이하인 표(수상)는 그대로 둔다.
+ * 모양은 globals.css의 .md-stack이 정한다. CSS의 :has() 안에는 :has()를 못 써서, 고르는 일은 여기서 한다.
+ * - 칸마다 맨 앞에 열 머리글 이름표(.md-label)를 넣고, 원래 내용은 값(.md-value)으로 감싼다.
+ *   이름표를 CSS ::before로 그리면 화면 읽기 프로그램이 열 머리글과 함께 두 번 읽어 aria-hidden 글자로 넣는다.
+ * - CSS로 display를 바꾸면 브라우저가 표 구조를 접근성 트리에서 지울 수 있어 역할(role)을 적는다.
+ */
+export function rehypeStackTables() {
+  const text = (node) => (node.type === "text" ? node.value : (node.children ?? []).map(text).join(""));
+  const elements = (node, tag) => (node?.children ?? []).filter((c) => c.type === "element" && (!tag || c.tagName === tag));
+  const withProps = (node, props) => {
+    node.properties = { ...node.properties, ...props };
+  };
+
+  const stack = (table) => {
+    const [thead] = elements(table, "thead");
+    const [tbody] = elements(table, "tbody");
+    if (!thead || !tbody) return;
+    const heads = elements(elements(thead, "tr")[0], "th").map((th) => text(th).trim());
+    const rows = elements(tbody, "tr");
+    if (heads.length < 4 && rows.length !== 1) return;
+
+    withProps(table, { className: [...(table.properties?.className ?? []), "md-stack"], role: "table" });
+    for (const group of [thead, tbody]) {
+      withProps(group, { role: "rowgroup" });
+      for (const tr of elements(group, "tr")) {
+        withProps(tr, { role: "row" });
+        elements(tr).forEach((cell, i) => {
+          if (cell.tagName === "th") return withProps(cell, { role: "columnheader" });
+          withProps(cell, { role: "cell" });
+          // 칸의 원래 내용은 값(.md-value) 하나로 감싼다. 글자와 굵은 글자, 링크가 섞인 칸도 격자의 값 칸 하나에 머문다.
+          const label = { type: "element", tagName: "span", properties: { className: ["md-label"], ariaHidden: "true" }, children: [{ type: "text", value: heads[i] ?? "" }] };
+          const value = { type: "element", tagName: "span", properties: { className: ["md-value"] }, children: cell.children };
+          cell.children = [label, value];
+        });
+      }
+    }
+  };
+
+  return (tree) => {
+    const walk = (node) => {
+      for (const child of elements(node)) (child.tagName === "table" ? stack : walk)(child);
+    };
+    walk(tree);
+  };
+}
