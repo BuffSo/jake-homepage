@@ -13,6 +13,7 @@
     "check:motion-size": "node scripts/check-motion-size.mjs",
     "check:stack": "node scripts/check-stack.mjs",
     "sync": "node scripts/sync-content.mjs",
+    "og:image": "node scripts/og-image.mjs",
     "test": "node --test \"scripts/**/*.test.mjs\"",
     "test:e2e": "next build && playwright test",
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
