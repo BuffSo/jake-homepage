@@ -15,18 +15,32 @@ export function StackLayers({ layers, children }: { layers: Layer[]; children?: 
   const pointerType = useRef("");
 
   // 고정한 층은 층 밖을 누르거나 Esc를 누르면 푼다. 그대로 두면 서비스의 한 줄 설명이 계속 가려진다.
-  // pointerdown이 아니라 click을 본다. 모바일에서 층을 누른 뒤 아래 목록을 보려고 스크롤해도 풀리지 않게 하기 위해서다.
+  // 층 밖에서 누르고 뗀 것(pointerdown과 pointerup)을 본다. click은 iOS Safari에서 링크나 버튼이 아닌 곳을 탭하면 생기지 않는다.
+  // 모바일에서 층을 누른 뒤 아래 목록을 보려고 스크롤하면 브라우저가 pointercancel을 보내므로 풀리지 않는다.
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (!listRef.current?.contains(e.target as Node)) release();
+    const outside = (e: Event) => !listRef.current?.contains(e.target as Node);
+    let pressedOutside = false;
+    const onPointerDown = (e: PointerEvent) => {
+      pressedOutside = outside(e);
+    };
+    const onPointerCancel = () => {
+      pressedOutside = false;
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      if (pressedOutside && outside(e)) release();
+      pressedOutside = false;
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") release();
     };
-    document.addEventListener("click", onClick);
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("pointercancel", onPointerCancel);
+    document.addEventListener("pointerup", onPointerUp);
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener("click", onClick);
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("pointercancel", onPointerCancel);
+      document.removeEventListener("pointerup", onPointerUp);
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [release]);
@@ -42,10 +56,11 @@ export function StackLayers({ layers, children }: { layers: Layer[]; children?: 
               data-active={active?.name === layer.name}
               // 마우스는 올리기만으로 보이므로 눌러도 고정하지 않는다. 고정은 마우스가 없는 터치와 키보드에만 쓴다.
               onPointerDown={(e) => (pointerType.current = e.pointerType)}
-              onClick={() => {
+              // 키보드로 누른 클릭은 detail이 0이다. 마우스로 누른 채 층 밖에서 떼어 남은 값과 관계없이 고정한다.
+              onClick={(e) => {
                 const type = pointerType.current;
                 pointerType.current = "";
-                if (type !== "mouse") toggle(layer.name);
+                if (e.detail === 0 || type !== "mouse") toggle(layer.name);
               }}
               // 터치는 누르기만 쓴다. 손가락을 떼도 pointerleave가 오지 않아 미리 보기가 남기 때문이다.
               onPointerEnter={(e) => e.pointerType === "mouse" && preview(layer.name)}

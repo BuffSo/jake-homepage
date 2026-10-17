@@ -34,7 +34,7 @@ export function LayerFocusProvider({ layers, children }: { layers: Layer[]; chil
     active: find(previewName ?? pinnedName),
     pinned: find(pinnedName),
     toggle: (name) => {
-      // 누른 뒤에는 마우스가 그대로 있어도 누른 결과가 바로 보이게 미리 보기를 지운다.
+      // 키보드 포커스로 잠깐 보여 주던 층을 누르면, 누른 결과가 바로 보이게 미리 보기를 지운다.
       setPreviewName(null);
       setPinnedName((current) => (current === name ? null : name));
     },
