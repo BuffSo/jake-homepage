@@ -220,6 +220,27 @@
 |---|---|---|---|
 | ![홈 About의 동료 평가 세 줄](design/peer-review/home-about-1280.png) | ![모바일 홈 About의 동료 평가 세 줄](design/peer-review/home-about-375.png) | ![이력서의 동료 평가 상자](design/peer-review/resume-review-1280.png) | ![다크 모드 모바일 이력서의 동료 평가 상자](design/peer-review/resume-review-375-dark.png) |
 
+## 이력서 끝 사진에서 정한 값
+
+이력서 본문 끝의 사진입니다(2026-10-17, [02-ia.md](02-ia.md#resume-이력서-f4)). 캡처는 [docs/design/resume-end-photo/](design/resume-end-photo/)에 있습니다.
+
+| 항목 | 모바일 | 데스크톱 (`lg`, 64rem 이상) |
+|---|---|---|
+| 자리 | 본문 아래, 본문 열 왼쪽 정렬 | 같음 |
+| 본문과 사이 | 4rem | 6rem |
+| 너비 | 화면 폭(최대 30rem) | 30rem |
+| 비율 | 16:9로 자르고 아래쪽(그네와 바다)을 남김 | 같음 |
+| 모서리와 테두리 | 0.625rem, 테두리 1 `line` (`/work` 캡처와 같음) | 같음 |
+| 인쇄 | 숨김 | - |
+
+- 원본이 960×720이라 30rem보다 넓히면 레티나 화면에서 흐려집니다. 원본의 하늘이 넓어 16:9로 위쪽을 잘랐습니다.
+- 첫 화면 밖이라 늦게 불러옵니다(`next/image` 기본값).
+- 페이지 끝에서 맨 위로 버튼은 사진 아래, 푸터 위의 여백에 멈춥니다. 모바일에서도 사진과 겹치지 않습니다.
+
+| 데스크톱 (1280) | 모바일 (375) | 모바일 다크 (375) |
+|---|---|---|
+| ![이력서 끝의 사진](design/resume-end-photo/resume-end-1280.png) | ![모바일 이력서 끝의 사진](design/resume-end-photo/resume-end-375.png) | ![다크 모드 모바일 이력서 끝의 사진](design/resume-end-photo/resume-end-375-dark.png) |
+
 ## 작업 순서
 
 1. 실제 문구로 흑백 스토리보드를 그립니다(Design 캔버스). 박자별 모바일과 데스크톱 아트보드, 멈춘 뒤의 첫 화면 배치 2~3안. 캔버스는 비공개이므로, 정한 뒤에는 고른 안과 고르지 않은 안을 캡처해 `docs/design/<기능>/`에 남깁니다.
