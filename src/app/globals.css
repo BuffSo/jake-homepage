@@ -317,6 +317,56 @@
   .md-resume td {
     overflow-wrap: normal;
   }
+  /*
+    모바일의 연락처와 학력 표 (docs/guide/UI_모바일_표_20261017.md). rehypeStackTables가 고른 표(.md-stack)를
+    40rem 미만 화면에서 행마다 상자 하나, 칸마다 "이름표 값" 줄로 그린다. 이름표(.md-label)는 그때만 보인다.
+    인쇄와 넓은 화면은 표 그대로다(screen 조건).
+  */
+  .md-resume .md-label {
+    display: none;
+  }
+  @media screen and (width < 40rem) {
+    .md-resume .md-table.md-stack {
+      border: 0;
+      border-radius: 0;
+      overflow: visible;
+    }
+    /* .md-table.md-stack까지 써야 위의 학력 최소 폭(table:has(th:nth-child(4)), :has 안의 선택자만큼 구체적)을 이긴다 */
+    .md-resume .md-table.md-stack :is(table, tbody, tr, td) {
+      display: block;
+      min-width: 0;
+    }
+    .md-resume .md-stack thead {
+      @apply sr-only;
+    }
+    .md-resume .md-stack tr {
+      @apply rounded-lg border border-line-soft;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem 0.875rem;
+    }
+    .md-resume .md-stack tr:last-child {
+      margin-bottom: 0;
+    }
+    /* 위의 display: block보다 뒤에, 같은 구체성으로 써야 칸이 "이름표 값" 격자가 된다 */
+    .md-resume .md-table.md-stack td {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+      column-gap: 0.75rem;
+      align-items: baseline;
+      padding: 0.3125rem 0;
+      border: 0;
+      white-space: normal;
+    }
+    .md-resume .md-stack .md-label {
+      @apply block text-muted;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    /* 행이 하나뿐인 표(연락처)는 상자 제목이 없으므로 첫 칸도 보통 굵기다. 학력은 첫 칸(기간)이 상자 제목처럼 굵다. */
+    .md-resume .md-stack table:not(:has(tbody tr + tr)) td:first-child {
+      font-weight: 400;
+    }
+  }
 
   @media (width >= 64rem) {
     .md {

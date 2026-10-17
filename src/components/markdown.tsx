@@ -2,7 +2,7 @@ import Markdown, { type Components, type Options } from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkCjkFriendly from "remark-cjk-friendly";
 import remarkGfm from "remark-gfm";
-import { rehypeDropStyle, rehypeHeadingIds, rehypeReviews, remarkSoftBreaks } from "@/lib/markdown-plugins.mjs";
+import { rehypeDropStyle, rehypeHeadingIds, rehypeReviews, rehypeStackTables, remarkSoftBreaks } from "@/lib/markdown-plugins.mjs";
 import { ExternalLink } from "./external-link";
 
 // 포트폴리오와 이력서 원문을 그린다 (ADR-0009). 서버 컴포넌트에서만 쓴다. 모양은 globals.css의 .md가 정한다.
@@ -21,9 +21,10 @@ const components: Components = {
       <a href={href}>{children}</a>
     ),
   // 넓은 표는 상자 안에서만 가로로 넘긴다. 키보드로도 넘길 수 있게 초점을 받는다.
-  table: ({ children }) => (
-    <div className="md-table" role="region" aria-label="표" tabIndex={0}>
-      <table>{children}</table>
+  // rehypeStackTables가 고른 표는 클래스(md-stack)를 바깥 상자로 옮겨 globals.css가 모바일 모양을 정하게 하고, 역할은 표에 둔다.
+  table: ({ children, className, role }) => (
+    <div className={className ? `md-table ${className}` : "md-table"} role="region" aria-label="표" tabIndex={0}>
+      <table role={role}>{children}</table>
     </div>
   ),
   // 원문 이미지는 확인한 것만 싣는다. 지금은 content/site/work.md가 모두 빼므로 그리지 않는다.
@@ -33,7 +34,8 @@ const components: Components = {
 /**
  * bare면 바깥 div 없이 그린다. 이미 .md 안에서 다른 요소와 섞어 쓸 때 쓴다.
  * breaks면 문단 안의 줄바꿈을 살리고, headingIds(절 제목 → id)를 주면 h2에 id를 붙인다.
- * reviews({ label, quotes })를 주면 머리글 뒤의 인용을 동료 평가 상자로 묶고, 정해 둔 글이 든 상자에 id를 붙인다. 둘 다 지금은 이력서만 쓴다.
+ * reviews({ label, quotes })를 주면 머리글 뒤의 인용을 동료 평가 상자로 묶고, 정해 둔 글이 든 상자에 id를 붙인다.
+ * stackTables면 좁은 화면에서 넘치는 표(연락처, 학력)를 모바일에서 행마다 상자로 그린다. 셋 다 지금은 이력서만 쓴다.
  */
 export function MarkdownText({
   children,
@@ -42,6 +44,7 @@ export function MarkdownText({
   breaks = false,
   headingIds,
   reviews,
+  stackTables = false,
 }: {
   children: string;
   className?: string;
@@ -49,12 +52,14 @@ export function MarkdownText({
   breaks?: boolean;
   headingIds?: Record<string, string>;
   reviews?: { label: string; quotes: { id: string; text: string }[] };
+  stackTables?: boolean;
 }) {
   const remarkPlugins: Options["remarkPlugins"] = [remarkGfm, remarkCjkFriendly];
   if (breaks) remarkPlugins.push(remarkSoftBreaks);
   const rehypePlugins: Options["rehypePlugins"] = [rehypeRaw, rehypeDropStyle];
   if (headingIds) rehypePlugins.push([rehypeHeadingIds, { ids: headingIds }]);
   if (reviews) rehypePlugins.push([rehypeReviews, reviews]);
+  if (stackTables) rehypePlugins.push(rehypeStackTables);
 
   const markdown = (
     <Markdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
