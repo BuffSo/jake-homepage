@@ -56,17 +56,34 @@ export function HeroIntro() {
     };
   }, []);
 
+  // 층 아래 안내 문구와 같은 색의 리로드 아이콘 하나다(2026-10-17). 테두리 있는 알약 버튼은 첫 화면에서 너무 커 보였고,
+  // 다시 볼 일이 드물어 글자로 설명하지 않는다. 이름은 화면 읽기와 마우스 툴팁으로만 알린다.
+  // 보이는 것은 작아도 누르는 영역은 2.75rem 정사각형이고, 아이콘은 층의 오른쪽 끝에 맞춘다.
   return (
     <button
       ref={ref}
       type="button"
+      aria-label="움직임 다시 보기"
+      title="움직임 다시 보기"
       onClick={() => {
         const hero = ref.current?.closest<HTMLElement>("[data-hero]");
         if (hero) start(hero, stopRef);
       }}
-      className="h-11 shrink-0 cursor-pointer rounded-full border border-fg/20 px-4 text-[0.8125rem] hover:border-fg motion-reduce:hidden"
+      className="flex size-11 shrink-0 cursor-pointer items-center justify-end text-subtle hover:text-fg motion-reduce:hidden"
     >
-      다시 보기
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 16 16"
+        className="size-4.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M13.25 8a5.25 5.25 0 1 1-1.54-3.71" />
+        <path d="M12 1.75V4.5H9.25" />
+      </svg>
     </button>
   );
 }
