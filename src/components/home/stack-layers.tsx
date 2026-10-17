@@ -17,11 +17,17 @@ export function StackLayers({ layers, children }: { layers: Layer[]; children?: 
   // 고정한 층은 층 밖을 누르거나 Esc를 누르면 푼다. 그대로 두면 서비스의 한 줄 설명이 계속 가려진다.
   // 층 밖에서 누르고 뗀 것(pointerdown과 pointerup)을 본다. click은 iOS Safari에서 링크나 버튼이 아닌 곳을 탭하면 생기지 않는다.
   // 모바일에서 층을 누른 뒤 아래 목록을 보려고 스크롤하면 브라우저가 pointercancel을 보내므로 풀리지 않는다.
+  // 관성으로 미끄러지는 화면을 손가락으로 멈춘 누름은 pointercancel이 없으므로, 스크롤 직후(0.1초 안)의 누름은 세지 않는다.
+  // 오른쪽 클릭처럼 주 버튼이 아닌 누름도 세지 않는다.
   useEffect(() => {
     const outside = (e: Event) => !listRef.current?.contains(e.target as Node);
     let pressedOutside = false;
+    let scrolledAt = 0;
+    const onScroll = () => {
+      scrolledAt = performance.now();
+    };
     const onPointerDown = (e: PointerEvent) => {
-      pressedOutside = outside(e);
+      pressedOutside = e.button === 0 && outside(e) && performance.now() - scrolledAt > 100;
     };
     const onPointerCancel = () => {
       pressedOutside = false;
@@ -33,11 +39,13 @@ export function StackLayers({ layers, children }: { layers: Layer[]; children?: 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") release();
     };
+    window.addEventListener("scroll", onScroll, { passive: true });
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("pointercancel", onPointerCancel);
     document.addEventListener("pointerup", onPointerUp);
     document.addEventListener("keydown", onKeyDown);
     return () => {
+      window.removeEventListener("scroll", onScroll);
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("pointercancel", onPointerCancel);
       document.removeEventListener("pointerup", onPointerUp);
