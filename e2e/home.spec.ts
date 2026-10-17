@@ -102,7 +102,7 @@ test("탭 아이콘(favicon.ico, icon.png)과 홈 화면 아이콘(apple-icon.pn
 
 test("헤더에서 Work, AI, Resume로 갈 수 있다", async ({ page }, testInfo) => {
   await page.goto("/");
-  if (testInfo.project.name === "mobile") await page.getByText("메뉴").click();
+  if (testInfo.project.name === "mobile") await page.locator("header summary").click();
   const nav = page.getByRole("navigation", { name: "주요 메뉴" }).locator("visible=true");
   await expect(nav.getByRole("link", { name: "Work" })).toHaveAttribute("href", "/work");
   await expect(nav.getByRole("link", { name: "AI" })).toHaveAttribute("href", "/ai");
@@ -113,7 +113,7 @@ test("헤더에 지금 보는 페이지가 표시된다", async ({ page }, testI
   const mobile = testInfo.project.name === "mobile";
   const nav = page.getByRole("navigation", { name: "주요 메뉴" }).locator("visible=true");
   const open = async () => {
-    if (mobile) await page.getByText("메뉴", { exact: true }).click();
+    if (mobile) await page.locator("header summary").click();
   };
   for (const [path, label] of [
     ["/work", "Work"],
@@ -126,7 +126,8 @@ test("헤더에 지금 보는 페이지가 표시된다", async ({ page }, testI
       const link = nav.getByRole("link", { name: other });
       if (other === label) {
         await expect(link).toHaveAttribute("aria-current", "page");
-        await expect(link).toHaveCSS("text-decoration-line", "underline");
+        // 모바일은 이름 글자에만 밑줄을 준다. 링크에 주면 옆의 페이지 제목까지 밑줄이 번진다.
+        await expect(mobile ? link.locator("span").first() : link).toHaveCSS("text-decoration-line", "underline");
       } else {
         await expect(link).not.toHaveAttribute("aria-current");
       }
@@ -141,7 +142,7 @@ test("화면만 바뀌는 이동 뒤에도 헤더의 표시가 따라온다", as
   // 헤더는 루트 레이아웃이라 다시 그려지지 않는다. 경로가 바뀌면 표시도 옮겨 가야 한다.
   // 모바일은 메뉴 링크를 누르면 메뉴가 닫히므로, 이동 뒤에 메뉴를 다시 열어 본다.
   const open = async () => {
-    if (testInfo.project.name === "mobile") await page.getByText("메뉴", { exact: true }).click();
+    if (testInfo.project.name === "mobile") await page.locator("header summary").click();
   };
   await page.goto("/work");
   const nav = page.getByRole("navigation", { name: "주요 메뉴" }).locator("visible=true");
@@ -172,13 +173,20 @@ test.describe("모바일 메뉴", () => {
     await expect(page.getByRole("heading", { level: 1, name: "포트폴리오" })).toBeInViewport();
   });
 
-  test("메뉴 밖을 누르거나 Esc를 누르면 닫힌다", async ({ page }) => {
+  test("메뉴 밖이나 어둡게 덮은 곳을 누르거나 Esc를 누르면 닫힌다", async ({ page }) => {
     const menu = page.locator("header details");
     const summary = menu.locator("summary");
 
+    // 헤더의 홈 링크 옆 빈 곳(메뉴 밖)
     await summary.click();
     await expect(menu).toHaveAttribute("open", "");
-    await page.getByRole("heading", { level: 1 }).click();
+    await page.mouse.click(200, 28);
+    await expect(menu).not.toHaveAttribute("open");
+
+    // 패널 아래 어둡게 덮은 곳. 페이지를 덮고 있어 그 아래 글은 눌리지 않는다.
+    await summary.click();
+    await expect(menu).toHaveAttribute("open", "");
+    await page.mouse.click(187, 700);
     await expect(menu).not.toHaveAttribute("open");
 
     await summary.click();
@@ -187,6 +195,52 @@ test.describe("모바일 메뉴", () => {
     await expect(menu).not.toHaveAttribute("open");
     await expect(summary).toBeFocused();
   });
+
+  test("버튼은 이름이 메뉴인 아이콘이고, 열면 X로 바뀐다", async ({ page }) => {
+    const menu = page.locator("header details");
+    const summary = menu.locator("summary");
+    const [bars, close] = [summary.locator("svg").nth(0), summary.locator("svg").nth(1)];
+    // 보이는 글자는 없고, 화면 읽기용 이름만 있다.
+    await expect(summary).toHaveText("메뉴");
+    await expect(summary.getByText("메뉴")).toHaveClass(/sr-only/);
+    await expect(bars).toBeVisible();
+    await expect(close).toBeHidden();
+    const box = (await summary.boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(44);
+
+    await summary.click();
+    await expect(bars).toBeHidden();
+    await expect(close).toBeVisible();
+  });
+
+  test("패널은 헤더 아래 화면 폭 전체이고, 줄마다 그 페이지의 브라우저 제목이 있다", async ({ page }) => {
+    await page.locator("header summary").click();
+    const nav = page.locator("header details nav");
+    const header = (await page.locator("header").boundingBox())!;
+    const panel = (await nav.boundingBox())!;
+    expect(panel.x).toBe(0);
+    expect(panel.width).toBe(page.viewportSize()!.width);
+    expect(panel.y).toBe(header.y + header.height);
+
+    const rows = await nav.getByRole("link").evaluateAll((links) =>
+      links.map((a) => ({ href: a.getAttribute("href")!, note: a.querySelectorAll("span")[1]?.textContent ?? "" })),
+    );
+    expect(rows.map((r) => r.href)).toEqual(["/work", "/ai", "/resume"]);
+    // 페이지 제목은 그 페이지의 브라우저 제목 앞부분과 같다. 이력서의 h1은 이력서 원문의 이름이라 브라우저 제목으로 맞춘다.
+    for (const { href, note } of rows) {
+      await page.goto(href);
+      await expect(page).toHaveTitle(`${note} · 소재희`);
+    }
+  });
+});
+
+test("푸터에는 저작권 한 줄만 있다", async ({ page }) => {
+  for (const path of ["/", "/work"]) {
+    await page.goto(path);
+    const footer = page.locator("body > footer");
+    await expect(footer).toHaveText("© 2026 소재희");
+    await expect(footer.getByRole("link")).toHaveCount(0);
+  }
 });
 
 test("다크 모드에서는 어두운 바탕을 쓴다", async ({ page }) => {
@@ -210,7 +264,8 @@ test.describe("첫 화면", () => {
     const contact = hero.getByRole("list", { name: "연락" });
     await expect(contact).toHaveCount(1);
     await expect(contact.getByRole("link", { name: home.contact.email })).toHaveAttribute("href", `mailto:${home.contact.email}`);
-    await expect(contact.getByRole("link", { name: /GitHub/ })).toHaveAttribute("href", home.contact.github);
+    // GitHub도 이메일처럼 주소로 보인다.
+    await expect(contact.getByRole("link", { name: home.contact.github.replace(/^https:\/\//, "") })).toHaveAttribute("href", home.contact.github);
     await expect(contact.getByRole("link", { name: "이력서 보기" })).toHaveAttribute("href", "/resume");
   });
 

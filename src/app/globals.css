@@ -20,6 +20,8 @@
   --brand-1: #0b7a52;
   --brand-2: #0969da;
   --brand-3: #7c3aed;
+  /* 모바일 메뉴를 열었을 때 뒤 페이지를 덮는 층. 다크 바탕은 이미 어두워 더 진하게 덮어야 보인다. */
+  --scrim: rgb(0 0 0 / 0.2);
   color-scheme: light dark;
 }
 
@@ -37,6 +39,7 @@
     --brand-1: #2fb383;
     --brand-2: #58a6ff;
     --brand-3: #a78bfa;
+    --scrim: rgb(0 0 0 / 0.6);
   }
 }
 
@@ -80,6 +83,7 @@
   --color-surface: var(--surface);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
+  --color-scrim: var(--scrim);
   --font-sans:
     var(--font-geist), "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
     "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
