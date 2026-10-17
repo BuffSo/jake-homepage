@@ -33,7 +33,7 @@ const components: Components = {
 /**
  * bare면 바깥 div 없이 그린다. 이미 .md 안에서 다른 요소와 섞어 쓸 때 쓴다.
  * breaks면 문단 안의 줄바꿈을 살리고, headingIds(절 제목 → id)를 주면 h2에 id를 붙인다.
- * quoteIds({ id, text })를 주면 그 글이 든 인용에 id를 붙인다. 둘 다 지금은 이력서만 쓴다.
+ * quoteIds({ id, text })를 주면 그 글이 든 인용의 머리글(바로 앞 문단)에 id를 붙인다. 둘 다 지금은 이력서만 쓴다.
  */
 export function MarkdownText({
   children,

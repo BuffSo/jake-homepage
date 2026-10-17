@@ -35,6 +35,6 @@ sources:
 /resume 페이지의 머리와 목차 (docs/02-ia.md /resume). 본문은 content/synced/resume.md를 그대로 그린다.
 sections는 원문의 절(h2) 제목과 순서까지 같아야 한다. 원문의 절이 바뀌면 빌드와 테스트가 멈추므로 여기를 맞춘다.
 description은 브라우저 설명이고, 자기소개 첫 줄을 그대로 쓴다(sources).
-quotes는 원문에서 이 글이 든 인용(blockquote)에 id를 붙인다. 홈 About의 동료 평가 링크(home.md의 quoteHref)가 여기로 온다.
+quotes는 원문에서 이 글이 든 인용(blockquote)의 머리글(바로 앞 문단)에 id를 붙인다. 홈 About의 동료 평가 링크(home.md의 quoteHref)가 여기로 온다.
 원문에서 글이 사라지면 빌드가 멈춘다.
 -->
