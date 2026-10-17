@@ -66,7 +66,17 @@ try {
     },
     { avatar, headline, width: WIDTH, height: HEIGHT },
   );
-  await page.locator("#og img").evaluate((img) => (img.complete ? null : new Promise((r) => (img.onload = r))));
+  // 아바타를 다 받을 때까지 기다린다. 받지 못하면 멈춰 있지 말고 오류로 끝낸다.
+  await page.locator("#og img").evaluate(
+    (img) =>
+      new Promise((resolve, reject) => {
+        const fail = (why) => reject(new Error(`아바타를 불러오지 못했습니다 (${why}): ${img.src}`));
+        if (img.complete) return img.naturalWidth ? resolve() : fail("깨진 그림");
+        img.onload = () => resolve();
+        img.onerror = () => fail("응답 오류");
+        setTimeout(() => fail("10초 넘게 걸림"), 10_000);
+      }),
+  );
   await page.evaluate(() => document.fonts.ready);
   await page.locator("#og").screenshot({ path: OUT });
   console.log(`미리보기 그림을 만들었습니다 - ${OUT.replace(process.cwd() + "/", "")} (${WIDTH}x${HEIGHT})`);
