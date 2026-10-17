@@ -1,25 +1,52 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { Layer } from "@/lib/content";
 import { useLayerFocus } from "./layer-focus";
 
 // 기술 층 여섯 (docs/04-motion.md 기술 층). 데스크톱은 첫 화면 오른쪽, 모바일은 소개 아래에 쌓는다.
-// 층을 누르거나 올리면 서비스 목록에 서비스마다 그 층에서 쓴 기술이 보인다(service-list.tsx).
+// 층에 마우스를 올리거나 키보드 포커스가 가면 서비스 목록에 서비스마다 그 층에서 쓴 기술이 보인다(service-list.tsx).
+// 터치와 키보드는 눌러서 고정할 수 있고, 층 밖을 누르거나 Esc를 누르면 풀린다.
 // children은 층 아래 오른쪽에 두는 다시 보기 버튼이다. 움직임 무대는 층 목록 자리에 얹으므로 바깥을 relative로 둔다.
 export function StackLayers({ layers, children }: { layers: Layer[]; children?: ReactNode }) {
-  const { active, pinned, toggle, preview } = useLayerFocus();
+  const { active, pinned, toggle, preview, release } = useLayerFocus();
+  const listRef = useRef<HTMLUListElement>(null);
+  // 마지막으로 층을 누른 포인터의 종류. 키보드로 누르면 pointerdown이 없어 빈 값이다.
+  const pointerType = useRef("");
+
+  // 고정한 층은 층 밖을 누르거나 Esc를 누르면 푼다. 그대로 두면 서비스의 한 줄 설명이 계속 가려진다.
+  // pointerdown이 아니라 click을 본다. 모바일에서 층을 누른 뒤 아래 목록을 보려고 스크롤해도 풀리지 않게 하기 위해서다.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (!listRef.current?.contains(e.target as Node)) release();
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") release();
+    };
+    document.addEventListener("click", onClick);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("click", onClick);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [release]);
 
   return (
     <div className="relative flex flex-col lg:grow">
-      <ul data-intro-layers aria-label="기술 층" className="flex flex-col gap-1 lg:gap-2">
+      <ul ref={listRef} data-intro-layers aria-label="기술 층" className="flex flex-col gap-1 lg:gap-2">
         {layers.map((layer) => (
           <li key={layer.name} data-intro-part="layer">
             <button
               type="button"
               aria-pressed={pinned?.name === layer.name}
               data-active={active?.name === layer.name}
-              onClick={() => toggle(layer.name)}
+              // 마우스는 올리기만으로 보이므로 눌러도 고정하지 않는다. 고정은 마우스가 없는 터치와 키보드에만 쓴다.
+              onPointerDown={(e) => (pointerType.current = e.pointerType)}
+              onClick={() => {
+                const type = pointerType.current;
+                pointerType.current = "";
+                if (type !== "mouse") toggle(layer.name);
+              }}
               // 터치는 누르기만 쓴다. 손가락을 떼도 pointerleave가 오지 않아 미리 보기가 남기 때문이다.
               onPointerEnter={(e) => e.pointerType === "mouse" && preview(layer.name)}
               onPointerLeave={(e) => e.pointerType === "mouse" && preview(null)}
@@ -37,7 +64,7 @@ export function StackLayers({ layers, children }: { layers: Layer[]; children?: 
         ))}
       </ul>
       <div data-intro-part className="mt-2 flex items-center justify-end gap-4 lg:mt-1.5 lg:justify-between">
-        <p className="hidden text-xs text-subtle lg:block">층을 누르면 서비스마다 그 층에서 쓴 기술이 표시됩니다</p>
+        <p className="hidden text-xs text-subtle lg:block">층에 마우스를 올리면 서비스마다 그 층에서 쓴 기술이 표시됩니다</p>
         {children}
       </div>
     </div>
