@@ -337,7 +337,7 @@ test.describe("기술 층 강조", () => {
     const button = layerButton(page, layer);
 
     await button.tap();
-    // 층을 누른 뒤 아래 서비스 목록을 보려고 스크롤해도 풀리지 않는다(층 밖 click만 본다)
+    // 층을 누른 뒤 아래 서비스 목록을 보려고 스크롤해도 풀리지 않는다(층 밖에서 누르고 뗀 것만 본다)
     await page.mouse.wheel(0, 200);
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
     await expect(button).toHaveAttribute("aria-pressed", "true");
@@ -417,6 +417,23 @@ test.describe("기술 층 강조", () => {
     await page.keyboard.press("Escape");
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expectHighlight(page, null);
+
+    // 층 밖을 마우스로 눌러도 풀린다
+    await button.press("Enter");
+    await page.getByRole("heading", { level: 1 }).click();
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("마우스로 층을 누른 채 밖에서 떼어도, 다음 키보드 Enter는 고정한다", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === "mobile", "마우스 동작 확인");
+    await page.goto("/");
+    const button = layerButton(page, layer);
+    await button.hover();
+    await page.mouse.down();
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
+    await button.press("Enter");
+    await expect(button).toHaveAttribute("aria-pressed", "true");
   });
 
   test("데스크톱은 마우스를 올리면 보여 주고 떼면 돌아가며, 눌러도 고정하지 않는다", async ({ page }, testInfo) => {
