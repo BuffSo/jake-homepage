@@ -41,7 +41,7 @@ export default function ResumePage() {
           src={sea}
           alt={page.endPhotoAlt}
           sizes="(min-width: 32rem) 30rem, 100vw"
-          className="mt-16 aspect-video w-full max-w-[30rem] rounded-[0.625rem] border border-line object-cover object-bottom lg:mt-24 print:hidden"
+          className="mt-16 aspect-video w-full max-w-[30rem] rounded-[0.625rem] border border-line object-cover object-bottom lg:mt-24 lg:rounded-xl print:hidden"
         />
       </main>
       <BackToTop target="page-index" />
