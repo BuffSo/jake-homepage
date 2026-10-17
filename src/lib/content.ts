@@ -30,7 +30,7 @@ export type Home = {
   contact: { email: string; github: string };
   layers: Layer[];
   sections: Record<"work" | "ai", { label: string; title: string; intro: string }>;
-  about: { label: string; title: string; body: string; quote: string; quoteBy: string };
+  about: { label: string; title: string; body: string; quote: string; quoteBy: string; quoteHref: string };
 };
 
 export type Project = {
@@ -135,6 +135,7 @@ export type ResumePage = {
   description: string;
   print: string;
   sections: { id: string; title: string }[];
+  quotes: { id: string; text: string }[];
 };
 
 /** 동기화한 이력서. 머리(한 줄 소개, 이름)와 본문으로 나눈다 (src/lib/resume.mjs) */

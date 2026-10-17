@@ -29,6 +29,7 @@ export default function ResumePage() {
           className="md-resume mt-10 max-w-[47.5rem] lg:mt-16 print:mt-[1.125rem] print:max-w-none print:border-t print:border-line-soft print:pt-[1.125rem]"
           breaks
           headingIds={headingIds}
+          quoteIds={page.quotes}
         >
           {resume.body}
         </MarkdownText>

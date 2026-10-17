@@ -47,3 +47,31 @@ export function rehypeHeadingIds({ ids }) {
   };
   return (tree) => walk(tree);
 }
+
+/**
+ * 정해 둔 글이 든 인용(blockquote)의 머리글에 id를 붙인다 (rehype). quotes는 { id, text }다.
+ * 머리글은 인용 바로 앞의 문단이다(이력서의 **Peer Review**). 그리로 오면 머리글부터 보인다.
+ * 다른 페이지에서 원문의 한 인용으로 바로 보내려고 쓴다(홈 About의 동료 평가 → 이력서).
+ * 글이 든 인용이나 그 앞 문단을 못 찾으면 예외를 던져 빌드를 멈춘다. 링크가 갈 곳이 없는 채로 배포되지 않게 한다.
+ */
+export function rehypeQuoteIds({ quotes }) {
+  const text = (node) => (node.type === "text" ? node.value : (node.children ?? []).map(text).join(""));
+  return (tree) => {
+    const found = new Set();
+    const walk = (node) => {
+      const elements = (node.children ?? []).filter((child) => child.type === "element");
+      elements.forEach((child, i) => {
+        if (child.tagName !== "blockquote") return;
+        const quote = quotes.find((q) => text(child).includes(q.text));
+        const label = elements[i - 1];
+        if (!quote || label?.tagName !== "p") return;
+        label.properties = { ...label.properties, id: quote.id };
+        found.add(quote.id);
+      });
+      node.children?.forEach(walk);
+    };
+    walk(tree);
+    const missing = quotes.filter((q) => !found.has(q.id));
+    if (missing.length) throw new Error(`머리글이 있는 인용을 원문에서 찾지 못했습니다: ${missing.map((q) => q.text).join(", ")}`);
+  };
+}

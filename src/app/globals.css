@@ -227,6 +227,10 @@
     @apply border-line-soft;
     margin: 2.5rem 0;
   }
+  /* 다른 페이지에서 바로 오는 인용의 머리글(rehypeQuoteIds). 절 제목처럼 1rem 위에 멈춘다. */
+  .md-resume p[id] {
+    scroll-margin-top: 1rem;
+  }
   .md-resume h2 {
     scroll-margin-top: 1rem;
     margin: 0 0 1.25rem;
