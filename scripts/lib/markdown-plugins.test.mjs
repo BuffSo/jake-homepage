@@ -67,6 +67,17 @@ describe("rehypeQuoteIds", () => {
     assert.throws(() => render("**Peer Review**\n\n> 다른 평가\n\n겸손히 소통 (인용 밖)", { rehype: [[rehypeQuoteIds, { quotes }]] }), /겸손히 소통/);
   });
 
+  test("한 글이 여러 인용에 들어 있으면 id가 겹치므로 멈춘다", () => {
+    const md = "**Peer Review**\n\n> 늘 겸손히 소통\n\n**Peer Review**\n\n> 역시 겸손히 소통";
+    assert.throws(() => render(md, { rehype: [[rehypeQuoteIds, { quotes }]] }), /둘 이상입니다: 겸손히 소통/);
+  });
+
+  test("한 인용에 글이 둘 이상 걸리면 멈춘다", () => {
+    const both = [...quotes, { id: "lead", text: "리드를 잘" }];
+    const md = "**Peer Review**\n\n> 리드를 잘 하셨습니다\n> 늘 겸손히 소통";
+    assert.throws(() => render(md, { rehype: [[rehypeQuoteIds, { quotes: both }]] }), /둘 이상 걸렸습니다/);
+  });
+
   test("인용 앞에 머리글 문단이 없으면 멈춘다", () => {
     assert.throws(() => render("### 제목\n\n> 늘 겸손히 소통", { rehype: [[rehypeQuoteIds, { quotes }]] }), /겸손히 소통/);
   });

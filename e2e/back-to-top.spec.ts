@@ -54,7 +54,24 @@ test("움직임 줄이기가 아니어도 맨 위까지 올라간다", async ({ 
   await page.goto("/work");
   await scrollPast(page, "page-index");
   await button(page).click();
+  // 부드럽게 올라가므로 누른 바로 뒤에는 아직 맨 위가 아니다
+  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(0);
   await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+  await expect(button(page)).toBeHidden();
+});
+
+test("낮은 창에서 목차가 첫 화면 아래에 있어도, 바로 맨 위로 뛰면 다시 숨는다", async ({ page }) => {
+  // 가로로 돌린 휴대폰처럼 창이 낮으면 맨 위에서 목차가 화면 아래에 있다.
+  // 움직임 줄이기로 바로 뛰면 목차가 화면 위에서 아래로 화면을 거치지 않고 건너간다.
+  await page.setViewportSize({ width: page.viewportSize()!.width, height: 240 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/work");
+  expect((await page.locator("#page-index").boundingBox())!.y).toBeGreaterThan(240);
+  await expect(button(page)).toBeHidden();
+  await scrollPast(page, "page-index");
+  await expect(button(page)).toBeVisible();
+  await button(page).click();
+  expect(await page.evaluate(() => scrollY)).toBe(0);
   await expect(button(page)).toBeHidden();
 });
 
