@@ -93,7 +93,7 @@ test("탭 아이콘(favicon.ico, icon.png)과 홈 화면 아이콘(apple-icon.pn
     expect(response.headers()["content-type"]).toContain(type);
   }
 
-  // 탭 아이콘은 16, 32, 48 세 크기를 한 파일에 담는다 (Next.js 기본 아이콘을 바꿨다)
+  // 탭 아이콘은 16, 32, 48 세 크기를 한 파일에 담는다
   const ico = await (await request.get("/favicon.ico")).body();
   const count = ico.readUInt16LE(4);
   const sizes = Array.from({ length: count }, (_, i) => ico[6 + 16 * i]).sort((a, b) => a - b);
