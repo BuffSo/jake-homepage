@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { rehypeDropStyle, rehypeHeadingIds, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
+import { rehypeDropStyle, rehypeHeadingIds, rehypeQuoteIds, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
 
 // 원문 마크다운 플러그인 (src/lib/markdown-plugins.mjs). 사이트와 같은 react-markdown으로 그려 HTML을 본다.
 
@@ -50,6 +50,25 @@ describe("rehypeHeadingIds", () => {
 
   test("Object의 속성 이름과 같은 제목도 모르는 제목으로 본다", () => {
     assert.throws(() => render("## constructor", { rehype: [[rehypeHeadingIds, { ids }]] }), /constructor/);
+  });
+});
+
+describe("rehypeQuoteIds", () => {
+  const quotes = [{ id: "peer-review", text: "겸손히 소통" }];
+
+  test("정해 둔 글이 든 인용의 머리글(바로 앞 문단)에만 id를 붙인다", () => {
+    const md = '**Peer Review**\n\n> "다른 평가"\n\n---\n\n**Peer Review**\n\n> "앞 문장"\n> "늘 겸손히 소통하시는 모습"';
+    const html = render(md, { remark: [remarkSoftBreaks], rehype: [[rehypeQuoteIds, { quotes }]] });
+    assert.equal((html.match(/id="peer-review"/g) ?? []).length, 1);
+    assert.ok(html.includes('<hr/>\n<p id="peer-review"><strong>Peer Review</strong></p>'));
+  });
+
+  test("글이 든 인용이 없으면 멈춘다", () => {
+    assert.throws(() => render("**Peer Review**\n\n> 다른 평가\n\n겸손히 소통 (인용 밖)", { rehype: [[rehypeQuoteIds, { quotes }]] }), /겸손히 소통/);
+  });
+
+  test("인용 앞에 머리글 문단이 없으면 멈춘다", () => {
+    assert.throws(() => render("### 제목\n\n> 늘 겸손히 소통", { rehype: [[rehypeQuoteIds, { quotes }]] }), /겸손히 소통/);
   });
 });
 
