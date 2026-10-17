@@ -14,9 +14,16 @@ export function BackToTop({ target }: { target: string }) {
   useEffect(() => {
     const element = document.getElementById(target);
     if (!element) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      setShown(!entry.isIntersecting && entry.boundingClientRect.top < 0);
-    });
+    // 관찰 영역을 화면 아래로 아주 길게 늘려, target이 화면 위로 사라졌을 때만 '겹치지 않음'이 되게 한다.
+    // 화면 크기만 보면 target이 화면을 거치지 않고 위아래로 건너뛸 때(낮은 창에서 End 키나 바로 맨 위로 뛰기) 변화가 잡히지 않는다.
+    // 한 번에 여러 변화가 오면 마지막 것이 지금 상태다.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries.at(-1)!;
+        setShown(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      { rootMargin: "0% 0% 100000% 0%" },
+    );
     observer.observe(element);
     return () => observer.disconnect();
   }, [target]);
