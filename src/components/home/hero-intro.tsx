@@ -57,20 +57,29 @@ export function HeroIntro() {
   }, []);
 
   // 층 아래 안내 문구와 같은 색의 리로드 아이콘 하나다(2026-10-17). 테두리 있는 알약 버튼은 첫 화면에서 너무 커 보였고,
-  // 다시 볼 일이 드물어 글자로 설명하지 않는다. 이름은 화면 읽기와 마우스 툴팁으로만 알린다.
+  // 다시 볼 일이 드물어 글자로 설명하지 않는다. 이름은 화면 읽기 이름과 아래 툴팁으로만 알린다.
   // 보이는 것은 작아도 누르는 영역은 2.75rem 정사각형이고, 아이콘은 층의 오른쪽 끝에 맞춘다.
   return (
     <button
       ref={ref}
       type="button"
-      aria-label="움직임 다시 보기"
-      title="움직임 다시 보기"
+      aria-label="다시 보기"
       onClick={() => {
         const hero = ref.current?.closest<HTMLElement>("[data-hero]");
         if (hero) start(hero, stopRef);
       }}
-      className="flex size-11 shrink-0 cursor-pointer items-center justify-end text-subtle hover:text-fg motion-reduce:hidden"
+      className="group relative flex size-11 shrink-0 cursor-pointer items-center justify-end text-subtle hover:text-fg motion-reduce:hidden"
     >
+      {/* 툴팁. 브라우저 기본 툴팁(title)은 늦게 뜨거나 뜨지 않는 브라우저가 있어 직접 그린다.
+          아이콘 왼쪽 같은 줄에 띄워 다른 글을 가리지 않는다. 마우스를 올리면 0.2초 뒤에 뜨고, 치우면 바로 사라진다.
+          hover는 마우스가 있는 기기에서만 걸리므로(Tailwind 4), 탭하면 바로 재생되는 휴대폰에는 뜨지 않는다.
+          키보드 초점에도 뜬다. 이름은 aria-label이 알리므로 화면 읽기에서는 숨긴다. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-[1.625rem] -translate-y-1/2 rounded-md bg-fg px-2.5 py-1.5 text-xs leading-none whitespace-nowrap text-bg opacity-0 transition-opacity duration-100 group-hover:opacity-100 group-hover:delay-200 group-focus-visible:opacity-100"
+      >
+        다시 보기
+      </span>
       <svg
         aria-hidden="true"
         viewBox="0 0 16 16"
