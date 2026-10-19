@@ -1,6 +1,6 @@
 # jake-homepage
 
-제 개인 홈페이지 [genys.kr](https://genys.kr)의 소스입니다.
+제 개인 홈페이지 [jakeso.dev](https://jakeso.dev)의 소스입니다.
 
 사이트가 결과물이라면, 이 저장소는 그 과정입니다. 기획 문서, 결정 기록, 에이전트 작업 규칙, 검증 장치를 처음부터 함께 공개합니다.
 

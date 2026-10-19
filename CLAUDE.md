@@ -6,7 +6,7 @@
 
 ## 프로젝트
 
-- 소재희 개인 홈페이지(genys.kr)의 소스다. Next.js 16 App Router, TypeScript, Tailwind CSS 4로 만들고 Vercel에 배포한다.
+- 소재희 개인 홈페이지(jakeso.dev)의 소스다. Next.js 16 App Router, TypeScript, Tailwind CSS 4로 만들고 Vercel에 배포한다.
 - 목적과 독자는 `docs/00-vision.md`, 요구사항과 범위는 `docs/01-prd.md`, 페이지 구조는 `docs/02-ia.md`, 디자인 원칙은 `docs/03-design.md`, 첫 화면 움직임은 `docs/04-motion.md`에 있다.
 - 지금까지의 결정은 `docs/adr/`에 있다. 결정을 뒤집으려면 해당 ADR을 먼저 고친다.
 - 같이 정한 규칙과 정책, 그 분야를 구현하며 겪은 문제와 해결은 `docs/guide/`에 있다(색인 `docs/guide/README.md`). 페이지를 더하거나 공유 정보를 바꿀 때는 검색과 공유 정책 가이드를 따른다.
