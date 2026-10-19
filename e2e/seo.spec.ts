@@ -46,6 +46,11 @@ for (const path of PAGES) {
   });
 }
 
+test("홈은 네이버 서치어드바이저 소유 확인 태그를 단다", async ({ page }) => {
+  await page.goto("/");
+  expect(await meta(page, "name", "naver-site-verification")).toBe("f8c2cba6fbf38fea24228495b83acfd15ea2969e");
+});
+
 test("robots.txt는 모두 허용하고 사이트맵을 알린다", async ({ request }) => {
   const res = await request.get("/robots.txt");
   expect(res.status()).toBe(200);

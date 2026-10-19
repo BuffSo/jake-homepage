@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     path: "/",
   }),
   twitter: { card: "summary_large_image" },
+  // 네이버 서치어드바이저 소유 확인. 네이버는 DNS로 확인하지 못해 태그를 단다. 지우면 소유 확인이 풀린다.
+  // Google은 Vercel DNS의 TXT 레코드로 확인해서 여기에 없다 (docs/guide/SEO_검색과_공유_정책_20261017.md).
+  verification: { other: { "naver-site-verification": "f8c2cba6fbf38fea24228495b83acfd15ea2969e" } },
 };
 
 export const viewport: Viewport = {
