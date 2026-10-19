@@ -8,7 +8,7 @@
 
 | 이메일             | GitHub                    | 홈페이지         |
 | ------------------ | ------------------------- | ---------------- |
-| buff4701@gmail.com | https://github.com/BuffSo | https://genys.kr |
+| buff4701@gmail.com | https://github.com/BuffSo | https://jakeso.dev |
 
 ---
 
@@ -195,7 +195,7 @@ AI 코딩 도구가 등장하기 훨씬 전부터 다양한 로직을 직접 구
 - **프론트엔드 및 배포** - Next.js 16(App Router) + React Query + Tailwind/shadcn
   - 다국어(i18n) 구조 설계 - 현재 한·영 적용, 13개 언어로 확장 가능 (에러 메시지 로케일 응답)
   - 본인 AWS 직접 구축 - EC2 컨테이너(Nginx·백엔드·워커·Redis·MySQL), OIDC·ECR 자동 배포, S3 백업
-- **AI 개발 환경 직접 구축** - 코드 리뷰 스킬·이미지 생성 MCP 자작, 영상 제작까지 에이전트 활용
+- **AI 개발 환경 직접 구축** - 코드 리뷰 스킬·오픈소스 기반 이미지 MCP 제작, 영상 제작까지 에이전트 활용
 
 ---
 
