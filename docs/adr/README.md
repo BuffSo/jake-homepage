@@ -8,12 +8,13 @@
 | [0002](0002-personal-hub-for-everyone.md) | 방문자를 가리지 않는 개인 허브로 만든다 | 채택 |
 | [0003](0003-content-source-and-sync.md) | 콘텐츠 원본은 이력서·포트폴리오 md이고, 허용 목록으로 동기화한다 | 채택 |
 | [0004](0004-ask-answer-policy.md) | 질문 창은 사실만 답하고, 해석과 개인 조건은 답하지 않는다 | 채택 (구현은 2차) |
-| [0005](0005-nextjs16-vercel-genys-domain.md) | Next.js 16, Vercel, genys.kr 루트 도메인 | 채택 |
+| [0005](0005-nextjs16-vercel-genys-domain.md) | Next.js 16, Vercel, genys.kr 루트 도메인 | 채택 (도메인은 0011로 바뀜) |
 | [0006](0006-public-repo-and-privacy.md) | 처음부터 공개 저장소로 운영하고 민감정보는 네 겹으로 막는다 | 채택 |
 | [0007](0007-yaml-frontmatter.md) | 사이트 전용 글의 앞부분 데이터는 yaml 패키지로 읽는다 | 채택 |
 | [0008](0008-playwright-e2e.md) | 화면 확인은 Playwright E2E로 자동화한다 | 채택 |
 | [0009](0009-markdown-renderer.md) | 포트폴리오와 이력서 원문은 react-markdown으로 그린다 | 채택 |
 | [0010](0010-stack-from-source.md) | 첫 화면 기술 층의 기술-서비스 짝은 각 서비스의 소스 코드로 확인한다 | 채택 |
+| [0011](0011-jakeso-dev-domain.md) | 대표 주소를 jakeso.dev로 옮기고 genys.kr은 넘겨 준다 | 채택 |
 
 ## 양식
 

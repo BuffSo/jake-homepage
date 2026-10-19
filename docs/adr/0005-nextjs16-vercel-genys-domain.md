@@ -15,7 +15,7 @@
 | 언어 | TypeScript (strict) | |
 | 스타일 | Tailwind CSS 4 | |
 | 배포 | Vercel | GENYS Lotto AI와 같은 팀에서 운영합니다 |
-| 도메인 | `genys.kr` 루트 | `lotto.genys.kr`은 그대로 둡니다. DNS는 등록 기관에서 관리합니다 |
+| 도메인 | `genys.kr` 루트 | `lotto.genys.kr`은 그대로 둡니다. DNS는 등록 기관에서 관리합니다. 대표 주소는 [ADR-0011](0011-jakeso-dev-domain.md)에서 `jakeso.dev`로 바꿨습니다 |
 
 ## 판단
 
