@@ -14,7 +14,7 @@
 | [0008](0008-playwright-e2e.md) | 화면 확인은 Playwright E2E로 자동화한다 | 채택 |
 | [0009](0009-markdown-renderer.md) | 포트폴리오와 이력서 원문은 react-markdown으로 그린다 | 채택 |
 | [0010](0010-stack-from-source.md) | 첫 화면 기술 층의 기술-서비스 짝은 각 서비스의 소스 코드로 확인한다 | 채택 |
-| [0011](0011-jakeso-dev-domain.md) | 대표 주소를 jakeso.dev로 옮기고 genys.kr은 넘겨 준다 | 채택 |
+| [0011](0011-jakeso-dev-domain.md) | 대표 주소를 jakeso.dev로 정한다 | 채택 |
 
 ## 양식
 
