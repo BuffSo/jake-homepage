@@ -3,10 +3,11 @@ import Link from "next/link";
 import { ButtonLink } from "@/components/button-link";
 import { Metric, SectionHead } from "@/components/section-head";
 import { getHome, getProjects } from "@/lib/content";
-import { PROJECT_IMAGES } from "@/lib/project-images";
+import { CARD_IMAGES } from "@/lib/project-images";
 
 // 운영 중인 서비스 (docs/02-ia.md 홈 2). 카드에는 실제 화면, 제목 문장, 역할과 기간, 숫자 하나만 담고
 // 설명과 스택, 큰 화면은 /work에서 보여 준다. 카드의 id는 첫 화면 서비스 목록의 링크가 가리키는 곳이다.
+// 카드 화면은 처음 보는 사람이 알아볼 화면이라 /work 챕터의 화면과 다를 수 있다(CARD_IMAGES).
 
 export function ServiceCards() {
   const { work } = getHome().sections;
@@ -23,8 +24,8 @@ export function ServiceCards() {
             className="flex scroll-mt-4 flex-col overflow-hidden rounded-[0.625rem] border border-line lg:rounded-xl"
           >
             <Image
-              src={PROJECT_IMAGES[project.slug]}
-              alt={project.imageAlt}
+              src={CARD_IMAGES[project.slug]}
+              alt={project.cardImageAlt ?? project.imageAlt}
               sizes="(min-width: 80rem) 23rem, (min-width: 64rem) 30vw, 100vw"
               className="h-[11.875rem] w-full border-b border-line object-cover object-left-top lg:h-[13.75rem]"
             />

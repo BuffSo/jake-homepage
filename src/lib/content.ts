@@ -53,7 +53,8 @@ export type Project = {
   liveUrl: string;
   liveLabel?: string;
   image: string;
-  imageAlt: string;
+  imageAlt: string; // /work 챕터 캡처
+  cardImageAlt?: string; // 홈 카드 캡처가 /work와 다를 때
 };
 
 export type AiGroup = "dev" | "product" | "beyond" | "personal";

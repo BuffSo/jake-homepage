@@ -16,6 +16,7 @@ type Project = {
   liveUrl: string;
   liveLabel?: string;
   imageAlt: string;
+  cardImageAlt?: string;
 };
 type AiWork = {
   slug: string;
@@ -533,7 +534,8 @@ test.describe("아래 섹션", () => {
     for (const [i, project] of projects.entries()) {
       const card = cards.nth(i);
       await expect(card).toHaveAttribute("id", project.slug);
-      await expect(card.getByRole("img", { name: project.imageAlt })).toBeVisible();
+      // 홈 카드는 /work 챕터와 다른 화면을 쓸 수 있다(cardImageAlt).
+      await expect(card.getByRole("img", { name: project.cardImageAlt ?? project.imageAlt })).toBeVisible();
       await expect(card.getByRole("heading", { level: 3 })).toHaveText(project.headline);
       const live = card.getByRole("link", { name: new RegExp(project.liveLabel ?? "서비스 열기") });
       await expect(live).toHaveAttribute("href", project.liveUrl);
