@@ -54,7 +54,7 @@ try {
         <div style="display:flex;align-items:center;gap:20px">
           <img alt="" style="width:64px;height:64px;border-radius:999px">
           <span style="font-size:32px;font-weight:700">소재희</span>
-          <span style="font-family:var(--font-mono);font-size:26px;color:var(--subtle)">genys.kr</span>
+          <span style="font-family:var(--font-mono);font-size:26px;color:var(--subtle)">jakeso.dev</span>
         </div>`;
       const [first, middle, last] = card.querySelectorAll("h1 span");
       first.textContent = headline.first;

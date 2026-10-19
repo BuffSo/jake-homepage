@@ -3,9 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 
 // 검색과 공유 (docs/guide/SEO_검색과_공유_정책_20261017.md). 화면 폭과 관계없는 값이라 데스크톱에서만 돌린다.
-// 공유 정보는 운영 주소(https://genys.kr)를 가리키므로, 그림은 주소의 경로만 떼어 이 서버에서 받아 본다.
+// 공유 정보는 운영 주소(https://jakeso.dev)를 가리키므로, 그림은 주소의 경로만 떼어 이 서버에서 받아 본다.
 
-const SITE = "https://genys.kr";
+const SITE = "https://jakeso.dev";
 const PAGES = ["/", "/work", "/ai", "/resume"];
 const home = parseFrontmatter(readFileSync("content/site/home.md", "utf8"), "home.md").data as {
   lines: string[];

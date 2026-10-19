@@ -3,12 +3,12 @@ import ogImage from "@/assets/og-image.png";
 
 // 검색과 공유에 쓰는 메타데이터 (docs/guide/SEO_검색과_공유_정책_20261017.md).
 // 운영 주소가 기준이다. 미리보기 배포 주소나 로컬 주소로 열어도 canonical과 og:url은 이 주소를 가리킨다.
-export const SITE_URL = "https://genys.kr";
+export const SITE_URL = "https://jakeso.dev";
 export const SITE_NAME = "소재희";
 
 // 모든 페이지가 같은 미리보기 그림 한 장을 쓴다. npm run og:image가 만든다.
 // 가져온 그림의 주소에는 내용 해시가 붙어, 그림을 바꾸면 주소도 바뀌어 메신저가 새 그림을 가져간다.
-const OG_IMAGE = { url: ogImage.src, width: ogImage.width, height: ogImage.height, alt: "Idea to production. 소재희 · genys.kr" };
+const OG_IMAGE = { url: ogImage.src, width: ogImage.width, height: ogImage.height, alt: "Idea to production. 소재희 · jakeso.dev" };
 
 /**
  * 페이지 하나의 제목, 설명, 대표 주소, 공유 정보.
