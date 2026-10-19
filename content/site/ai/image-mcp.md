@@ -19,6 +19,6 @@ sources:
 
 <!--
 포트폴리오 "2. AI 활용 - 개발 > 개발 외의 일"의 이미지 생성 줄에 있는 작업이다.
-서버의 README가 오픈소스 gemini-imagen-mcp-server(MIT)를 바탕으로 했다고 밝히므로 그대로 쓴다(2026-10-15 확인). 포트폴리오의 "직접 구현" 표현은 원본 저장소 todo로 남겼다.
+서버의 README가 오픈소스 gemini-imagen-mcp-server(MIT)를 바탕으로 했다고 밝히므로 그대로 쓴다(2026-10-15 확인). 포트폴리오와 이력서의 원문도 같은 뜻으로 고쳤다(2026-10-19).
 도구 네 개(generate_image, edit_image, list_models, health_check)와 모델을 설정으로 바꾸는 것도 README에서 확인했다.
 -->

@@ -60,7 +60,7 @@ const config = {
     ],
     // 제품 코드가 부르는 Anthropic SDK
     "Claude API": [{ dep: "@anthropic-ai/sdk" }],
-    // 직접 만든 이미지 생성 MCP 서버가 Gemini API로 만든 그림을 이 이름으로 저장한다.
+    // 오픈소스 서버를 바탕으로 만든 이미지 생성 MCP 서버가 Gemini API로 만든 그림을 이 이름으로 저장한다.
     Gemini: [{ file: name("nano-banana_[^/]+") }],
   },
 };
