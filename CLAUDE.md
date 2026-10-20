@@ -95,7 +95,7 @@ npm run check:units       # 손으로 쓴 px 길이 검사 (docs/03-design.md �
 npm run check:motion-size # 빌드 뒤 첫 화면 움직임 코드 용량 검사 (gzip 10KB 이하)
 npm test                  # 스크립트 테스트 (node --test)
 npm run test:e2e          # 빌드 후 Playwright E2E (포트 3210, 데스크톱 1280과 모바일 375)
-npm run check:captures    # E2E 뒤 주요 화면 캡처 18장이 test-results/captures/에 모두 생겼는지 확인
+npm run check:captures    # E2E 뒤 주요 화면 캡처 22장이 test-results/captures/에 모두 생겼는지 확인
 npm run sync              # 콘텐츠 동기화 (CAREER_DIR, .sensitive-terms.local 필요)
 npm run sync -- --check   # content/synced/가 원본과 같은지 확인만
 npm run og:image          # 공유 미리보기 그림(src/assets/og-image.png) 다시 만들기 (개발 서버가 떠 있어야 함)
