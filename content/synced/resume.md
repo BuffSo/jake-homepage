@@ -192,7 +192,7 @@ AI 코딩 도구가 등장하기 훨씬 전부터 다양한 로직을 직접 구
   - 사이드바 캐시 동기화로 트리 일관성 유지
 - **예약 표시이름 시스템 구현** - username/displayName 도메인 분리 및 상태 머신
   - 브랜드명·일반명사 예약, 사용자 신청 → 관리자 심사로 배정
-- **프론트엔드 및 배포** - Next.js 16(App Router) + React Query + Tailwind/shadcn
+- **프론트엔드 및 배포** - Next.js 16(App Router) + React Query + Tailwind/shadcn, SEO·검색엔진 등록
   - 다국어(i18n) 구조 설계 - 현재 한·영 적용, 13개 언어로 확장 가능 (에러 메시지 로케일 응답)
   - 본인 AWS 직접 구축 - EC2 컨테이너(Nginx·백엔드·워커·Redis·MySQL), OIDC·ECR 자동 배포, S3 백업
 - **AI 개발 환경 직접 구축** - 코드 리뷰 스킬·오픈소스 기반 이미지 MCP 제작, 영상 제작까지 에이전트 활용
@@ -253,6 +253,7 @@ AI 코딩 도구가 등장하기 훨씬 전부터 다양한 로직을 직접 구
   - Redis 인증 코드(10분 TTL)·Resend API 우회, AES-256 개인정보 암호화
 - **로그 저장소 분리** - 제약조건으로 버려졌으나 실제 당첨된 조합을 MongoDB Atlas(Mongoose)에 적재
   - 사용자별·회차별 집계 파이프라인 구현, LOG_TARGET 환경변수로 파일/MongoDB 듀얼 로깅 전략 선택
+- **SEO 개선** - 버튼 이동을 링크로 바꿔 내부 링크 0→12개, 중복 URL 17→10개, JS를 막던 robots 규칙 제거
 - **인프라** - Vercel + Supabase(PostgreSQL), Upstash Redis, MongoDB Atlas, Vercel 자동 배포
 
 ---
