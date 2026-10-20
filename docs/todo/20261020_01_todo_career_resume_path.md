@@ -20,6 +20,6 @@ PDF는 모두 career 맨 위에 있습니다(`소재희-이력서.pdf`, `소재�
 
 ## 할 일
 
-- [x] `scripts/sync.config.mjs`의 이력서 `source`를 `"소재희-이력서.md"`에서 `"이력서/소재희-이력서.md"`로 바꾼다.
-- [x] `npm run sync`를 돌려 `content/synced/resume.md`가 전과 같은지 확인한다. 내용은 바뀌지 않았으므로 diff가 없어야 한다.
-- [x] 사이트에서 PDF 파일을 career 경로로 직접 가리키는 곳이 있으면 함께 고친다. 2026-10-20에 찾아본 범위(코드와 설정)에는 없었다.
+- [x] `scripts/sync.config.mjs`의 이력서 `source`를 `"소재희-이력서.md"`에서 `"이력서/소재희-이력서.md"`로 바꿉니다.
+- [x] `npm run sync`를 돌려 `content/synced/resume.md`가 전과 같은지 확인합니다. 내용은 바뀌지 않았으므로 diff가 없어야 합니다.
+- [x] 사이트에서 PDF 파일을 career 경로로 직접 가리키는 곳이 있으면 함께 고칩니다. 2026-10-20에 찾아본 범위(코드와 설정)에는 없었습니다.
