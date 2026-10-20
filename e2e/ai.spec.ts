@@ -104,7 +104,7 @@ test("짧은 카드는 /work의 AI 절로 보낸다", async ({ page }) => {
 
 test("머리 아래, 목차 위의 사례 입구가 /ai/case로 간다", async ({ page }) => {
   await page.goto("/ai");
-  const entry = page.getByRole("link", { name: "AI 도구 활용 사례 한눈에 보기" });
+  const entry = page.getByRole("link", { name: "AI 도구 활용 사례 자세히 보기" });
   await expect(entry).toHaveAttribute("href", "/ai/case");
   // 입구는 목차보다 앞에 있다
   const order = await entry.evaluate((el) => {
