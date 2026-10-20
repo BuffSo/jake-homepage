@@ -4,7 +4,7 @@
 
 export const CAPTURE_DIR = "test-results/captures";
 
-const PAGES = ["home", "work", "ai", "resume"];
+const PAGES = ["home", "work", "ai", "ai-case", "resume"];
 const THEMES = ["light", "dark"];
 // playwright.config.ts의 desktop, mobile 프로젝트 폭
 const WIDTHS = [1280, 375];

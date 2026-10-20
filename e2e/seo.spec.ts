@@ -6,7 +6,7 @@ import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 // 공유 정보는 운영 주소(https://jakeso.dev)를 가리키므로, 그림은 주소의 경로만 떼어 이 서버에서 받아 본다.
 
 const SITE = "https://jakeso.dev";
-const PAGES = ["/", "/work", "/ai", "/resume"];
+const PAGES = ["/", "/work", "/ai", "/ai/case", "/resume"];
 const home = parseFrontmatter(readFileSync("content/site/home.md", "utf8"), "home.md").data as {
   lines: string[];
   contact: { github: string };
@@ -61,7 +61,7 @@ test("robots.txt는 모두 허용하고 사이트맵을 알린다", async ({ req
   expect(body).toContain(`Sitemap: ${SITE}/sitemap.xml`);
 });
 
-test("사이트맵에 네 페이지가 대표 주소 그대로 있다", async ({ request }) => {
+test("사이트맵에 모든 페이지가 대표 주소 그대로 있다", async ({ request }) => {
   const res = await request.get("/sitemap.xml");
   expect(res.status()).toBe(200);
   const locs = [...(await res.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);

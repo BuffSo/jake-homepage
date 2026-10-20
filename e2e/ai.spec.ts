@@ -102,9 +102,27 @@ test("짧은 카드는 /work의 AI 절로 보낸다", async ({ page }) => {
   }
 });
 
+test("머리 아래, 목차 위의 사례 입구가 /ai/case로 간다", async ({ page }) => {
+  await page.goto("/ai");
+  const entry = page.getByRole("link", { name: "AI 도구 활용 사례 한눈에 보기" });
+  await expect(entry).toHaveAttribute("href", "/ai/case");
+  // 입구는 목차보다 앞에 있다
+  const order = await entry.evaluate((el) => {
+    const nav = document.getElementById("page-index")!;
+    return el.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING;
+  });
+  expect(order).toBeTruthy();
+  // 작은 그림 네 칸은 장식이라 대체 텍스트를 비운다. 링크 이름이 뜻을 말한다.
+  await expect(entry.locator("img")).toHaveCount(4);
+  for (const image of await entry.locator("img").all()) await expect(image).toHaveAttribute("alt", "");
+  await entry.click();
+  await expect(page).toHaveURL(/\/ai\/case$/);
+});
+
 test("이미지마다 대체 텍스트가 있고, 내려오면 불러온다", async ({ page }) => {
   await page.goto("/ai");
-  const images = page.locator("main img");
+  // 사례 입구의 장식 그림은 위 테스트에서 따로 본다.
+  const images = page.locator('main img:not(a[href="/ai/case"] img)');
   const count = await images.count();
   expect(count).toBeGreaterThan(0);
   for (let i = 0; i < count; i++) {
