@@ -3,6 +3,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
+import { parseAiCase } from "./ai-case.mjs";
 import { parseFrontmatter } from "./frontmatter.mjs";
 import { composeChapters } from "./portfolio.mjs";
 import { countAdrs, countCiChecks } from "./repo-stats.mjs";
@@ -14,6 +15,8 @@ const SITE_DIR = path.join(process.cwd(), "content", "site");
 // 같은 이유로 동기화한 포트폴리오도 파일 하나로 고정한다.
 const PORTFOLIO = path.join(process.cwd(), "content", "synced", "portfolio.md");
 const RESUME = path.join(process.cwd(), "content", "synced", "resume.md");
+const AI_CASE = path.join(process.cwd(), "content", "synced", "ai-case.json");
+const AI_CASE_BODY = path.join(process.cwd(), "content", "synced", "ai-case.txt");
 
 export type ProjectSlug = "recueve" | "prowith" | "lotto-ai";
 
@@ -150,6 +153,12 @@ export type ResumePage = {
 /** 동기화한 이력서. 머리(한 줄 소개, 이름)와 본문으로 나눈다 (src/lib/resume.mjs) */
 export type Resume = { tagline: string; name: string; body: string };
 
+/** 4컷 한 칸. crop은 원본 그림에서 칸의 자리(x, y, 폭, 높이)다 */
+export type AiCasePanel = { crop: [number, number, number, number]; caption: string };
+
+/** 동기화한 AI 도구 활용 사례 (src/lib/ai-case.mjs, /ai/case) */
+export type AiCase = { title: string; subtitle: string; heading: string; panels: AiCasePanel[]; body: string[] };
+
 /** content/site/ 아래의 글 하나 */
 function read<T>(relative: string): T {
   const text = readFileSync(path.join(SITE_DIR, relative), "utf8");
@@ -222,4 +231,9 @@ export function getResume(): Resume {
   const resume = splitResume(readFileSync(RESUME, "utf8"));
   checkSections(resume.body, getResumePage().sections);
   return resume;
+}
+
+/** 사례의 json과 본문을 읽는다. 형식이 맞지 않으면 빌드가 멈춘다. */
+export function getAiCase(): AiCase {
+  return parseAiCase(readFileSync(AI_CASE, "utf8"), readFileSync(AI_CASE_BODY, "utf8")) as AiCase;
 }

@@ -9,6 +9,20 @@ import { scanText } from "./sensitive-rules.mjs";
 
 export const MANIFEST = "manifest.json";
 
+// 글 파일은 utf8로 읽어 변환하고 민감정보를 검사한다. 그림은 바이트 그대로 옮긴다(ADR-0003 원본 추가).
+// 민감정보 검사는 글자만 읽으므로, 그림은 가져올 때 눈으로 확인한다.
+const TEXT_OUTPUT = /^[a-z0-9-]+\.(md|txt|json)$/;
+const BINARY_OUTPUT = /^[a-z0-9-]+\.png$/;
+
+export function isBinaryOutput(name) {
+  return BINARY_OUTPUT.test(name);
+}
+
+/** 쓴 파일(Buffer)과 새로 만든 결과가 같은지 본다. 그림은 바이트로, 글은 utf8 문자열로 비교한다. */
+export function sameContent(fileBuffer, content) {
+  return typeof content === "string" ? fileBuffer.toString("utf8") === content : fileBuffer.equals(content);
+}
+
 // 이 모듈이 던지는 오류. 메시지에는 원본 내용과 로컬 경로를 넣지 않는다.
 export class SyncError extends Error {}
 
@@ -108,9 +122,11 @@ export function validateConfig(config) {
     if (!isPlainRelative(f.source)) {
       throw new SyncError(`허용 목록의 경로는 원본 저장소 안의 상대 경로여야 합니다: ${f.source}`);
     }
-    if (!/^[a-z0-9-]+\.md$/.test(f.output) || f.output === MANIFEST || outputs.has(f.output)) {
+    const binary = isBinaryOutput(f.output);
+    if (!(binary || TEXT_OUTPUT.test(f.output)) || f.output === MANIFEST || outputs.has(f.output)) {
       throw new SyncError(`출력 파일 이름이 올바르지 않거나 겹칩니다: ${f.output}`);
     }
+    if (binary && f.transforms.length) throw new SyncError(`그림 파일에는 변환 규칙을 달 수 없습니다: ${f.output}`);
     outputs.add(f.output);
     f.transforms.forEach(transformOf);
   }
@@ -174,7 +190,10 @@ export function buildOutputs({ careerDir, config, privateTerms, allowDirty = fal
   const outputs = new Map();
   config.files.forEach((f, i) => {
     try {
-      outputs.set(f.output, applyTransforms(readFileSync(reals[i], "utf8"), f.transforms));
+      outputs.set(
+        f.output,
+        isBinaryOutput(f.output) ? readFileSync(reals[i]) : applyTransforms(readFileSync(reals[i], "utf8"), f.transforms),
+      );
     } catch (e) {
       if (e instanceof SyncError) throw new SyncError(`${f.output}: ${e.message}`);
       throw e;
@@ -190,6 +209,7 @@ export function buildOutputs({ careerDir, config, privateTerms, allowDirty = fal
 
   const findings = [];
   for (const [name, content] of outputs) {
+    if (typeof content !== "string") continue; // 그림은 글자 검사를 하지 않는다
     for (const { line, id, shown } of scanText(content, privateTerms)) {
       findings.push({ at: `${name}:${line}`, id, shown });
     }

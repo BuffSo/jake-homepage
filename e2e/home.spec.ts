@@ -116,17 +116,19 @@ test("헤더에 지금 보는 페이지가 표시된다", async ({ page }, testI
   const open = async () => {
     if (mobile) await page.locator("header summary").click();
   };
-  for (const [path, label] of [
-    ["/work", "Work"],
-    ["/ai", "AI"],
-    ["/resume", "Resume"],
+  // 메뉴 아래의 페이지(/ai/case)는 밑줄은 같고, 화면 읽기 프로그램에는 "true"로 알린다.
+  for (const [path, label, state] of [
+    ["/work", "Work", "page"],
+    ["/ai", "AI", "page"],
+    ["/ai/case", "AI", "true"],
+    ["/resume", "Resume", "page"],
   ]) {
     await page.goto(path);
     await open();
     for (const other of ["Work", "AI", "Resume"]) {
       const link = nav.getByRole("link", { name: other });
       if (other === label) {
-        await expect(link).toHaveAttribute("aria-current", "page");
+        await expect(link).toHaveAttribute("aria-current", state);
         // 모바일은 이름 글자에만 밑줄을 준다. 링크에 주면 옆의 페이지 제목까지 밑줄이 번진다.
         await expect(mobile ? link.locator("span").first() : link).toHaveCSS("text-decoration-line", "underline");
       } else {

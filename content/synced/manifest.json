@@ -1,6 +1,6 @@
 {
   "source": {
-    "commit": "36937e1286d4e49cf7d02dcdc91cb1cf87db871c",
+    "commit": "ec9d945cdda1af013c54673f6daa56538f1719fc",
     "dirty": false
   },
   "files": [
@@ -13,6 +13,20 @@
     },
     {
       "output": "portfolio.md",
+      "transforms": []
+    },
+    {
+      "output": "ai-case.json",
+      "transforms": [
+        "replace-line \"subtitle\":"
+      ]
+    },
+    {
+      "output": "ai-case.txt",
+      "transforms": []
+    },
+    {
+      "output": "ai-case.png",
       "transforms": []
     }
   ]
