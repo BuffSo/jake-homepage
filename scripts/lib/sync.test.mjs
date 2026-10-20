@@ -4,7 +4,16 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSyn
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, describe, test } from "node:test";
-import { applyTransforms, buildOutputs, dropLine, dropTableColumn, MANIFEST, replaceLine, SyncError } from "./sync.mjs";
+import {
+  applyTransforms,
+  buildOutputs,
+  dropLine,
+  dropTableColumn,
+  MANIFEST,
+  replaceLine,
+  sameContent,
+  SyncError,
+} from "./sync.mjs";
 
 // 전화번호 모양의 값이 파일에 그대로 있으면 민감정보 검사에 걸리므로 실행할 때 만든다.
 const PHONE = ["010", "0000", "0000"].join("-");
@@ -196,6 +205,55 @@ describe("buildOutputs", () => {
     const careerDir = makeCareerRepo({ "이력서.md": RESUME });
     const config = { ...CONFIG, files: [{ ...CONFIG.files[0], output: MANIFEST }] };
     assert.throws(() => buildOutputs({ careerDir, config, privateTerms: [] }), SyncError);
+  });
+});
+
+describe("글 파일과 그림 파일 (ADR-0003 원본 추가)", () => {
+  // PNG 머리와, 글자로 읽으면 전화번호 모양이 되는 바이트를 섞는다.
+  const PNG = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0xff]), Buffer.from(PHONE)]);
+  const CASE = '{\n  "title": "사례",\n  "subtitle": "부제  |  이름",\n  "heading": "본문 제목"\n}\n';
+  const caseConfig = (files) => ({ outputDir: "content/synced", files });
+
+  test("json은 줄 규칙으로 고치고, txt는 그대로, 그림은 바이트 그대로 옮긴다", () => {
+    const careerDir = makeCareerRepo({ "사례.json": CASE, "사례.txt": "첫 문단\n\n둘째 문단\n", "4컷.png": PNG });
+    const config = caseConfig([
+      { source: "사례.json", output: "ai-case.json", transforms: [{ type: "replace-line", startsWith: '"subtitle":', with: '"subtitle": "부제",' }] },
+      { source: "사례.txt", output: "ai-case.txt", transforms: [] },
+      { source: "4컷.png", output: "ai-case.png", transforms: [] },
+    ]);
+    const { outputs, findings } = buildOutputs({ careerDir, config, privateTerms: [] });
+
+    assert.equal(JSON.parse(outputs.get("ai-case.json")).subtitle, "부제");
+    assert.equal(outputs.get("ai-case.txt"), "첫 문단\n\n둘째 문단\n");
+    assert.ok(Buffer.isBuffer(outputs.get("ai-case.png")));
+    assert.ok(outputs.get("ai-case.png").equals(PNG));
+    // 그림은 글자 검사를 하지 않는다. 바이트 안의 전화번호 모양은 걸리지 않는다.
+    assert.deepEqual(findings, []);
+    assert.deepEqual(
+      JSON.parse(outputs.get(MANIFEST)).files.map((f) => f.output),
+      ["ai-case.json", "ai-case.txt", "ai-case.png"],
+    );
+  });
+
+  test("그림 파일에 변환 규칙을 달면 멈춘다", () => {
+    const careerDir = makeCareerRepo({ "4컷.png": PNG });
+    const config = caseConfig([{ source: "4컷.png", output: "ai-case.png", transforms: [{ type: "drop-line", startsWith: "x" }] }]);
+    assert.throws(() => buildOutputs({ careerDir, config, privateTerms: [] }), /변환 규칙을 달 수 없습니다/);
+  });
+
+  test("출력 이름은 md, txt, json, png만 받는다", () => {
+    const careerDir = makeCareerRepo({ "이력서.md": RESUME });
+    for (const output of ["resume.html", "resume.pdf", "Resume.md", "ai case.json"]) {
+      const config = { ...CONFIG, files: [{ ...CONFIG.files[0], output }] };
+      assert.throws(() => buildOutputs({ careerDir, config, privateTerms: [] }), SyncError, output);
+    }
+  });
+
+  test("sameContent는 글은 문자열로, 그림은 바이트로 비교한다", () => {
+    assert.equal(sameContent(Buffer.from("본문\n"), "본문\n"), true);
+    assert.equal(sameContent(Buffer.from("본문\n"), "본문"), false);
+    assert.equal(sameContent(Buffer.from(PNG), PNG), true);
+    assert.equal(sameContent(Buffer.from(PNG), Buffer.concat([PNG, Buffer.from([0])])), false);
   });
 });
 

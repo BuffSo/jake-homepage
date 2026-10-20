@@ -10,7 +10,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PRIVATE_TERMS_FILE, readPrivateTerms } from "./lib/sensitive-rules.mjs";
-import { buildOutputs, SyncError } from "./lib/sync.mjs";
+import { buildOutputs, sameContent, SyncError } from "./lib/sync.mjs";
 import config from "./sync.config.mjs";
 
 process.chdir(path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."));
@@ -29,7 +29,7 @@ function compare(outputs) {
   for (const [name, content] of outputs) {
     const file = path.join(dir, name);
     if (!existsSync(file)) diffs.push(`${name}: 없음`);
-    else if (readFileSync(file, "utf8") !== content) diffs.push(`${name}: 원본과 다름`);
+    else if (!sameContent(readFileSync(file), content)) diffs.push(`${name}: 원본과 다름`);
   }
   for (const name of existsSync(dir) ? readdirSync(dir) : []) {
     if (!outputs.has(name)) diffs.push(`${name}: 허용 목록에 없음`);
