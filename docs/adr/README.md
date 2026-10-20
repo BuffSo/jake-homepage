@@ -6,7 +6,7 @@
 |---|---|---|
 | [0001](0001-static-shell-with-dynamic-features.md) | 정적 사이트로 끝내지 않고, 정적 셸에 동적 기능을 더한다 | 채택 |
 | [0002](0002-personal-hub-for-everyone.md) | 방문자를 가리지 않는 개인 허브로 만든다 | 채택 |
-| [0003](0003-content-source-and-sync.md) | 콘텐츠 원본은 이력서·포트폴리오 md이고, 허용 목록으로 동기화한다 | 채택 |
+| [0003](0003-content-source-and-sync.md) | 콘텐츠 원본은 이력서·포트폴리오 같은 원본 파일이고, 허용 목록으로 동기화한다 | 채택 (AI 도구 활용 사례 원본 2026-10-20 추가) |
 | [0004](0004-ask-answer-policy.md) | 질문 창은 사실만 답하고, 해석과 개인 조건은 답하지 않는다 | 채택 (구현은 2차) |
 | [0005](0005-nextjs16-vercel-genys-domain.md) | Next.js 16, Vercel, genys.kr 루트 도메인 | 채택 (도메인은 0011로 바뀜) |
 | [0006](0006-public-repo-and-privacy.md) | 처음부터 공개 저장소로 운영하고 민감정보는 네 겹으로 막는다 | 채택 |
