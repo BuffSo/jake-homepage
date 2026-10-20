@@ -23,11 +23,22 @@ const MENU = {
   note: "text-sm text-subtle",
 };
 
+/**
+ * 메뉴 하나가 지금 경로와 어떤 사이인지. 그 페이지면 "page", 그 메뉴 아래의 페이지(/ai/case)면 "true"다.
+ * 아래 페이지에서도 밑줄은 같게 붙이고, 화면 읽기 프로그램에는 지금 페이지 자체가 아니라고 알린다(docs/02-ia.md 공통 요소).
+ */
+function currentState(href: string, current?: string) {
+  if (current === href) return "page" as const;
+  if (current?.startsWith(`${href}/`)) return "true" as const;
+  return undefined;
+}
+
 /** 경로를 읽지 않고 그리는 링크. 경로를 알기 전(Suspense 대체 화면)에는 표시 없이 그린다. */
 export function NavLinks({ items, variant, onNavigate, current }: Props & { current?: string }) {
   return items.map((item) => {
-    const isCurrent = item.href === current;
-    const common = { href: item.href, onClick: onNavigate, "aria-current": isCurrent ? ("page" as const) : undefined };
+    const state = currentState(item.href, current);
+    const isCurrent = state !== undefined;
+    const common = { href: item.href, onClick: onNavigate, "aria-current": state };
     if (variant === "bar") {
       return (
         <Link key={item.href} {...common} className={isCurrent ? `${BAR.base} ${BAR.current}` : BAR.base}>
