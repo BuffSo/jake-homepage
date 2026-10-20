@@ -24,7 +24,7 @@
 | 서비스 | 안내 |
 |---|---|
 | **Recueve** | https://recueve.com<br>회원가입하시면 링크 주소만 넣어 **AI가 설명과 카테고리를 채워 주는 기록**(레코)을 직접 만들어 보실 수 있습니다(가입 시 AI 크레딧 30개 지급) |
-| **ProWith** | https://prowith.kr<br>첫 화면이 쇼핑몰입니다. 오른쪽 위 **`로그인` → `DEMO Login`**에서 `일반회원`으로는 주문을 해 보실 수 있고, **`시스템 관리자`로는** 계정 없이 **모든 설정 기능**을 보실 수 있습니다. 회원·상품·매출은 시드 데이터이고, **마감 결과는 그 데이터로 정산을 실제로 돌려 나온 값**입니다 |
+| **ProWith** | https://prowith.kr<br>첫 화면이 쇼핑몰입니다. 오른쪽 위 <strong>`로그인` → `DEMO Login`</strong>에서 `일반회원`으로는 주문을 해 보실 수 있고, **`시스템 관리자`로는** 계정 없이 **모든 설정 기능**을 보실 수 있습니다. 회원·상품·매출은 시드 데이터이고, **마감 결과는 그 데이터로 정산을 실제로 돌려 나온 값**입니다 |
 | **GENYS Lotto AI** | https://lotto.genys.kr<br>회원가입 후 이용하실 수 있습니다 |
 
 ---
@@ -47,7 +47,7 @@ ProWith를 운영하면서 정작 시간을 잡아먹는 건 코드가 아니라
 
 | 스킬 | 하는 일 |
 |---|---|
-| <span style="white-space:nowrap">**신규 업체 셋업**</span><br><span style="white-space:nowrap">`new-tenant`</span> | 명령 한 번으로 **디렉토리 복제 → 로컬 DB·Prisma → GitHub 레포 → AWS(ECR·RDS·SSL·Secrets) 배포 → Vercel 프론트 + 도메인 연결**까지. 직접 하는 건 DNS 설정 정도입니다 |
+| <span style="white-space:nowrap">**신규 업체 셋업**</span><br><span style="white-space:nowrap">`new-tenant`</span> | 명령 한 번으로 **디렉토리 복제 → 로컬 DB·Prisma → GitHub 레포 → AWS(ECR·RDS·SSL·Secrets) 배포 → Vercel 프론트 + 도메인 연결**까지. 마지막까지 직접 하던 DNS 설정도 AI 브라우저로 로그인부터 등록까지 처리합니다 |
 | <span style="white-space:nowrap">**보상플랜 문서화**</span><br><span style="white-space:nowrap">`compose-plan`</span> | 원본 자료(PPTX·HWP·PDF·이미지)를 읽어 **검증 스킬이 그대로 읽을 수 있는 규격 문서**로 정리합니다. 자격 조건의 단위·마감 주기처럼 **모호한 항목은 임의로 정하지 않고 되묻게** 했습니다 |
 | <span style="white-space:nowrap">**보상플랜 반영**</span><br><span style="white-space:nowrap">`build-seed-plan`</span> | 그 문서를 업체별 설정값으로 옮깁니다. 기본값과 같더라도 **플랜이 정한 값은 명시**해 둡니다 - 나중에 기본값이 바뀌어도 업체 설정이 따라 흔들리지 않게 |
 | <span style="white-space:nowrap">**마감 검증**</span><br><span style="white-space:nowrap">`verify-cutoffs`</span> | 보상플랜 문서와 현재 설정을 읽어 **합격 기준을 스스로 구성**한 뒤, DB 재시드 → 테스트 매출 → 일/주/15일/월 순차 마감 → 집계 검증. 마감 취소 정합성·탈퇴자 실적 제외까지 (아래 ①) |
