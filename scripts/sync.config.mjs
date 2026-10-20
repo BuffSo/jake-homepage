@@ -9,7 +9,7 @@ const config = {
   outputDir: "content/synced",
   files: [
     {
-      source: "소재희-이력서.md",
+      source: "이력서/소재희-이력서.md",
       output: "resume.md",
       transforms: [
         {
