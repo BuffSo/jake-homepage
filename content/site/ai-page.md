@@ -5,7 +5,7 @@ groups:
   - id: product
     title: 제품에 넣은 AI
   - id: beyond
-    title: 개발 밖의 일
+    title: 개발 업무 외 작업
   - id: personal
     title: 개인 도구
 ---
