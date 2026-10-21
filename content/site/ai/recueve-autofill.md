@@ -4,7 +4,7 @@ order: 5
 group: product
 eyebrow: RECUEVE · AI 자동 채움
 title: Recueve AI 자동 채움
-problem: LLM 호출이 곧 돈이 나가는 트랜잭션입니다.
+problem: LLM 호출이 곧 과금되는 트랜잭션입니다.
 built: 크레딧 차감부터 실패 시 환불까지 7단계 파이프라인입니다.
 result: 모두의 레코스의 카테고리와 설명이 이 파이프라인의 산출물입니다.
 metric:
@@ -19,4 +19,5 @@ sources:
 
 <!--
 포트폴리오 "3. AI 활용 - 제품"이다. 원문은 /work의 Recueve 챕터에 있으므로 여기서는 짧은 카드로 두고 그 절로 보낸다.
+problem은 원문의 "돈이 나가는 트랜잭션"을 /work와 같이 "과금되는 트랜잭션"으로 바꿔 쓴다(content/site/work.md의 Recueve replace). 원본이 바뀌어 다시 동기화하면 sources도 새 문장으로 고친다.
 -->
