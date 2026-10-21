@@ -13,11 +13,10 @@ metric:
 links: []
 more: /work#recueve-ai
 sources:
-  - 돈이 나가는 트랜잭션
+  - 과금되는 트랜잭션
   - ⑦ 실패 시 환불
 ---
 
 <!--
 포트폴리오 "3. AI 활용 - 제품"이다. 원문은 /work의 Recueve 챕터에 있으므로 여기서는 짧은 카드로 두고 그 절로 보낸다.
-problem은 원문의 "돈이 나가는 트랜잭션"을 /work와 같이 "과금되는 트랜잭션"으로 바꿔 쓴다(content/site/work.md의 Recueve replace). 원본이 바뀌어 다시 동기화하면 sources도 새 문장으로 고친다.
 -->
