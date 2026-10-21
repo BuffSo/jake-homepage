@@ -30,6 +30,8 @@ chapters:
     replace:
       - find: 그누보드5 기반 레거시를 NestJS + Next.js로 새로 구축한 MLM 솔루션
         to: 보상플랜과 쇼핑몰을 설정으로 켜고 끄는 MLM 정산 솔루션
+      - find: '"최대"인 이유가 이 프로젝트의 핵심입니다.'
+        to: 풍부한 관리자 설정 기능이 이 프로젝트의 핵심입니다.
   - slug: lotto-ai
     detail: 4-3. GENYS Lotto AI
     howToView: GENYS Lotto AI
@@ -46,4 +48,5 @@ chapters:
   - Recueve: 3절 첫 문단은 앞에 나온 하네스를 가리키지만, 이 페이지에서는 Recueve가 먼저 나온다. 4-1의 "3절 참조"는 바로 아래 AI 절을 가리키게 바꾼다.
   - ProWith, Lotto: 포트폴리오 이미지와 설명 줄은 싣지 않는다(docs/todo/20261015_07_todo_portfolio_images.md).
   - ProWith: 4-2의 첫 인용 줄(레거시 전환)을 홈 서비스 목록의 소개와 같은 문장으로 바꾼다. 강점인 설정과 쇼핑몰이 먼저 보이게 하기 위해서다. 문장의 근거는 content/site/projects/prowith.md의 sources에 있다.
+  - ProWith: 정산 엔진 인용 상자의 첫 문장("최대"인 이유가…)은 두 줄 위 목록의 "최대"를 받아 갑자기 나온 것처럼 읽힌다. 바로 뒤 문장이 설명하는 풍부한 관리자 설정 기능을 주어로 바꾼다. 숫자(마감 4종, 수당 13종)를 넣으면 설정이 마감과 수당뿐인 것처럼 읽혀 넣지 않았다. 원본 수정은 커리어 저장소 todo로 넘겼고, 원본이 바뀌어 다시 동기화할 때 이 규칙을 지운다.
 -->
