@@ -1,7 +1,7 @@
 # 소재희 포트폴리오
 
 > **AI를 더해 기술을 비즈니스 가치로 연결하는 풀스택 개발자**
-> AI를 활용해 빠르게 구현하고 판단과 검증에 집중하는 하네스 엔지니어링으로, 혼자서도 팀의 속도로 기획부터 개발, 배포까지 완주합니다.
+> AI로 구현하고 검증하는 하네스 엔지니어링으로, 기획부터 개발, 배포까지 혼자서도 끝까지 해냅니다.
 
 | | |
 |---|---|
@@ -16,7 +16,7 @@
 | 서비스 | 한 줄 설명 | 역할 | 기간 | 스택 |
 |---|---|---|---|---|
 | [**Recueve**](https://recueve.com) | 흩어진 관심사를 한곳에 모으는 콘텐츠 큐레이션 플랫폼<br>**LLM 파이프라인 기반 콘텐츠 메타데이터 자동 생성** | 풀스택 (개인) | 2026.09~ | NestJS · Next.js 16 · Prisma · MySQL · Redis · BullMQ<br>**Claude API(Anthropic SDK)** |
-| [**ProWith**](https://prowith.kr) | 그누보드5 기반 레거시를 새로 구축한 MLM 정산 솔루션 (멀티테넌트) | 풀스택 (프리랜서) | 2025.12~2026.01 | NestJS · Next.js 16 · PostgreSQL · Prisma · Docker · AWS |
+| [**ProWith**](https://prowith.kr) | 보상플랜과 쇼핑몰을 설정으로 켜고 끄는 MLM 정산 솔루션 (멀티테넌트) | 풀스택 (프리랜서) | 2025.12~2026.01 | NestJS · Next.js 16 · PostgreSQL · Prisma · Docker · AWS |
 | [**GENYS Lotto AI**](https://lotto.genys.kr) | 로또 추첨 데이터 기반 통계 분석 + AI 예측 서비스 | 풀스택 (개인) | 2025.10~11 | Next.js 15 · PostgreSQL · Redis · AWS Lambda · SSE |
 
 ### 보시는 방법
@@ -24,7 +24,7 @@
 | 서비스 | 안내 |
 |---|---|
 | **Recueve** | https://recueve.com<br>회원가입하시면 링크 주소만 넣어 **AI가 설명과 카테고리를 채워 주는 기록**(레코)을 직접 만들어 보실 수 있습니다(가입 시 AI 크레딧 30개 지급) |
-| **ProWith** | https://prowith.kr<br>첫 화면이 쇼핑몰입니다. 오른쪽 위 <strong>`로그인` → `DEMO Login`</strong>에서 `일반회원`으로는 주문을 해 보실 수 있고, **`시스템 관리자`로는** 계정 없이 **모든 설정 기능**을 보실 수 있습니다. 회원·상품·매출은 시드 데이터이고, **마감 결과는 그 데이터로 정산을 실제로 돌려 나온 값**입니다 |
+| **ProWith** | https://prowith.kr<br>첫 화면이 쇼핑몰입니다. 오른쪽 위 <strong>`로그인` → `DEMO Login`</strong>에서 가입 없이 `일반회원`으로 주문을 해 보실 수 있고, `시스템 관리자`로 **모든 설정 기능**을 보실 수 있습니다. 회원·상품·매출은 시드 데이터이고, **마감 결과는 그 데이터로 정산을 실제로 돌려 나온 값**입니다 |
 | **GENYS Lotto AI** | https://lotto.genys.kr<br>회원가입 후 이용하실 수 있습니다 |
 
 ---
