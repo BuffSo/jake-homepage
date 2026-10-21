@@ -40,6 +40,10 @@ const config = {
     MySQL: [{ file: name("schema\\.prisma"), text: line('provider\\s*=\\s*"mysql"') }],
     Redis: [{ dep: "ioredis" }, { dep: "redis" }],
     Prisma: [{ dep: "@prisma/client" }],
+    // PostgreSQL을 Supabase에 두고 그 클라이언트로 읽고 쓴다
+    Supabase: [{ dep: "@supabase/supabase-js" }],
+    // 문서형 DB는 ODM이나 드라이버 패키지로 본다
+    MongoDB: [{ dep: "mongoose" }, { dep: "mongodb" }],
     // GitHub Actions로 AWS에 배포하거나, 배포 스크립트가 AWS CLI로 Lambda를 올린다.
     AWS: [
       { file: name("\\.github/workflows/[^/]+\\.ya?ml"), text: line("aws-actions/") },

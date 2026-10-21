@@ -39,12 +39,18 @@ layers:
     items:
       - name: PostgreSQL
         usedBy: [prowith, lotto-ai]
+      - name: Supabase
+        usedBy: [lotto-ai]
+        detailOnly: true
       - name: MySQL
         usedBy: [recueve]
+      - name: MongoDB
+        usedBy: [lotto-ai]
       - name: Redis
         usedBy: [recueve, lotto-ai]
       - name: Prisma
         usedBy: [recueve, prowith, lotto-ai]
+        detailOnly: true
   - name: 인프라
     items:
       - name: AWS
