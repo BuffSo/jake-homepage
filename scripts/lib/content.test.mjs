@@ -69,6 +69,15 @@ test("기술 층은 여섯 개이고, 기술 이름은 표지 설정과 같다",
   assert.deepEqual([...names].sort(), Object.keys(stackConfig.techs).sort());
 });
 
+test("층 줄에 싣는 기술은 층마다 네 개 이하다", () => {
+  // 360 폭에서 층 줄이 한 줄에 들어가는 한도다. 다섯 개면 데이터 층이 두 줄로 넘쳤다(2026-10-21 측정).
+  // 더 넣을 기술은 detailOnly로 두면 층을 눌렀을 때 서비스별 줄에만 보인다.
+  for (const layer of home.layers) {
+    const row = layer.items.filter((item) => !item.detailOnly);
+    assert.ok(row.length <= 4, `${layer.name}: 층 줄에 ${row.length}개`);
+  }
+});
+
 test("기술이 가리키는 서비스는 모두 있다", () => {
   const slugs = new Set(projects.map((p) => p.data.slug));
   for (const layer of home.layers) {

@@ -83,7 +83,10 @@ export function StackLayers({ layers, children }: { layers: Layer[]; children?: 
             >
               <span className="shrink-0 text-sm font-semibold md:text-base">{layer.name}</span>
               <span className="font-mono text-[0.6875rem] text-muted group-data-[active=true]:text-on-accent md:text-[0.8125rem]">
-                {layer.items.map((item) => item.name).join(" · ")}
+                {layer.items
+                  .filter((item) => !item.detailOnly)
+                  .map((item) => item.name)
+                  .join(" · ")}
               </span>
             </button>
           </li>
