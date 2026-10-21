@@ -23,12 +23,20 @@ const config = {
     Tailwind: [{ dep: "tailwindcss" }],
     // shadcn/ui는 패키지가 아니라 컴포넌트를 복사해 쓰는 방식이라, 설정 파일로 확인한다.
     "shadcn/ui": [{ file: name("components\\.json") }],
+    // 조직도 같은 시각화
+    "D3.js": [{ dep: "d3" }, { dep: "d3-org-chart" }],
     // API: 서버 프레임워크. Node.js는 패키지 매니페스트가 있으면 그 런타임에서 돈다고 본다
     NestJS: [{ dep: "@nestjs/core" }],
     "Node.js": [{ file: name("package\\.json") }],
     TypeScript: [{ dep: "typescript" }],
+    // NestJS 서버의 다국어 응답
+    "nestjs-i18n": [{ dep: "nestjs-i18n" }],
+    // 서버가 연결을 열어 두고 알림을 밀어 주는 응답 형식
+    SSE: [{ file: name("[^/]+\\.(ts|tsx|js|mjs)"), text: line("text/event-stream") }],
     // 워커: 큐 패키지
     BullMQ: [{ dep: "bullmq" }],
+    // 워커 이미지에 설치해 영상 자막을 뽑는 명령줄 도구
+    "yt-dlp": [{ file: name("Dockerfile[^/]*"), text: line("yt-dlp") }],
     // API 서버 안에서 도는 예약 작업
     Cron: [{ dep: "@nestjs/schedule" }],
     // Lambda 함수의 핸들러 타입
@@ -40,6 +48,10 @@ const config = {
     MySQL: [{ file: name("schema\\.prisma"), text: line('provider\\s*=\\s*"mysql"') }],
     Redis: [{ dep: "ioredis" }, { dep: "redis" }],
     Prisma: [{ dep: "@prisma/client" }],
+    // PostgreSQL을 Supabase에 두고 그 클라이언트로 읽고 쓴다
+    Supabase: [{ dep: "@supabase/supabase-js" }],
+    // 문서형 DB는 ODM이나 드라이버 패키지로 본다
+    MongoDB: [{ dep: "mongoose" }, { dep: "mongodb" }],
     // GitHub Actions로 AWS에 배포하거나, 배포 스크립트가 AWS CLI로 Lambda를 올린다.
     AWS: [
       { file: name("\\.github/workflows/[^/]+\\.ya?ml"), text: line("aws-actions/") },

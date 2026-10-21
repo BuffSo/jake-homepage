@@ -13,14 +13,17 @@ import { StackLayers } from "./stack-layers";
 // 데스크톱(lg 이상)은 글이 왼쪽, 기술 층이 오른쪽, 서비스 목록이 아래 띠다. 그보다 좁으면 위에서 아래로 쌓는다.
 export function Hero() {
   const home = getHome();
-  const services: ServiceItem[] = getProjects().map((project) => ({
+  const projects = getProjects();
+  // 세 서비스의 기술 줄을 모두 겹쳐 둔다. 한 서비스의 줄만 길어도 세 칸이 같은 높이를 잡아 데스크톱에서 주소 줄이 맞는다.
+  const allTechLines = [...new Set(projects.flatMap((project) => techLines(home.layers, project.slug)))];
+  const services: ServiceItem[] = projects.map((project) => ({
     slug: project.slug,
     num: String(project.order).padStart(2, "0"),
     name: project.title,
     line: project.summary,
     href: project.liveUrl,
     domain: new URL(project.liveUrl).host,
-    techLines: techLines(home.layers, project.slug),
+    techLines: allTechLines,
   }));
 
   // 첫 줄은 마지막 낱말 앞에서 줄을 바꾼다 ("Idea to / production.").

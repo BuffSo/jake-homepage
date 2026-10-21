@@ -6,7 +6,7 @@ import { capturePath, collectErrors } from "./helpers";
 // 홈 화면 확인 (ADR-0008). 캡처는 test-results/에만 남고 커밋하지 않는다.
 // 기대값은 사이트 전용 글(content/site/)에서 읽는다. 문구를 고쳐도 테스트는 그대로 두고, 화면에 빠진 것만 잡는다.
 
-type Layer = { name: string; items: { name: string; usedBy: string[] }[] };
+type Layer = { name: string; items: { name: string; usedBy: string[]; detailOnly?: boolean }[] };
 type Project = {
   slug: string;
   order: number;
@@ -294,7 +294,9 @@ test.describe("첫 화면", () => {
     await expect(buttons).toHaveCount(home.layers.length);
     for (const [i, layer] of home.layers.entries()) {
       await expect(buttons.nth(i)).toContainText(layer.name);
-      await expect(buttons.nth(i)).toContainText(layer.items.map((item) => item.name).join(" · "));
+      // 층 줄에는 detailOnly가 아닌 기술만 싣는다(서비스별 줄에는 모두 나온다)
+      const row = layer.items.filter((item) => !item.detailOnly).map((item) => item.name);
+      await expect(buttons.nth(i)).toContainText(row.join(" · "));
     }
   });
 

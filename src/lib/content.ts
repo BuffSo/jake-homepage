@@ -23,8 +23,11 @@ export type ProjectSlug = "recueve" | "prowith" | "lotto-ai";
 export type Metric = { value: string; label: string };
 export type Link = { label: string; href: string };
 
-/** 기술 층의 기술 하나와 그 기술을 쓴 서비스. 짝은 서비스 코드로 확인한다 (ADR-0010) */
-export type LayerItem = { name: string; usedBy: ProjectSlug[] };
+/**
+ * 기술 층의 기술 하나와 그 기술을 쓴 서비스. 짝은 서비스 코드로 확인한다 (ADR-0010)
+ * detailOnly는 층 줄에는 싣지 않고, 층을 눌렀을 때 서비스별 줄에만 보인다. 층 줄이 좁은 화면에서 한 줄을 넘지 않게 한다.
+ */
+export type LayerItem = { name: string; usedBy: ProjectSlug[]; detailOnly?: boolean };
 export type Layer = { name: string; items: LayerItem[] };
 
 export type Home = {

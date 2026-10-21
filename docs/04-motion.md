@@ -26,21 +26,21 @@
 
 | 층 | 기술 |
 |---|---|
-| 화면 | Next.js, React, Tailwind, shadcn/ui |
-| API | NestJS, Node.js, TypeScript |
-| 워커 | BullMQ, Cron, Lambda, EventBridge |
-| 데이터 | PostgreSQL, MySQL, Redis, Prisma |
+| 화면 | Next.js, React, Tailwind, shadcn/ui (층 줄에 싣지 않음: D3.js) |
+| API | NestJS, Node.js, TypeScript (층 줄에 싣지 않음: nestjs-i18n, SSE) |
+| 워커 | BullMQ, Cron, Lambda, EventBridge (층 줄에 싣지 않음: yt-dlp) |
+| 데이터 | PostgreSQL, MySQL, MongoDB, Redis (층 줄에 싣지 않음: Supabase, Prisma) |
 | 인프라 | AWS, Docker, Vercel, GitHub Actions |
 | AI | Claude Code, MCP, Claude API, Gemini |
 
-층을 누르면 서비스마다 그 층에서 쓴 기술이 보입니다.
+층을 누르면 서비스마다 그 층에서 쓴 기술이 보입니다. 층 줄에 싣지 않은 기술도 여기에는 나옵니다.
 
 | 층 | Recueve | ProWith | GENYS Lotto AI |
 |---|---|---|---|
-| 화면 | Next.js · React · Tailwind · shadcn/ui | Next.js · React · Tailwind · shadcn/ui | Next.js · React · Tailwind · shadcn/ui |
-| API | NestJS · Node.js · TypeScript | NestJS · Node.js · TypeScript | Node.js · TypeScript |
-| 워커 | BullMQ | Cron | Lambda · EventBridge |
-| 데이터 | MySQL · Redis · Prisma | PostgreSQL · Prisma | PostgreSQL · Redis · Prisma |
+| 화면 | Next.js · React · Tailwind · shadcn/ui | Next.js · React · Tailwind · shadcn/ui · D3.js | Next.js · React · Tailwind · shadcn/ui |
+| API | NestJS · Node.js · TypeScript · nestjs-i18n | NestJS · Node.js · TypeScript · nestjs-i18n | Node.js · TypeScript · SSE |
+| 워커 | BullMQ · yt-dlp | Cron | Lambda · EventBridge |
+| 데이터 | MySQL · Redis · Prisma | PostgreSQL · Prisma | PostgreSQL · Supabase · MongoDB · Redis · Prisma |
 | 인프라 | AWS · Docker · Vercel · GitHub Actions | AWS · Docker · Vercel · GitHub Actions | AWS · Vercel |
 | AI | Claude Code · MCP · Claude API · Gemini | Claude Code · MCP | Claude Code |
 
@@ -54,7 +54,13 @@
   - Gemini는 직접 만든 이미지 생성 MCP 서버(Gemini API 사용)가 Recueve를 만들며 남긴 그림입니다.
 - 워커의 Cron은 ProWith의 API 서버 안에서 도는 예약 작업입니다(`@nestjs/schedule`). 큐는 없지만 요청과 따로 도는 작업이라 워커 층에 둡니다.
 - AWS Lambda는 층 글자에서 "Lambda"로 줄였습니다. AWS는 인프라 층에 따로 있고, 360 폭 휴대폰에서 워커 층이 한 줄에 들어가게 하기 위해서입니다.
-- 층 글자는 360 폭에서도 한 줄에 들어가야 합니다. 지금 가장 긴 줄은 AI 층(39자)입니다. 그래서 TanStack Query, nginx처럼 핵심이지만 길이를 넘기는 기술은 넣지 않았습니다.
+- 층 줄에는 층마다 네 개까지만 싣습니다(2026-10-21). 360~390 폭과 1024 폭에서 다섯 개면 데이터 층이 두 줄로 넘쳤습니다. 더 싣는 기술은 `content/site/home.md`에서 `detailOnly: true`로 두어, 층 줄에는 없고 층을 눌렀을 때 서비스별 줄에만 보이게 합니다. 테스트가 네 개 한도를 봅니다(`scripts/lib/content.test.mjs`).
+  - 데이터 층 줄은 저장소(PostgreSQL, MySQL, MongoDB, Redis)만 둡니다. Supabase는 Lotto의 PostgreSQL을 둔 곳이고, Prisma는 저장소에 접근하는 ORM이라 서비스별 줄에만 나옵니다.
+  - Supabase와 MongoDB는 Lotto 코드의 `@supabase/supabase-js`, `mongoose`로 확인했습니다.
+  - 서비스마다 그 서비스만의 일을 보여 주는 기술도 서비스별 줄에만 싣습니다. ProWith 조직도를 그리는 D3.js, Recueve·ProWith의 다국어 응답(nestjs-i18n), Lotto의 실시간 알림(SSE), Recueve 워커가 영상 자막을 뽑는 yt-dlp입니다. 넷 다 이력서 항목에 나옵니다.
+  - 서비스별 줄도 360 폭에서 한 줄(약 47자)에 들어가야 합니다. 세 칸이 가장 긴 줄에 맞춰 높이를 잡으므로, 한 줄만 넘쳐도 휴대폰 첫 화면이 세 줄만큼 길어집니다. 그래서 Recharts(ProWith 화면 줄이 57자)와 상태 관리, 폼, 테스트 도구 같은 라이브러리는 넣지 않았습니다.
+- 서비스 목록의 세 칸은 세 서비스의 기술 줄을 모두 보이지 않게 겹쳐, 가장 긴 줄에 맞춘 같은 높이를 잡습니다. 1280에서 Lotto 데이터 줄만 두 줄이 되자 Lotto 칸의 주소가 다른 두 칸보다 내려가서 맞췄습니다([비교판](design/stack-source/data-layer-board-1280.png)).
+- 층 글자는 360 폭에서도 한 줄에 들어가야 합니다. 지금 가장 긴 줄은 AI 층(39자)입니다. 그래서 TanStack Query, nginx처럼 핵심이지만 길이를 넘기는 기술은 층 줄에 넣지 않았습니다.
 - 지금 표에서는 어느 층을 눌러도 흐려지는 서비스가 없습니다. 흐림 동작은 데이터가 바뀔 때를 위해 남깁니다.
 
 워커 층은 API와 데이터 사이에 둡니다. 요청에 바로 답하는 서버와 뒤에서 오래 도는 작업을 나눠 설계한다는 점이 층의 순서로 드러나게 하기 위해서입니다. Redis는 큐의 저장소로도 쓰지만 캐시와 인증 토큰에도 쓰므로 데이터 층에 둡니다.
