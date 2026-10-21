@@ -17,6 +17,9 @@ layers:
         usedBy: [recueve, prowith, lotto-ai]
       - name: shadcn/ui
         usedBy: [recueve, prowith, lotto-ai]
+      - name: D3.js
+        usedBy: [prowith]
+        detailOnly: true
   - name: API
     items:
       - name: NestJS
@@ -25,10 +28,19 @@ layers:
         usedBy: [recueve, prowith, lotto-ai]
       - name: TypeScript
         usedBy: [recueve, prowith, lotto-ai]
+      - name: nestjs-i18n
+        usedBy: [recueve, prowith]
+        detailOnly: true
+      - name: SSE
+        usedBy: [lotto-ai]
+        detailOnly: true
   - name: 워커
     items:
       - name: BullMQ
         usedBy: [recueve]
+      - name: yt-dlp
+        usedBy: [recueve]
+        detailOnly: true
       - name: Cron
         usedBy: [prowith]
       - name: Lambda

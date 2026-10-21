@@ -23,12 +23,20 @@ const config = {
     Tailwind: [{ dep: "tailwindcss" }],
     // shadcn/ui는 패키지가 아니라 컴포넌트를 복사해 쓰는 방식이라, 설정 파일로 확인한다.
     "shadcn/ui": [{ file: name("components\\.json") }],
+    // 조직도 같은 시각화
+    "D3.js": [{ dep: "d3" }, { dep: "d3-org-chart" }],
     // API: 서버 프레임워크. Node.js는 패키지 매니페스트가 있으면 그 런타임에서 돈다고 본다
     NestJS: [{ dep: "@nestjs/core" }],
     "Node.js": [{ file: name("package\\.json") }],
     TypeScript: [{ dep: "typescript" }],
+    // NestJS 서버의 다국어 응답
+    "nestjs-i18n": [{ dep: "nestjs-i18n" }],
+    // 서버가 연결을 열어 두고 알림을 밀어 주는 응답 형식
+    SSE: [{ file: name("[^/]+\\.(ts|tsx|js|mjs)"), text: line("text/event-stream") }],
     // 워커: 큐 패키지
     BullMQ: [{ dep: "bullmq" }],
+    // 워커 이미지에 설치해 영상 자막을 뽑는 명령줄 도구
+    "yt-dlp": [{ file: name("Dockerfile[^/]*"), text: line("yt-dlp") }],
     // API 서버 안에서 도는 예약 작업
     Cron: [{ dep: "@nestjs/schedule" }],
     // Lambda 함수의 핸들러 타입
