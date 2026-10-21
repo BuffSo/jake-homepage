@@ -12,7 +12,7 @@ export type ServiceItem = {
   line: string;
   href: string;
   domain: string;
-  /** 층마다 쓴 기술 줄. 모두 보이지 않게 겹쳐 가장 높은 줄의 자리를 미리 잡는다. */
+  /** 세 서비스가 층마다 쓴 기술 줄 전부. 모두 보이지 않게 겹쳐 가장 높은 줄의 자리를 미리 잡으므로 세 칸이 같은 높이다. */
   techLines: string[];
 };
 
