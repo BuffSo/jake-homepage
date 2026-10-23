@@ -87,7 +87,7 @@ sections:
   work:
     label: WORK
     title: 운영 중인 서비스
-    intro: 지금 열어 보실 수 있는 서비스 세 개입니다.
+    intro: 설명보다 직접 보는 게 빠릅니다. 세 서비스 모두 지금 접속할 수 있습니다.
   ai:
     label: AI
     title: AI로 일하는 방식
