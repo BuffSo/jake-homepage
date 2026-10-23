@@ -5,7 +5,7 @@ import { Hero } from "@/components/home/hero";
 import { ProfileJsonLd } from "@/components/home/profile-json-ld";
 import { ServiceCards } from "@/components/home/service-cards";
 
-// 홈 (F1, docs/02-ia.md 홈). 첫 화면 → 운영 중인 서비스 → AI로 일하는 방식 → About 순서다.
+// 홈 (F1, docs/02-ia.md 홈). 첫 화면 → 혼자 끝까지 만든 서비스 → AI로 일하는 방식 → About 순서다.
 export default function Home() {
   return (
     <>
