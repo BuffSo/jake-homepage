@@ -90,7 +90,7 @@ function ScrollCue() {
       <svg aria-hidden="true" viewBox="0 0 12 12" className="size-3">
         <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      <span className="sr-only">운영 중인 서비스로 내려가기</span>
+      <span className="sr-only">혼자 끝까지 만든 서비스로 내려가기</span>
     </a>
   );
 }

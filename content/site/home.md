@@ -86,7 +86,7 @@ layers:
 sections:
   work:
     label: WORK
-    title: 운영 중인 서비스
+    title: 혼자 끝까지 만든 서비스
     intro: 설명보다 직접 보는 게 빠릅니다. 세 서비스 모두 지금 접속할 수 있습니다.
   ai:
     label: AI
@@ -126,4 +126,6 @@ sources:
 층을 고치면 npm run check:stack을 로컬에서 돌린다. 기술마다 코드에서 찾는 표지는 scripts/stack.config.mjs에 있다.
 서비스의 이력서·포트폴리오 항목에 이름이 나오는 기술은 그 서비스에 반드시 표시한다(scripts/lib/content.test.mjs).
 sources의 문장은 동기화한 이력서와 포트폴리오에 그대로 있어야 한다 (scripts/lib/content.test.mjs).
+서비스 섹션 제목의 "혼자"는 본인이 확인한 사실이다(2026-10-23, ADR-0003). 포트폴리오에는 Recueve 상세에만 "혼자 맡아"가 있고,
+ProWith는 프리랜서 프로젝트, GENYS Lotto AI는 개인 프로젝트로 적혀 있다. 세 서비스 모두 다른 개발자 없이 만들었다.
 -->

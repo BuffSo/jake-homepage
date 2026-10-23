@@ -11,7 +11,7 @@ import type { ProjectSlug } from "./content";
 /** /work 챕터의 캡처 */
 export const PROJECT_IMAGES: Record<ProjectSlug, StaticImageData> = { recueve, prowith, "lotto-ai": lotto };
 
-/** 홈 "운영 중인 서비스" 카드의 캡처 */
+/** 홈 "혼자 끝까지 만든 서비스" 카드의 캡처 */
 export const CARD_IMAGES: Record<ProjectSlug, StaticImageData> = {
   recueve: recueveCard,
   prowith: prowithCard,

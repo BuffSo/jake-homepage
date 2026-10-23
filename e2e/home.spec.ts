@@ -302,7 +302,7 @@ test.describe("첫 화면", () => {
 
   test("서비스 세 개가 번호, 이름, 라이브 링크로 있다", async ({ page }) => {
     await page.goto("/");
-    const items = page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("listitem");
+    const items = page.getByRole("list", { name: "혼자 끝까지 만든 서비스" }).getByRole("listitem");
     await expect(items).toHaveCount(projects.length);
     for (const [i, project] of projects.entries()) {
       const item = items.nth(i);
@@ -318,7 +318,7 @@ test.describe("첫 화면", () => {
   test("서비스 목록과 연락 링크가 스크롤 없이 첫 화면에 들어온다", async ({ page }) => {
     await page.goto("/");
     const height = page.viewportSize()!.height;
-    for (const name of ["운영 중인 서비스", "연락"]) {
+    for (const name of ["혼자 끝까지 만든 서비스", "연락"]) {
       const box = await page.getByRole("list", { name }).first().boundingBox();
       expect(box!.y + box!.height, name).toBeLessThanOrEqual(height);
     }
@@ -333,7 +333,7 @@ test.describe("기술 층 강조", () => {
   const layer = home.layers.find((l) => new Set(projects.map((p) => techs(l, p).join())).size === projects.length)!;
   // 그 층의 기술을 하나도 안 쓰는 서비스가 있어야 흐려지는 서비스가 생긴다. 지금 데이터에는 없다.
   const dimLayer = home.layers.find((l) => projects.some((p) => techs(l, p).length === 0));
-  const serviceItems = (page: Page) => page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("listitem");
+  const serviceItems = (page: Page) => page.getByRole("list", { name: "혼자 끝까지 만든 서비스" }).getByRole("listitem");
 
   // 강조색 토큰(#rrggbb)을 계산된 색 표기(rgb(r, g, b))로 바꾼다.
   async function accentColor(page: Page) {
@@ -376,7 +376,7 @@ test.describe("기술 층 강조", () => {
     test.skip(testInfo.project.name !== "mobile", "마우스가 없는 화면만 탭으로 고정한다");
     await page.goto("/");
     const button = layerButton(page, layer);
-    const band = page.getByRole("list", { name: "운영 중인 서비스" });
+    const band = page.getByRole("list", { name: "혼자 끝까지 만든 서비스" });
     const before = (await band.boundingBox())!.height;
     await expect(button).toHaveAttribute("aria-pressed", "false");
 
@@ -424,7 +424,7 @@ test.describe("기술 층 강조", () => {
   test("여섯 층 모두 서비스마다 그 층에서 쓴 기술이 보이고, 목록 높이가 바뀌지 않는다", async ({ page }, testInfo) => {
     const mobile = testInfo.project.name === "mobile";
     await page.goto("/");
-    const band = page.getByRole("list", { name: "운영 중인 서비스" });
+    const band = page.getByRole("list", { name: "혼자 끝까지 만든 서비스" });
     const before = (await band.boundingBox())!.height;
     for (const target of home.layers) {
       await show(page, target, mobile);
@@ -439,7 +439,7 @@ test.describe("기술 층 강조", () => {
     test.skip(testInfo.project.name === "mobile", "데스크톱 폭 확인");
     await page.setViewportSize({ width: 1024, height: 800 });
     await page.goto("/");
-    const band = page.getByRole("list", { name: "운영 중인 서비스" });
+    const band = page.getByRole("list", { name: "혼자 끝까지 만든 서비스" });
     const before = (await band.boundingBox())!.height;
     for (const target of home.layers) {
       await show(page, target, false);
@@ -519,20 +519,20 @@ test.describe("기술 층 강조", () => {
 });
 
 test.describe("첫 화면 아래 SCROLL 표시", () => {
-  test("첫 화면 안에 보이고, 누르면 운영 중인 서비스로 내려간다", async ({ page }) => {
+  test("첫 화면 안에 보이고, 누르면 혼자 끝까지 만든 서비스로 내려간다", async ({ page }) => {
     await page.goto("/");
     const cue = page.getByRole("link", { name: /^SCROLL/ });
     await expect(cue).toBeInViewport();
     await cue.click();
     await expect(page).toHaveURL(/#work$/);
-    await expect(page.getByRole("heading", { level: 2, name: "운영 중인 서비스" })).toBeInViewport();
+    await expect(page.getByRole("heading", { level: 2, name: "혼자 끝까지 만든 서비스" })).toBeInViewport();
   });
 });
 
 test.describe("아래 섹션", () => {
   test("서비스 카드 세 장에 화면, 제목, 서비스 링크가 있고 첫 화면 목록이 카드를 가리킨다", async ({ page }) => {
     await page.goto("/");
-    const section = page.getByRole("region", { name: "운영 중인 서비스" });
+    const section = page.getByRole("region", { name: "혼자 끝까지 만든 서비스" });
     const cards = section.getByRole("article");
     await expect(cards).toHaveCount(projects.length);
     for (const [i, project] of projects.entries()) {
@@ -549,7 +549,7 @@ test.describe("아래 섹션", () => {
 
     // 첫 화면 목록의 이름을 누르면 해당 카드로 내려간다
     const first = projects[0];
-    await page.getByRole("list", { name: "운영 중인 서비스" }).getByRole("link", { name: first.title, exact: true }).click();
+    await page.getByRole("list", { name: "혼자 끝까지 만든 서비스" }).getByRole("link", { name: first.title, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`#${first.slug}$`));
     await expect(cards.first()).toBeInViewport();
   });
