@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { SiteAnalytics } from "@/components/site-analytics";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SITE_URL, pageMetadata } from "@/lib/site-meta";
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         {children}
         <SiteFooter />
+        <SiteAnalytics />
       </body>
     </html>
   );
