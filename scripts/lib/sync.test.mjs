@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, describe, test } from "node:test";
 import {
+  appendSection,
   applyTransforms,
   buildOutputs,
   dropLine,
@@ -119,6 +120,23 @@ describe("replaceLine", () => {
   test("맞는 줄이 없거나 두 줄 이상이면 멈춘다", () => {
     assert.throws(() => replaceLine("본문", "- 옛 문구", "- 새 문구"), SyncError);
     assert.throws(() => replaceLine("- 옛 문구 1\n- 옛 문구 2", "- 옛 문구", "- 새 문구"), SyncError);
+  });
+});
+
+describe("appendSection", () => {
+  test("글 끝에 구분선과 절을 붙이고, 끝의 빈 줄 수와 관계없이 같은 결과를 낸다", () => {
+    const want = "## 강의\n\n- 특강\n\n---\n\n## 자격증\n\n- 자격 하나\n";
+    assert.equal(appendSection("## 강의\n\n- 특강\n", "## 자격증", "- 자격 하나"), want);
+    assert.equal(appendSection("## 강의\n\n- 특강\n\n\n", "## 자격증", "- 자격 하나\n"), want);
+  });
+
+  test("같은 제목이 이미 있으면 멈춘다", () => {
+    assert.throws(() => appendSection("## 자격증\n\n- 자격 하나\n", "## 자격증", "- 자격 둘"), SyncError);
+  });
+
+  test("본문이 없으면 멈춘다", () => {
+    assert.throws(() => appendSection("본문\n", "## 자격증", ""), SyncError);
+    assert.throws(() => appendSection("본문\n", "## 자격증"), SyncError);
   });
 });
 
