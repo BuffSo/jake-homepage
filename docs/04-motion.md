@@ -28,7 +28,7 @@
 |---|---|
 | 화면 | Next.js, React, Tailwind, shadcn/ui (층 줄에 싣지 않음: D3.js) |
 | API | NestJS, Node.js, TypeScript (층 줄에 싣지 않음: nestjs-i18n, SSE) |
-| 워커 | BullMQ, Cron, Lambda, EventBridge (층 줄에 싣지 않음: yt-dlp) |
+| 워커 | BullMQ, Cron, Lambda, EventBridge (층 줄에 싣지 않음: yt-dlp, Python) |
 | 데이터 | PostgreSQL, MySQL, MongoDB, Redis (층 줄에 싣지 않음: Supabase, Prisma) |
 | 인프라 | AWS, Docker, Vercel, GitHub Actions |
 | AI | Claude Code, MCP, Claude API, Gemini |
@@ -39,7 +39,7 @@
 |---|---|---|---|
 | 화면 | Next.js · React · Tailwind · shadcn/ui | Next.js · React · Tailwind · shadcn/ui · D3.js | Next.js · React · Tailwind · shadcn/ui |
 | API | NestJS · Node.js · TypeScript · nestjs-i18n | NestJS · Node.js · TypeScript · nestjs-i18n | Node.js · TypeScript · SSE |
-| 워커 | BullMQ · yt-dlp | Cron | Lambda · EventBridge |
+| 워커 | BullMQ · yt-dlp | Cron | Lambda · EventBridge · Python |
 | 데이터 | MySQL · Redis · Prisma | PostgreSQL · Prisma | PostgreSQL · Supabase · MongoDB · Redis · Prisma |
 | 인프라 | AWS · Docker · Vercel · GitHub Actions | AWS · Docker · Vercel · GitHub Actions | AWS · Vercel |
 | AI | Claude Code · MCP · Claude API · Gemini | Claude Code · MCP | Claude Code |

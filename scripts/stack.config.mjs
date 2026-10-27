@@ -43,6 +43,8 @@ const config = {
     Lambda: [{ dep: "@types/aws-lambda" }],
     // 예약 규칙은 배포 스크립트가 만든다.
     EventBridge: [{ file: name("[^/]+\\.sh"), text: line("EventBridge") }],
+    // 서비스 코드가 예측 스크립트를 python3로 실행한다. .py 파일만으로 보면 서비스 밖의 작업 스크립트까지 잡힌다
+    Python: [{ file: name("[^/]+\\.(ts|tsx|js|mjs)"), text: line("['\"`]python3?['\"`]") }],
     // 데이터: DB 종류는 Prisma 스키마의 provider로, Redis와 ORM은 클라이언트 패키지로 본다
     PostgreSQL: [{ file: name("schema\\.prisma"), text: line('provider\\s*=\\s*"postgresql"') }],
     MySQL: [{ file: name("schema\\.prisma"), text: line('provider\\s*=\\s*"mysql"') }],

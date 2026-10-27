@@ -89,10 +89,19 @@ export function replaceLine(text, prefix, replacement) {
   return lines.join("\n");
 }
 
+// 원본에서 빠졌지만 사이트에 남길 절을 글 끝에 덧붙인다. 원본처럼 구분선(---) 뒤에 제목과 본문을 둔다.
+// 원본에 같은 제목이 돌아오면 이 규칙을 지워야 하므로 멈춘다.
+export function appendSection(text, heading, body) {
+  if (typeof body !== "string" || !body.trim()) throw new SyncError(`"${heading}" 규칙에 덧붙일 본문(body)이 없습니다`);
+  if (text.split("\n").some((l) => l.trim() === heading)) throw new SyncError(`"${heading}" 절이 이미 원본에 있습니다`);
+  return `${text.replace(/\n+$/, "")}\n\n---\n\n${heading}\n\n${body.replace(/\n+$/, "")}\n`;
+}
+
 const TRANSFORMS = {
   "drop-table-column": { run: (text, t) => dropTableColumn(text, t.header), target: (t) => t.header },
   "drop-line": { run: (text, t) => dropLine(text, t.startsWith), target: (t) => t.startsWith },
   "replace-line": { run: (text, t) => replaceLine(text, t.startsWith, t.with), target: (t) => t.startsWith },
+  "append-section": { run: (text, t) => appendSection(text, t.heading, t.body), target: (t) => t.heading },
 };
 
 function transformOf(t) {
