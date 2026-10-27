@@ -47,6 +47,9 @@ layers:
         usedBy: [lotto-ai]
       - name: EventBridge
         usedBy: [lotto-ai]
+      - name: Python
+        usedBy: [lotto-ai]
+        detailOnly: true
   - name: 데이터
     items:
       - name: PostgreSQL
