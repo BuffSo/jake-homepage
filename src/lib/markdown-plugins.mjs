@@ -168,3 +168,40 @@ export function rehypeGroupTitles() {
   };
   return (tree) => walk(tree);
 }
+
+/**
+ * 인라인 코드만 늘어선 문단을 칩 목록(ul.md-chips)으로 바꾼다 (rehype).
+ * 이력서의 스킬 줄과 프로젝트 스택 줄이다. 기술 이름 목록이라 /work의 스택 칩과 같은 모양으로 그린다(globals.css .md-chips).
+ * 문장 안의 코드처럼 다른 글과 섞인 코드는 그대로 둔다.
+ * logos(이름 → SVG path, src/lib/tech-logos.mjs)에 있는 이름은 칩 앞에 단색 로고를 넣는다. 이름 끝의 버전 숫자는 떼고 찾는다.
+ * 로고는 aria-hidden이라 화면 낭독기는 이름만 읽는다.
+ */
+export function rehypeChipLists({ logos = {} } = {}) {
+  const text = (node) => (node.type === "text" ? node.value : (node.children ?? []).map(text).join(""));
+  const logo = (name) => {
+    const d = logos[name] ?? logos[name.replace(/\s+\d[\d.]*$/, "")];
+    if (!d) return [];
+    const path = { type: "element", tagName: "path", properties: { d }, children: [] };
+    return [{ type: "element", tagName: "svg", properties: { className: ["md-chip-logo"], viewBox: "0 0 24 24", ariaHidden: "true" }, children: [path] }];
+  };
+  const blank = (node) => node.type === "text" && !node.value.trim();
+  const isChips = (node) => {
+    if (node.type !== "element" || node.tagName !== "p") return false;
+    const kids = node.children.filter((c) => !blank(c));
+    return kids.length > 0 && kids.every((c) => c.type === "element" && c.tagName === "code");
+  };
+  const walk = (node) => {
+    (node.children ?? []).forEach((child, i) => {
+      if (!isChips(child)) return walk(child);
+      node.children[i] = {
+        type: "element",
+        tagName: "ul",
+        properties: { className: ["md-chips"] },
+        children: child.children
+          .filter((c) => !blank(c))
+          .map((code) => ({ type: "element", tagName: "li", properties: {}, children: [...logo(text(code).trim()), ...code.children] })),
+      };
+    });
+  };
+  return (tree) => walk(tree);
+}
