@@ -10,6 +10,7 @@ import {
   buildOutputs,
   dropLine,
   dropTableColumn,
+  insertBefore,
   MANIFEST,
   replaceLine,
   sameContent,
@@ -137,6 +138,30 @@ describe("appendSection", () => {
   test("본문이 없으면 멈춘다", () => {
     assert.throws(() => appendSection("본문\n", "## 자격증", ""), SyncError);
     assert.throws(() => appendSection("본문\n", "## 자격증"), SyncError);
+  });
+});
+
+describe("insertBefore", () => {
+  const INTRO = "## 자기소개\n\n**[핵심 역량]**\n\n- 역량 하나\n\n※ 각주\n";
+
+  test("기준 줄 앞에 묶음과 빈 줄을 끼우고, body 끝의 빈 줄 수와 관계없이 같은 결과를 낸다", () => {
+    const want = "## 자기소개\n\n**[핵심 역량]**\n\n- 역량 하나\n\n**[강점]**\n\n강점 하나\n강점 둘\n\n※ 각주\n";
+    assert.equal(insertBefore(INTRO, "※ 각주", "**[강점]**\n\n강점 하나\n강점 둘"), want);
+    assert.equal(insertBefore(INTRO, "※ 각주", "**[강점]**\n\n강점 하나\n강점 둘\n\n"), want);
+  });
+
+  test("기준 줄이 없거나 둘 이상이면 멈춘다", () => {
+    assert.throws(() => insertBefore(INTRO, "※ 없는 줄", "**[강점]**"), SyncError);
+    assert.throws(() => insertBefore(`${INTRO}※ 각주 둘\n`, "※ 각주", "**[강점]**"), SyncError);
+  });
+
+  test("끼울 묶음의 이름표가 이미 원본에 있으면 멈춘다", () => {
+    assert.throws(() => insertBefore(INTRO, "※ 각주", "**[핵심 역량]**\n\n- 역량 둘"), SyncError);
+  });
+
+  test("본문이 없으면 멈춘다", () => {
+    assert.throws(() => insertBefore(INTRO, "※ 각주", "  \n"), SyncError);
+    assert.throws(() => insertBefore(INTRO, "※ 각주"), SyncError);
   });
 });
 
