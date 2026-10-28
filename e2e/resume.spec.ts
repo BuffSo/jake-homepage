@@ -36,6 +36,17 @@ test("브라우저 제목과 이름(h1), 한 줄 소개가 있다", async ({ pag
   await expect(page.getByText(resume.tagline, { exact: true })).toBeVisible();
 });
 
+test("머리는 화면에서 한 줄 소개를, 인쇄에서는 이름을 더 크게 그린다", async ({ page }) => {
+  // docs/03-design.md F4 머리(2026-10-28). 화면은 이 페이지가 처음 전하는 말에 크기를 두고, 종이에는 사이트 헤더가 없어 이름을 크게 둔다.
+  await page.goto("/resume");
+  const size = (l: Locator) => l.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  const name = page.getByRole("heading", { level: 1 });
+  const tagline = page.getByText(resume.tagline, { exact: true });
+  expect(await size(tagline)).toBeGreaterThan(await size(name));
+  await page.emulateMedia({ media: "print" });
+  expect(await size(name)).toBeGreaterThan(await size(tagline));
+});
+
 test("가로 스크롤이 생기지 않는다", async ({ page }) => {
   await page.goto("/resume");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
