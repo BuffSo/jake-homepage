@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { rehypeDropStyle, rehypeHeadingIds, rehypeReviews, rehypeStackTables, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
+import { rehypeDropStyle, rehypeGroupTitles, rehypeHeadingIds, rehypeReviews, rehypeStackTables, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
 
 // 원문 마크다운 플러그인 (src/lib/markdown-plugins.mjs). 사이트와 같은 react-markdown으로 그려 HTML을 본다.
 
@@ -128,5 +128,29 @@ describe("rehypeStackTables", () => {
   test("여러 행에 세 칸 이하인 표(수상)는 그대로 둔다", () => {
     const md = table(["연도", "수상명", "수여기관"], [["2011", "상", "기관"], ["2012", "상", "기관"]]);
     assert.equal(stacked(md), render(md));
+  });
+});
+
+describe("rehypeGroupTitles", () => {
+  const grouped = (md) => render(md, { remark: [remarkSoftBreaks], rehype: [rehypeGroupTitles] });
+  const titles = (html) => [...html.matchAll(/<p class="md-group"><strong>(.*?)<\/strong><\/p>/g)].map((m) => m[1]);
+
+  test("굵은 글씨만 있는 줄 바로 뒤에 목록이 오면 묶음 제목으로 표시한다 (빈 줄이 있어도 없어도)", () => {
+    const html = grouped(["**사업 기획**", "- 하나", "", "**서비스 개발**", "", "1. 둘"].join("\n"));
+    assert.deepEqual(titles(html), ["사업 기획", "서비스 개발"]);
+  });
+
+  test("굵은 글씨 뒤에 글이 있거나, 다음이 인용이나 문단이면 표시하지 않는다", () => {
+    const md = ["**풀스택 엔지니어** | 2021.03", "- 하나", "", "**Peer Review**", "", "> 인용", "", "**이름**", "", "문단"].join("\n");
+    assert.doesNotMatch(grouped(md), /md-group/);
+  });
+
+  test("자기소개의 대괄호 이름표는 뒤에 목록이 와도 표시하지 않는다", () => {
+    assert.doesNotMatch(grouped("**[핵심 역량]**\n\n- 하나"), /md-group/);
+  });
+
+  test("목록 안의 문단도 같은 기준으로 본다 (기타 경력의 회사 줄은 굵은 글씨 뒤에 글이 있다)", () => {
+    const html = grouped(["- **1998.07 ~ 2003.04** 회사", "", "  - 하나", "", "- **묶음**", "", "  - 둘"].join("\n"));
+    assert.deepEqual(titles(html), ["묶음"]);
   });
 });

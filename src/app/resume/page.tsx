@@ -32,6 +32,7 @@ export default function ResumePage() {
         <MarkdownText
           className="md-resume mt-10 max-w-[47.5rem] lg:mt-16 print:mt-[1.125rem] print:max-w-none print:border-t print:border-line-soft print:pt-[1.125rem]"
           breaks
+          groupTitles
           headingIds={headingIds}
           reviews={page.reviews}
           stackTables
