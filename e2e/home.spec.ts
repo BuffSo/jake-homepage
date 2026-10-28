@@ -32,7 +32,7 @@ const home = read("content/site/home.md") as {
   lines: string[];
   contact: { email: string; github: string };
   layers: Layer[];
-  about: { title: string; reviewsTitle: string; reviews: { quote: string; by: string; href: string }[] };
+  about: { title: string; body: string[]; reviewsTitle: string; reviews: { quote: string; by: string; href: string }[] };
 };
 const readDir = <T extends { order: number }>(dir: string) =>
   readdirSync(dir)
@@ -575,6 +575,13 @@ test.describe("아래 섹션", () => {
   test("About에 소개, 동료 평가, 이력서와 연락 링크가 있다", async ({ page }) => {
     await page.goto("/");
     const section = page.getByRole("region", { name: home.about.title });
+    for (const paragraph of home.about.body) {
+      // 문단 안의 \n은 <br>로 그린다
+      const lines = paragraph.split("\n");
+      const p = section.locator("p", { hasText: lines[0] });
+      for (const line of lines) await expect(p).toContainText(line);
+      await expect(p.locator("br")).toHaveCount(lines.length - 1);
+    }
     for (const review of home.about.reviews) await expect(section.getByText(`“${review.quote}”`)).toBeVisible();
     await expect(section.getByRole("link", { name: "이력서 보기" })).toHaveAttribute("href", "/resume");
     await expect(section.getByRole("link", { name: home.contact.email })).toHaveAttribute("href", `mailto:${home.contact.email}`);

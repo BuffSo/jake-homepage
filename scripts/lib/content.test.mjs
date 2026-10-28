@@ -50,6 +50,16 @@ test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대�
   }
 });
 
+test("홈 About 본문은 문단 목록이다", () => {
+  // about.tsx가 문단마다 <p>로 그린다. 한 줄 문자열로 돌아가면 문단이 사라진다.
+  assert.ok(Array.isArray(home.about.body), "about.body는 문단 목록이어야 합니다");
+  for (const paragraph of home.about.body) {
+    assert.ok(typeof paragraph === "string", "문단은 글이어야 합니다");
+    // 문단 안의 \n은 줄바꿈으로 그린다. 빈 줄이 끼면 <br>이 겹친다.
+    for (const line of paragraph.split("\n")) assert.ok(line.trim(), `빈 줄이 있습니다: ${JSON.stringify(paragraph)}`);
+  }
+});
+
 test("홈 About의 동료 평가 링크는 이력서에서 같은 문장이 든 Peer Review 상자로 간다", () => {
   // 글이 원문의 상자에 있는지는 빌드가 본다(rehypeReviews). 여기서는 두 글의 짝이 맞는지만 본다.
   // 홈에서 줄인 문장은 끝에 …를 붙이고, 이력서 쪽에는 … 앞까지만 둔다.

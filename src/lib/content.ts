@@ -39,7 +39,8 @@ export type Home = {
   about: {
     label: string;
     title: string;
-    body: string;
+    /** 문단마다 한 항목. 개발 경력, 경영 경험과 그 덕분에 얻은 것, 지금 순서다. 문단 안의 \n은 줄을 바꿔 그린다(2026-10-28) */
+    body: string[];
     reviewsTitle: string;
     /** 동료 평가 세 줄. 줄인 문장은 끝에 …를 붙인다. href는 이력서의 그 프로젝트 Peer Review 상자다 */
     reviews: { quote: string; by: string; href: string }[];
