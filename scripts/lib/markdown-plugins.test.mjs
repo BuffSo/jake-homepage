@@ -4,7 +4,16 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { rehypeDropStyle, rehypeGroupTitles, rehypeHeadingIds, rehypeReviews, rehypeStackTables, remarkSoftBreaks } from "../../src/lib/markdown-plugins.mjs";
+import {
+  rehypeChipLists,
+  rehypeDropStyle,
+  rehypeGroupTitles,
+  rehypeHeadingIds,
+  rehypeReviews,
+  rehypeStackTables,
+  remarkSoftBreaks,
+} from "../../src/lib/markdown-plugins.mjs";
+import { TECH_LOGOS } from "../../src/lib/tech-logos.mjs";
 
 // 원문 마크다운 플러그인 (src/lib/markdown-plugins.mjs). 사이트와 같은 react-markdown으로 그려 HTML을 본다.
 
@@ -152,5 +161,39 @@ describe("rehypeGroupTitles", () => {
   test("목록 안의 문단도 같은 기준으로 본다 (기타 경력의 회사 줄은 굵은 글씨 뒤에 글이 있다)", () => {
     const html = grouped(["- **1998.07 ~ 2003.04** 회사", "", "  - 하나", "", "- **묶음**", "", "  - 둘"].join("\n"));
     assert.deepEqual(titles(html), ["묶음"]);
+  });
+});
+
+describe("rehypeChipLists", () => {
+  const logos = { "Next.js": "M0 0h24v24H0z", NestJS: "M1 1h22v22H1z" };
+  const chips = (md) => render(md, { remark: [remarkSoftBreaks], rehype: [[rehypeChipLists, { logos }]] });
+  const items = (html) => [...html.matchAll(/<li>(.*?)<\/li>/g)].map((m) => m[1].replace(/<svg.*?<\/svg>/, ""));
+
+  test("인라인 코드만 늘어선 문단을 칩 목록으로 바꾼다", () => {
+    const html = chips("`NestJS` `Next.js` `Redis`");
+    assert.match(html, /^<ul class="md-chips">/);
+    assert.deepEqual(items(html), ["NestJS", "Next.js", "Redis"]);
+    assert.doesNotMatch(html, /<code>/);
+  });
+
+  test("글과 섞인 코드는 문단 그대로 둔다", () => {
+    const html = chips("설정은 `next.config.ts`에 둡니다");
+    assert.doesNotMatch(html, /md-chips/);
+    assert.match(html, /<code>next.config.ts<\/code>/);
+  });
+
+  test("아는 이름에는 로고를 넣고, 끝의 버전 숫자는 떼고 찾는다", () => {
+    const html = chips("`Next.js 16` `NestJS`");
+    const svgs = [...html.matchAll(/<svg class="md-chip-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="([^"]+)"><\/path><\/svg>/g)].map((m) => m[1]);
+    assert.deepEqual(svgs, [logos["Next.js"], logos.NestJS]);
+    assert.deepEqual(items(html), ["Next.js 16", "NestJS"]);
+  });
+
+  test("모르는 이름은 로고 없이 글자만 그린다", () => {
+    assert.equal(chips("`BullMQ` `SSE`").includes("<svg"), false);
+  });
+
+  test("이력서 로고 데이터는 모두 path 명령만 담는다 (따옴표나 태그가 섞이지 않는다)", () => {
+    for (const [name, d] of Object.entries(TECH_LOGOS)) assert.match(d, /^[Mm][\d.\s,a-zA-Z-]+$/, name);
   });
 });

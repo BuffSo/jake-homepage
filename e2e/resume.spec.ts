@@ -227,3 +227,18 @@ test("캡처를 남긴다 (라이트, 다크, 인쇄)", async ({ page }) => {
   await page.emulateMedia({ media: "print", colorScheme: "light" });
   await page.screenshot({ path: capturePath(page, "resume-print"), fullPage: true });
 });
+
+test("기술 이름만 늘어선 줄은 단색 로고가 든 칩 목록으로 보인다", async ({ page }) => {
+  // rehypeChipLists (docs/03-design.md F4). 원문에서 인라인 코드만 늘어선 줄(스킬, 프로젝트 스택)의 수와 이름을 그대로 센다.
+  const lines = [...resume.body.matchAll(/^(?:`[^`]+`[ \t]*)+$/gm)].map((m) => [...m[0].matchAll(/`([^`]+)`/g)].map((x) => x[1]));
+  expect(lines.length).toBeGreaterThan(0);
+  await page.goto("/resume");
+  const lists = page.locator(".md-resume .md-chips");
+  await expect(lists).toHaveCount(lines.length);
+  for (const [i, names] of lines.entries()) {
+    await expect(lists.nth(i).getByRole("listitem")).toHaveText(names);
+  }
+  const logos = page.locator(".md-resume .md-chip-logo");
+  expect(await logos.count()).toBeGreaterThan(0);
+  expect(await logos.evaluateAll((els) => els.every((el) => el.getAttribute("aria-hidden") === "true"))).toBe(true);
+});
