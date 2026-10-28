@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import { ButtonLink } from "@/components/button-link";
 import { getHome } from "@/lib/content";
 
@@ -16,10 +17,18 @@ export function About() {
       <h2 id="about-title" className="text-[1.875rem] leading-[1.25] font-extrabold tracking-[-0.025em] lg:text-5xl lg:leading-[1.2]">
         {about.title}
       </h2>
-      {/* 문단은 생각 하나씩이다: 개발 경력, 경영 경험과 그 덕분에 얻은 것, 지금 (docs/02-ia.md 홈 4) */}
+      {/* 문단은 생각 하나씩이다: 개발 경력, 경영 경험과 그 덕분에 얻은 것, 지금 (docs/02-ia.md 홈 4).
+          문단 안에서 문장은 줄을 바꿔 시작한다(\n → <br>). */}
       <div className="flex max-w-[48.75rem] flex-col gap-4 text-base leading-[1.7] lg:gap-5 lg:text-xl">
         {about.body.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
+          <p key={paragraph}>
+            {paragraph.split("\n").map((line, i) => (
+              <Fragment key={line}>
+                {i > 0 && <br />}
+                {line}
+              </Fragment>
+            ))}
+          </p>
         ))}
       </div>
       {/* 팀 프로젝트 동료 평가 세 줄. 출처는 이력서에서 그 프로젝트의 Peer Review 상자로 간다(resume-page.md의 reviews) */}
