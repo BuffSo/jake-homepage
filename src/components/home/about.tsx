@@ -16,7 +16,12 @@ export function About() {
       <h2 id="about-title" className="text-[1.875rem] leading-[1.25] font-extrabold tracking-[-0.025em] lg:text-5xl lg:leading-[1.2]">
         {about.title}
       </h2>
-      <p className="max-w-[48.75rem] text-base leading-[1.7] lg:text-xl">{about.body}</p>
+      {/* 문단은 생각 하나씩이다: 개발 경력, 경영 경험과 그 덕분에 얻은 것, 지금 (docs/02-ia.md 홈 4) */}
+      <div className="flex max-w-[48.75rem] flex-col gap-4 text-base leading-[1.7] lg:gap-5 lg:text-xl">
+        {about.body.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+      </div>
       {/* 팀 프로젝트 동료 평가 세 줄. 출처는 이력서에서 그 프로젝트의 Peer Review 상자로 간다(resume-page.md의 reviews) */}
       <div className="mt-1 flex max-w-[48.75rem] flex-col gap-3 lg:mt-2 lg:gap-4">
         <h3 className="text-xs text-subtle">{about.reviewsTitle}</h3>
