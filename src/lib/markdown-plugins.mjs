@@ -141,3 +141,30 @@ export function rehypeStackTables() {
     walk(tree);
   };
 }
+
+/**
+ * 굵은 글씨만 있는 줄 바로 뒤에 목록이 오면 그 줄을 목록의 묶음 제목(.md-group)으로 표시한다 (rehype).
+ * 이력서 업무 경험의 "사업 기획", "서비스 개발" 같은 줄이다. 모양은 globals.css의 .md-group이 정한다.
+ * 자기소개의 대괄호 이름표([핵심 역량] 등)는 고르지 않는다. 같은 절의 다른 이름표 뒤에는 문단이 와서 간격을 맞춘다.
+ * 굵은 글씨 뒤에 글이 더 있는 줄(직함과 기간, 기타 경력의 회사 줄)도 고르지 않는다.
+ */
+export function rehypeGroupTitles() {
+  const text = (node) => (node.type === "text" ? node.value : (node.children ?? []).map(text).join(""));
+  const blank = (node) => node.type === "text" && !node.value.trim();
+  const isTitle = (node) => {
+    if (node.type !== "element" || node.tagName !== "p") return false;
+    const kids = node.children.filter((c) => !blank(c));
+    return kids.length === 1 && kids[0].type === "element" && kids[0].tagName === "strong" && !text(node).trim().startsWith("[");
+  };
+  const walk = (node) => {
+    const kids = (node.children ?? []).filter((c) => !blank(c));
+    kids.forEach((child, i) => {
+      const next = kids[i + 1];
+      if (isTitle(child) && next?.type === "element" && ["ul", "ol"].includes(next.tagName)) {
+        child.properties = { ...child.properties, className: [...(child.properties?.className ?? []), "md-group"] };
+      }
+      walk(child);
+    });
+  };
+  return (tree) => walk(tree);
+}

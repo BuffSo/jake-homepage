@@ -97,11 +97,30 @@ export function appendSection(text, heading, body) {
   return `${text.replace(/\n+$/, "")}\n\n---\n\n${heading}\n\n${body.replace(/\n+$/, "")}\n`;
 }
 
+// 원본에서 빠졌지만 사이트에 남길 묶음을 prefix로 시작하는 줄 앞에 끼운다. 엉뚱한 곳에 끼우지 않도록 그 줄은 한 줄이어야 한다.
+// body의 첫 줄(이름표)이 원본에 돌아오면 이 규칙을 지워야 하므로 멈춘다.
+export function insertBefore(text, prefix, body) {
+  if (typeof body !== "string" || !body.trim()) throw new SyncError(`"${prefix}" 규칙에 끼울 본문(body)이 없습니다`);
+  const lines = text.split("\n");
+  const label = body.trim().split("\n")[0].trim();
+  if (lines.some((l) => l.trim() === label)) throw new SyncError(`"${label}" 줄이 이미 원본에 있습니다`);
+  const hits = lines.flatMap((l, i) => (l.trimStart().startsWith(prefix) ? [i] : []));
+  if (hits.length !== 1) {
+    throw new SyncError(`"${prefix}"로 시작하는 줄이 한 줄이어야 하는데 ${hits.length}줄입니다`);
+  }
+  lines.splice(hits[0], 0, ...body.replace(/\n+$/, "").split("\n"), "");
+  return lines.join("\n");
+}
+
 const TRANSFORMS = {
   "drop-table-column": { run: (text, t) => dropTableColumn(text, t.header), target: (t) => t.header },
   "drop-line": { run: (text, t) => dropLine(text, t.startsWith), target: (t) => t.startsWith },
   "replace-line": { run: (text, t) => replaceLine(text, t.startsWith, t.with), target: (t) => t.startsWith },
   "append-section": { run: (text, t) => appendSection(text, t.heading, t.body), target: (t) => t.heading },
+  "insert-before": {
+    run: (text, t) => insertBefore(text, t.startsWith, t.body),
+    target: (t) => String(t.body ?? "").trim().split("\n")[0],
+  },
 };
 
 function transformOf(t) {

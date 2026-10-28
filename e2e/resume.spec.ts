@@ -109,6 +109,31 @@ test("원문의 줄바꿈이 살아 있다 (강점 다섯 줄)", async ({ page }
   await expect(strengths.locator("br")).toHaveCount(4);
 });
 
+test("자기소개의 핵심 역량은 이름표 바로 아래 목록으로 보인다", async ({ page }) => {
+  // 원문에서 이름표 뒤 빈 줄 다음의 불릿 줄을 센다
+  const bullets = resume.body.match(/^\*\*\[핵심 역량\]\*\*\n\n((?:- .*\n)+)/m)![1].trim().split("\n");
+  await page.goto("/resume");
+  const label = page.locator(".md-resume p", { hasText: "[핵심 역량]" });
+  await expect(label.locator("xpath=following-sibling::*[1]")).toHaveJSProperty("tagName", "UL");
+  await expect(label.locator("xpath=following-sibling::ul[1]/li")).toHaveCount(bullets.length);
+});
+
+test("업무 경험의 묶음 제목은 바로 아래 목록에 붙는다", async ({ page }) => {
+  await page.goto("/resume");
+  const titles = await page.locator(".md-resume .md-group").evaluateAll((els) =>
+    els.map((el) => ({
+      next: el.nextElementSibling?.tagName,
+      above: parseFloat(getComputedStyle(el).marginTop),
+      below: parseFloat(getComputedStyle(el).marginBottom),
+    })),
+  );
+  expect(titles.length).toBeGreaterThan(0);
+  for (const title of titles) {
+    expect(["UL", "OL"]).toContain(title.next);
+    expect(title.below).toBeLessThan(title.above);
+  }
+});
+
 test("동료 평가(Peer Review)는 다른 인용과 구분되는 상자로 보인다", async ({ page }) => {
   await page.goto("/resume");
   const boxes = page.locator(".md-resume .md-review");

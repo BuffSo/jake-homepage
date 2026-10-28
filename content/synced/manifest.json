@@ -1,6 +1,6 @@
 {
   "source": {
-    "commit": "563c0299d6a75f2cf30dce78c33589c1c56378de",
+    "commit": "cac7604f4ac77b3d5b87bcea39db249b5a685e00",
     "dirty": false
   },
   "files": [
@@ -8,7 +8,7 @@
       "output": "resume.md",
       "transforms": [
         "drop-table-column 전화번호",
-        "drop-line ※ 태니지먼트",
+        "insert-before **[본인의 강점]**",
         "append-section ## 자격증"
       ]
     },
