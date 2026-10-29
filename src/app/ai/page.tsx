@@ -6,6 +6,7 @@ import { CaseEntry } from "@/components/ai/case-entry";
 import { BackToTop } from "@/components/back-to-top";
 import { SectionHead } from "@/components/section-head";
 import { getAiCase, getAiPage, getAiWorks, getHome } from "@/lib/content";
+import { nextPage } from "@/lib/nav";
 import { pageMetadata } from "@/lib/site-meta";
 
 // AI로 일하는 방식 (docs/02-ia.md /ai). 머리 → 사례 입구 → 목차 → 네 묶음. 머리 글은 홈 섹션과 같다.
@@ -59,7 +60,7 @@ export default function AiPage() {
           </section>
         ))}
       </main>
-      <BackToTop target="page-index" />
+      <BackToTop target="page-index" next={nextPage("/ai")} />
     </>
   );
 }
