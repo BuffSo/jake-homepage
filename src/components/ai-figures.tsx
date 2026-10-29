@@ -97,7 +97,7 @@ export function SiteSteps({ className = "" }: { className?: string }) {
 
 const REVIEWERS = ["규칙", "버그", "변경 이력", "이전 PR", "코드 주석"];
 
-/** 코드 리뷰 스킬: PR → 리뷰어 여섯(스펙 축은 점선) → 점수 */
+/** PR 리뷰 스킬: PR → 리뷰어 여섯(스펙 축은 점선) → 점수 */
 export function ReviewFlow({ className = "" }: { className?: string }) {
   const cell = `${BOX} h-6 text-[0.6875rem] font-semibold lg:h-[1.875rem] lg:text-xs`;
   return (
