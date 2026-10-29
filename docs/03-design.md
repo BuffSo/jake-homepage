@@ -267,7 +267,7 @@
 | 항목 | 모바일 | 데스크톱 (`lg`, 64rem 이상) |
 |---|---|---|
 | 모양 | 맨 위로와 같음(테두리 버튼, `bg` 바탕, `shadow-sm`), 높이 2.75rem | 높이 2.5rem |
-| 글자 | 다음 페이지 제목과 →, 0.8125rem | 같음 |
+| 글자 | 다음 페이지 제목과 →, 0.8125rem. 이력서 끝은 "처음으로 →" | 같음 |
 | 자리 | 맨 위로 바로 왼쪽, 사이 0.5rem. 오른쪽과 아래는 맨 위로 줄을 따름 | 같음 |
 | 보이는 때 | 끝까지 내려 맨 위로가 푸터 위에 멈출 때 | 같음 |
 
@@ -283,9 +283,13 @@
 |---|---|---|---|
 | ![맨 위로 오른쪽에 다음 버튼을 둔 시안](design/next-page/options-order-right-375.png) | ![맨 위로 왼쪽에 다음 버튼을 둔 시안](design/next-page/options-order-left-375.png) | ![홈 끝의 포트폴리오 버튼](design/next-page/options-label-ko-375.png) | ![홈 끝의 Work 버튼](design/next-page/options-label-en-375.png) |
 
-| `/work` 데스크톱 | `/work` 모바일 | `/work` 모바일 다크 | 홈 끝 (모바일) | `/ai` 끝 (모바일) | `/resume` 끝 (모바일, 다음 없음) |
+| 이력서 끝: 버튼 없음 (처음 구현) | 이력서 끝: 처음으로 (고름) | 이력서 끝: 홈 |
+|---|---|---|
+| ![/resume 끝, 맨 위로만 있는 모습](design/next-page/options-restart-none-375.png) | ![/resume 끝의 처음으로 버튼](design/next-page/impl-resume-375.png) | ![/resume 끝의 홈 버튼 시안](design/next-page/options-restart-home-375.png) |
+
+| `/work` 데스크톱 | `/work` 모바일 | `/work` 모바일 다크 | 홈 끝 (모바일) | `/ai` 끝 (모바일) | `/resume` 끝 (모바일) |
 |---|---|---|---|---|---|
-| ![/work 끝의 다음 페이지 버튼](design/next-page/impl-work-1280.png) | ![/work 모바일 끝의 다음 페이지 버튼](design/next-page/impl-work-375.png) | ![/work 모바일 다크 끝의 다음 페이지 버튼](design/next-page/impl-work-375-dark.png) | ![홈 끝의 포트폴리오 버튼](design/next-page/impl-home-375.png) | ![/ai 끝의 이력서 버튼](design/next-page/impl-ai-375.png) | ![/resume 끝, 맨 위로만 있는 모습](design/next-page/impl-resume-375.png) |
+| ![/work 끝의 다음 페이지 버튼](design/next-page/impl-work-1280.png) | ![/work 모바일 끝의 다음 페이지 버튼](design/next-page/impl-work-375.png) | ![/work 모바일 다크 끝의 다음 페이지 버튼](design/next-page/impl-work-375-dark.png) | ![홈 끝의 포트폴리오 버튼](design/next-page/impl-home-375.png) | ![/ai 끝의 이력서 버튼](design/next-page/impl-ai-375.png) | ![/resume 끝의 처음으로 버튼](design/next-page/impl-resume-375.png) |
 
 ## 동료 평가에서 정한 값
 
