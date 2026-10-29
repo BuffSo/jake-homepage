@@ -8,8 +8,8 @@ import { capturePath, collectErrors } from "./helpers";
 // 기대값은 사이트 전용 글과, 포트폴리오 원문으로 만든 챕터에서 읽는다.
 
 type Project = { slug: string; order: number; title: string; liveUrl: string; liveLabel?: string; imageAlt: string };
-type Site = { slug: string; order: number; title: string; liveUrl: string; sourceUrl: string; imageAlt: string };
-type Chapter = { slug: string; head: { name: string; url: string; lead: string }; ai: { title: string } | null };
+type Site = { slug: string; order: number; title: string; liveUrl: string; sourceUrl: string; imageAlt: string; stack: string[] };
+type Chapter = { slug: string; head: { name: string; url: string; lead: string; stack: string[] }; ai: { title: string } | null };
 type Work = { title: string; sites: { title: string }; chapters: unknown[] };
 
 const read = (file: string) => parseFrontmatter(readFileSync(file, "utf8"), file).data;
@@ -143,6 +143,24 @@ test("이미지마다 대체 텍스트가 있고, 내려오면 불러온다", as
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
   }
+});
+
+test("스택 칩은 아는 이름 앞에 단색 로고를 넣는다", async ({ page }) => {
+  // StackChips (docs/03-design.md F2). 칩 이름은 챕터 원문과 사이트 글의 스택 그대로이고, 로고는 aria-hidden이다.
+  await page.goto("/work");
+  const lists = page.locator('ul[aria-label="스택"]');
+  const stacks = [...chapters.map((c) => c.head.stack), ...sites.map((s) => s.stack)];
+  await expect(lists).toHaveCount(stacks.length);
+  for (const [i, names] of stacks.entries()) {
+    await expect(lists.nth(i).getByRole("listitem")).toHaveText(names);
+  }
+  const logos = lists.locator("svg");
+  expect(await logos.count()).toBeGreaterThan(0);
+  expect(await logos.evaluateAll((els) => els.every((el) => el.getAttribute("aria-hidden") === "true"))).toBe(true);
+  // 버전이 붙은 이름도 로고를 찾고, 그림이 없는 이름(AWS)은 글자만 둔다
+  const chip = (name: string) => lists.getByRole("listitem").filter({ hasText: new RegExp(`^${name}$`) }).first();
+  await expect(chip("Next\\.js 16").locator("svg")).toHaveCount(1);
+  await expect(chip("AWS").locator("svg")).toHaveCount(0);
 });
 
 test("캡처를 남긴다 (라이트, 다크)", async ({ page }) => {

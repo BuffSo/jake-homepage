@@ -13,7 +13,7 @@ import {
   rehypeStackTables,
   remarkSoftBreaks,
 } from "../../src/lib/markdown-plugins.mjs";
-import { TECH_LOGOS } from "../../src/lib/tech-logos.mjs";
+import { TECH_LOGOS, techLogo } from "../../src/lib/tech-logos.mjs";
 
 // 원문 마크다운 플러그인 (src/lib/markdown-plugins.mjs). 사이트와 같은 react-markdown으로 그려 HTML을 본다.
 
@@ -193,7 +193,19 @@ describe("rehypeChipLists", () => {
     assert.equal(chips("`BullMQ` `SSE`").includes("<svg"), false);
   });
 
-  test("이력서 로고 데이터는 모두 path 명령만 담는다 (따옴표나 태그가 섞이지 않는다)", () => {
+  test("로고 데이터는 모두 path 명령만 담는다 (따옴표나 태그가 섞이지 않는다)", () => {
     for (const [name, d] of Object.entries(TECH_LOGOS)) assert.match(d, /^[Mm][\d.\s,a-zA-Z-]+$/, name);
+  });
+});
+
+describe("techLogo", () => {
+  test("이름 끝의 버전 숫자는 떼고 찾는다 (이력서와 /work 칩이 같이 쓴다)", () => {
+    assert.equal(techLogo("Next.js 16"), TECH_LOGOS["Next.js"]);
+    assert.equal(techLogo("Tailwind CSS 4"), TECH_LOGOS["Tailwind CSS"]);
+    assert.equal(techLogo("Three.js"), TECH_LOGOS["Three.js"]);
+  });
+
+  test("그림이 없는 이름은 undefined다", () => {
+    for (const name of ["AWS", "AWS Lambda", "Motion", "Playwright", "SSE"]) assert.equal(techLogo(name), undefined, name);
   });
 });
