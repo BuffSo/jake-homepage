@@ -10,8 +10,15 @@ import { buttonClass } from "./button-link";
 // 버튼이 다시 숨을 때 초점이 갈 곳을 잃지 않게 하기 위해서다. target에는 tabIndex={-1}을 붙여 둔다.
 // 자리는 sticky다. 스크롤하는 동안은 화면 아래에 붙고, 페이지 끝에서는 본문 아래 여백(푸터 위)에 멈춰 푸터 링크를 가리지 않는다.
 // next는 순서(src/lib/nav.ts)에서 다음 페이지다. 끝까지 내려 버튼이 멈출 때만 맨 위로 왼쪽에 보인다.
-// 맨 위로는 오른쪽 끝 자리 그대로라, 다음 버튼이 나타나도 밀리지 않는다. 마지막 페이지(이력서)는 next가 없다.
-export function BackToTop({ target, next }: { target: string; next?: { href: string; title: string } }) {
+// 맨 위로는 오른쪽 끝 자리 그대로라, 다음 버튼이 나타나도 밀리지 않는다.
+// 마지막 페이지(이력서)의 next는 처음(홈)으로 돌아가는 "처음으로"다(restart). 화면 읽기에는 "처음으로 (홈)"으로 읽힌다.
+export function BackToTop({
+  target,
+  next,
+}: {
+  target: string;
+  next: { href: string; title: string; restart?: boolean };
+}) {
   const [shown, setShown] = useState(false);
   const [atEnd, setAtEnd] = useState(false);
   const end = useRef<HTMLDivElement>(null);
@@ -35,11 +42,11 @@ export function BackToTop({ target, next }: { target: string; next?: { href: str
 
   useEffect(() => {
     // sticky 칸 바로 뒤의 높이 0인 표지가 화면에 들어오면 끝이다. sticky 칸이 제자리에 멈추는 때와 같다.
-    if (!next || !end.current) return;
+    if (!end.current) return;
     const observer = new IntersectionObserver((entries) => setAtEnd(entries.at(-1)!.isIntersecting));
     observer.observe(end.current);
     return () => observer.disconnect();
-  }, [next]);
+  }, []);
 
   const onClick = () => {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -51,13 +58,12 @@ export function BackToTop({ target, next }: { target: string; next?: { href: str
     <>
       <div className="sticky bottom-0 z-10 mx-auto h-0 w-full max-w-7xl print:hidden">
         <div className="absolute right-4 bottom-4 flex gap-2 md:right-16 lg:bottom-8">
-          {next && (
-            <Link href={next.href} hidden={!atEnd} className={buttonClass("outline", "bg-bg shadow-sm")}>
-              <span className="sr-only">다음 페이지: </span>
-              {next.title}
-              <span aria-hidden="true">→</span>
-            </Link>
-          )}
+          <Link href={next.href} hidden={!atEnd} className={buttonClass("outline", "bg-bg shadow-sm")}>
+            {!next.restart && <span className="sr-only">다음 페이지: </span>}
+            {next.title}
+            {next.restart && <span className="sr-only"> (홈)</span>}
+            <span aria-hidden="true">→</span>
+          </Link>
           <button
             type="button"
             hidden={!shown}
@@ -69,7 +75,7 @@ export function BackToTop({ target, next }: { target: string; next?: { href: str
           </button>
         </div>
       </div>
-      {next && <div ref={end} aria-hidden="true" />}
+      <div ref={end} aria-hidden="true" />
     </>
   );
 }
