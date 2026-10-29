@@ -5,6 +5,7 @@ import { Chapter } from "@/components/work/chapter";
 import { SiteCards } from "@/components/work/site-cards";
 import { WorkIndex } from "@/components/work/work-index";
 import { getProjects, getSites, getWork, getWorkChapters } from "@/lib/content";
+import { nextPage } from "@/lib/nav";
 import { pageMetadata } from "@/lib/site-meta";
 
 // 포트폴리오 (docs/02-ia.md /work). 머리 → 목차 → 서비스 챕터 → 의뢰받아 만든 사이트.
@@ -56,7 +57,7 @@ export default function WorkPage() {
         ))}
         <SiteCards head={work.sites} sites={sites} />
       </main>
-      <BackToTop target="page-index" />
+      <BackToTop target="page-index" next={nextPage("/work")} />
     </>
   );
 }

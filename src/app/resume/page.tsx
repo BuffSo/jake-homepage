@@ -6,6 +6,7 @@ import { MarkdownText } from "@/components/markdown";
 import { ResumeHead } from "@/components/resume/resume-head";
 import { ResumeIndex } from "@/components/resume/resume-index";
 import { getResume, getResumePage } from "@/lib/content";
+import { nextPage } from "@/lib/nav";
 import { pageMetadata } from "@/lib/site-meta";
 
 // 이력서 (docs/02-ia.md /resume). 머리 → 목차 → 원문 열 절 → 끝 사진. 원문 문장은 고치지 않는다.
@@ -49,7 +50,7 @@ export default function ResumePage() {
           className="mt-16 aspect-video w-full max-w-[30rem] rounded-[0.625rem] border border-line object-cover object-bottom lg:mt-24 lg:rounded-xl print:hidden"
         />
       </main>
-      <BackToTop target="page-index" />
+      <BackToTop target="page-index" next={nextPage("/resume")} />
     </>
   );
 }

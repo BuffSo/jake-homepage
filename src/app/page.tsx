@@ -4,6 +4,7 @@ import { AiCards } from "@/components/home/ai-cards";
 import { Hero } from "@/components/home/hero";
 import { ProfileJsonLd } from "@/components/home/profile-json-ld";
 import { ServiceCards } from "@/components/home/service-cards";
+import { nextPage } from "@/lib/nav";
 
 // 홈 (F1, docs/02-ia.md 홈). 첫 화면 → 운영 중인 서비스 → AI로 일하는 방식 → About 순서다.
 export default function Home() {
@@ -16,7 +17,7 @@ export default function Home() {
         <AiCards />
         <About />
       </main>
-      <BackToTop target="hero" />
+      <BackToTop target="hero" next={nextPage("/")} />
     </>
   );
 }

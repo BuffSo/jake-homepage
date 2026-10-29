@@ -2,18 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import avatar from "@/assets/jake-avatar.png";
+import { NAV } from "@/lib/nav";
 import { MobileMenu } from "./mobile-menu";
 import { CurrentNavLinks, NavLinks } from "./nav-links";
 
 // 헤더 (docs/02-ia.md 공통 요소). 모바일은 메뉴 아이콘으로 같은 항목을 화면 폭 패널로 연다(mobile-menu.tsx).
 // 홈 링크는 실명 대신 프로필 그림과 별칭 "Jake"다. 이름은 제목, 푸터, About, 이력서에 둔다.
 // 그림은 GitHub 프로필의 일러스트에서 얼굴을 잘라 저장소에 둔 것이다(방문마다 GitHub에서 불러오지 않는다).
-// note는 모바일 메뉴에서 이름 옆에 보이는 페이지 제목이다. 각 페이지의 브라우저 제목 앞부분과 같아야 한다(e2e/home.spec.ts가 확인).
-const NAV = [
-  { label: "Work", href: "/work", note: "포트폴리오" },
-  { label: "AI", href: "/ai", note: "AI로 일하는 방식" },
-  { label: "Resume", href: "/resume", note: "이력서" },
-];
+// 메뉴 항목과 순서는 src/lib/nav.ts에 있다. 페이지 끝의 다음 페이지 버튼도 같은 순서를 쓴다.
 
 export function SiteHeader() {
   // relative: 모바일 메뉴 패널이 헤더 바로 아래에 화면 폭 전체로 붙는 기준이다.
