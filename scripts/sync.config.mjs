@@ -40,13 +40,13 @@ const config = {
       ],
     },
     {
-      source: "포트폴리오/소재희-포트폴리오.md",
+      source: "서류함/포트폴리오/소재희-포트폴리오.md",
       output: "portfolio.md",
       transforms: [],
     },
     // AI 도구 활용 사례(/ai/case). PDF가 아니라 PDF를 만드는 세 파일을 읽는다 (ADR-0003 원본 추가).
     {
-      source: "AI활용사례/ProWith.json",
+      source: "서류함/AI활용사례/ProWith.json",
       output: "ai-case.json",
       transforms: [
         {
@@ -58,13 +58,13 @@ const config = {
       ],
     },
     {
-      source: "AI활용사례/ProWith.txt",
+      source: "서류함/AI활용사례/ProWith.txt",
       output: "ai-case.txt",
       transforms: [],
     },
     {
       // 그림은 바이트 그대로 옮긴다. 민감정보 검사가 글자만 읽으므로 가져올 때 눈으로 확인한다.
-      source: "AI활용사례/ProWith-4컷.png",
+      source: "서류함/AI활용사례/ProWith-4컷.png",
       output: "ai-case.png",
       transforms: [],
     },
