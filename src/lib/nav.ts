@@ -7,8 +7,8 @@ export const NAV = [
   { label: "Resume", href: "/resume", note: "이력서" },
 ];
 
-/** 순서에서 다음 페이지. 홈 다음은 첫 메뉴이고, 마지막 페이지(이력서)는 다음이 없다. */
+/** 순서에서 다음 페이지. 홈 다음은 첫 메뉴이고, 마지막 페이지(이력서) 다음은 처음(홈)이다. */
 export function nextPage(href: string) {
   const next = NAV[NAV.findIndex((item) => item.href === href) + 1];
-  return next && { href: next.href, title: next.note };
+  return next ? { href: next.href, title: next.note } : { href: "/", title: "처음으로", restart: true };
 }

@@ -2,17 +2,18 @@ import { expect, test, type Page } from "@playwright/test";
 
 // 맨 위로 가기 버튼과 다음 페이지 버튼 확인 (docs/02-ia.md 공통 요소). 네 페이지에서 본다.
 // target은 버튼이 보이는 기준이자 누른 뒤 초점이 가는 곳이다. 홈은 첫 화면, 나머지는 목차다.
-// next는 헤더 순서의 다음 페이지다. 마지막 페이지(이력서)는 없다.
+// next는 헤더 순서의 다음 페이지 버튼이다. 마지막 페이지(이력서)는 처음(홈)으로 돌아가는 "처음으로"다.
+// next.name은 화면 읽기 프로그램이 읽는 이름이다.
 
 const PAGES = [
-  { path: "/", target: "hero", name: "첫 화면", subject: "첫 화면이", next: { title: "포트폴리오", href: "/work" } },
-  { path: "/work", target: "page-index", name: "목차", subject: "목차가", next: { title: "AI로 일하는 방식", href: "/ai" } },
-  { path: "/ai", target: "page-index", name: "목차", subject: "목차가", next: { title: "이력서", href: "/resume" } },
-  { path: "/resume", target: "page-index", name: "목차", subject: "목차가", next: undefined },
+  { path: "/", target: "hero", name: "첫 화면", subject: "첫 화면이", next: { name: "다음 페이지: 포트폴리오", href: "/work" } },
+  { path: "/work", target: "page-index", name: "목차", subject: "목차가", next: { name: "다음 페이지: AI로 일하는 방식", href: "/ai" } },
+  { path: "/ai", target: "page-index", name: "목차", subject: "목차가", next: { name: "다음 페이지: 이력서", href: "/resume" } },
+  { path: "/resume", target: "page-index", name: "목차", subject: "목차가", next: { name: "처음으로 (홈)", href: "/" } },
 ];
 
 const button = (page: Page) => page.getByRole("button", { name: "맨 위로" });
-const nextLink = (page: Page) => page.getByRole("link", { name: /^다음 페이지: / });
+const endLink = (page: Page, name: string) => page.getByRole("link", { name, exact: true });
 
 /** target이 화면 위로 다 사라질 만큼 내린다 */
 async function scrollPast(page: Page, target: string) {
@@ -50,40 +51,39 @@ for (const { path, target, name, subject, next } of PAGES) {
     expect(box.y + box.height).toBeLessThanOrEqual(footer.y);
   });
 
-  if (next) {
-    test(`${path}: 다음 페이지 버튼은 끝까지 내렸을 때만 맨 위로 왼쪽에 보인다`, async ({ page }) => {
-      await page.goto(path);
-      await expect(nextLink(page)).toBeHidden();
-      // 길잡이를 지난 중간에서는 맨 위로만 보인다
-      await scrollPast(page, target);
-      await expect(button(page)).toBeVisible();
-      await expect(nextLink(page)).toBeHidden();
-      await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
-      await expect(nextLink(page)).toBeVisible();
-      await expect(nextLink(page)).toHaveAccessibleName(`다음 페이지: ${next.title}`);
-      await expect(nextLink(page)).toHaveAttribute("href", next.href);
-      const link = (await nextLink(page).boundingBox())!;
-      const top = (await button(page).boundingBox())!;
-      const footer = (await page.locator("body > footer").boundingBox())!;
-      expect(link.x + link.width).toBeLessThanOrEqual(top.x);
-      expect(link.y + link.height).toBeLessThanOrEqual(footer.y);
-    });
-  } else {
-    test(`${path}: 마지막 페이지라 끝에서도 다음 페이지 버튼이 없다`, async ({ page }) => {
-      await page.goto(path);
-      await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
-      await expect(button(page)).toBeVisible();
-      await expect(nextLink(page)).toHaveCount(0);
-    });
-  }
+  test(`${path}: "${next.name}" 버튼은 끝까지 내렸을 때만 맨 위로 왼쪽에 보인다`, async ({ page }) => {
+    const link = endLink(page, next.name);
+    await page.goto(path);
+    await expect(link).toBeHidden();
+    // 길잡이를 지난 중간에서는 맨 위로만 보인다
+    await scrollPast(page, target);
+    await expect(button(page)).toBeVisible();
+    await expect(link).toBeHidden();
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", next.href);
+    const box = (await link.boundingBox())!;
+    const top = (await button(page).boundingBox())!;
+    const footer = (await page.locator("body > footer").boundingBox())!;
+    expect(box.x + box.width).toBeLessThanOrEqual(top.x);
+    expect(box.y + box.height).toBeLessThanOrEqual(footer.y);
+  });
 }
 
 test("다음 페이지 버튼을 누르면 그 페이지로 간다", async ({ page }) => {
   await page.goto("/work");
   await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
-  await nextLink(page).click();
+  await endLink(page, "다음 페이지: AI로 일하는 방식").click();
   await expect(page).toHaveURL(/\/ai$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("AI로 일하는 방식");
+});
+
+test("이력서 끝의 처음으로를 누르면 홈으로 간다", async ({ page }) => {
+  await page.goto("/resume");
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await endLink(page, "처음으로 (홈)").click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator("#hero")).toBeVisible();
 });
 
 test("움직임 줄이기가 아니어도 맨 위까지 올라간다", async ({ page }) => {
