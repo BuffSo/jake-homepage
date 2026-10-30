@@ -97,6 +97,7 @@
 | 표 글자 | 0.875rem | 0.9375rem |
 | 코드 블록 글자 | 0.75rem | 0.8125rem |
 | 스택 칩 높이 | 1.625rem | 1.75rem |
+| 스택 칩 로고 (2026-10-29) | 이력서 칩과 같음: 앞에 단색 로고 0.8125rem, 글자와 사이 0.3125rem | 같음 |
 | 사이트 카드 캡처 높이 | 12.5rem | 18.75rem |
 
 - 본문의 h3(예: "AI 활용 - 제품")은 위에 `line-soft` 선을 그어 프로젝트 본문과 나눕니다.
@@ -107,6 +108,15 @@
 - 챕터 머리의 grid는 열을 `grid-cols-1`(`minmax(0, 1fr)`)로 고정합니다. 열을 정하지 않으면 캡처의 원래 폭(Recueve는 575px)만큼 열이 늘어나 모바일에 가로 스크롤이 생깁니다.
 - 본문의 인라인 코드 바탕은 `line-soft` 70%입니다. 스토리보드의 연한 회색은 `surface`와 거의 같아 "보시는 방법" 상자 안에서 보이지 않았습니다.
 - 스토리보드는 역할과 기간 줄, "보시는 방법" 머리글을 고정폭으로 그렸습니다. 구현에서는 한글 문장을 고정폭으로 쓰지 않는다는 원칙(위 "타이포그래피")에 따라 본문 글꼴로 씁니다. 고정폭은 머리글의 영문, 번호, 도메인, 스택 칩에만 씁니다.
+- 스택 칩 앞에 단색 로고를 넣습니다(2026-10-29). 이력서 칩(아래 "F4에서 정한 값"의 칩 목록)과 같은 로고, 같은 크기입니다. 같은 프로젝트의 스택이 /work와 /resume에서 같은 모양으로 보이게 하기 위해서입니다.
+  - 두 칩 목록은 같은 목록(`src/lib/tech-logos.mjs`)과 같은 찾기 규칙(`techLogo`, 끝의 버전 숫자는 떼고 찾음)을 씁니다. /work에만 있는 Tailwind CSS, Three.js, Resend, Vitest를 이때 목록에 더했습니다.
+  - 그림이 없는 이름(Motion, Playwright, BullMQ, NextAuth.js, AWS, AWS Lambda, SSE)은 글자만 둡니다. /work 칩 24개 중 17개에 로고가 붙습니다.
+  - 칩이 조금 넓어져 모바일에서 칩 줄이 하나 늘 수 있습니다(Recueve는 두 줄에서 세 줄).
+  - 첫 화면 기술 층의 기술 이름에는 넣지 않습니다. 칩이 아니라 글자 줄이라 칩 모양을 맞출 대상이 아닙니다.
+
+| 전 (데스크톱, 사이트 카드) | 후 (데스크톱, 사이트 카드) | 전 (모바일, Recueve) | 후 (모바일, Recueve) | 후 (모바일 다크, AI TOOLS) |
+|---|---|---|---|---|
+| ![로고 없는 사이트 카드 스택 칩](design/work-chip-logos/before-1280.png) | ![로고가 든 사이트 카드 스택 칩](design/work-chip-logos/after-1280.png) | ![로고 없는 Recueve 스택 칩](design/work-chip-logos/before-375.png) | ![로고가 든 Recueve 스택 칩](design/work-chip-logos/after-375.png) | ![다크 모드의 AI TOOLS 스택 칩](design/work-chip-logos/after-375-dark.png) |
 
 ## F3에서 정한 값
 
@@ -165,7 +175,7 @@
   - 원문에서 인라인 코드만 늘어선 줄(스킬 네 줄, 프로젝트 스택 일곱 줄)은 기술 이름 목록이라 칩 목록(`ul`)으로 그립니다(`rehypeChipLists`). 코드 글자로 두면 옅은 회색 바탕이라 눈에 띄지 않았고, 모바일에서 "Claude / Code"처럼 이름이 두 줄로 갈렸습니다. 글과 섞인 코드는 그대로 둡니다.
   - 칩 모양은 /work 스택 칩과 같습니다. 같은 프로젝트의 스택이 두 페이지에서 같은 모양으로 보이게 하기 위해서입니다.
   - 칩 앞에 단색 로고를 넣습니다. 익숙한 기술은 글자보다 로고 모양으로 먼저 알아봅니다. 로고는 글자색(`currentColor`)으로 칠해 흑백과 강조색 하나라는 원칙을 지키고, 다크 모드에서도 그대로 보입니다. 로고는 장식이라 `aria-hidden`이고 화면 낭독기는 이름만 읽습니다.
-  - 로고 그림은 simple-icons 16.36.0(CC0-1.0)의 path를 `src/lib/tech-logos.mjs`로 옮겼습니다. 패키지는 더하지 않습니다. 그림이 없는 이름(i18n, Winston, BullMQ, SSE, NextAuth.js)과 simple-icons 15부터 그림이 빠진 AWS, AWS Lambda는 로고 없이 글자만 둡니다.
+  - 로고 그림은 simple-icons 16.36.0(CC0-1.0)의 path를 `src/lib/tech-logos.mjs`로 옮겼습니다. 패키지는 더하지 않습니다. 그림이 없는 이름(i18n, Winston, BullMQ, SSE, NextAuth.js)과 simple-icons 15부터 그림이 빠진 AWS, AWS Lambda는 로고 없이 글자만 둡니다. 2026-10-29부터 /work 스택 칩도 같은 목록과 찾기 규칙을 씁니다(위 "F2에서 정한 값").
   - 이력서 PDF처럼 브랜드색 배지(shields.io)도 비교했습니다. 쓰지 않은 이유는 셋입니다. 한 절에 브랜드색이 스무 가지 넘게 들어와 강조색이 묻히고, 다크 모드에서 검은 배지(Express, JWT, Next.js, GitHub)의 테두리가 사라지며, 외부 그림 서비스나 그림 파일이 필요합니다.
   - 한계: 글자로 된 로고(MySQL)는 0.8125rem에서 작은 얼룩처럼 보이고, TypeScript, JavaScript, CSS 로고는 꽉 찬 네모라 다른 로고보다 무겁습니다.
   - 인쇄 A4 쪽수는 바꾸기 전과 같은 8쪽입니다. 캡처는 [docs/design/resume-chips/](design/resume-chips/)에 있습니다.
