@@ -212,14 +212,18 @@ test("의뢰받아 만든 사이트 글은 카드에 필요한 값을 모두 갖
     assert.equal(`${data.slug}.md`, file);
     assert.equal(data.role, "외부 의뢰");
     assert.ok(Array.isArray(data.stack) && data.stack.length > 0, `${file}: stack 없음`);
-    assert.match(data.liveUrl, /^https:\/\//);
-    assert.match(data.sourceUrl, /^https:\/\/github\.com\//);
+    // 2026.10을 따옴표 없이 쓰면 YAML이 숫자로 읽어 2026.1이 된다
+    assert.match(String(data.period), /^\d{4}\.\d{2}/, `${file}: period 형식`);
+    assert.equal(data.sourceUrl, undefined, `${file}: 소스 링크는 싣지 않는다`);
+    // 사이트 링크가 없는 카드는 없는 이유를 쓴다
+    assert.ok(Boolean(data.liveUrl) !== Boolean(data.closed), `${file}: liveUrl과 closed 중 하나만`);
+    if (data.liveUrl) assert.match(data.liveUrl, /^https:\/\//);
   }
-  assert.deepEqual(sites.map((s) => s.data.order).sort(), [1, 2]);
+  assert.deepEqual(sites.map((s) => s.data.order).sort(), [1, 2, 3]);
 });
 
 test("Recueve와 Recoeve의 소스 저장소 링크는 싣지 않는다", () => {
-  const links = [...aiWorks.flatMap((w) => w.data.links).map((l) => l.href), ...sites.map((s) => s.data.sourceUrl)];
+  const links = aiWorks.flatMap((w) => w.data.links).map((l) => l.href);
   for (const href of links) assert.doesNotMatch(href, /github\.com\/[^/]+\/rec[ou]e?ve/i);
 });
 
