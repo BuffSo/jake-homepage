@@ -125,7 +125,7 @@ export type WorkChapter = {
   ai: { title: string; body: string } | null;
 };
 
-export type SiteSlug = "brainhouse" | "aitools";
+export type SiteSlug = "brainhouse" | "aitools" | "house9";
 
 export type Site = {
   slug: SiteSlug;
@@ -135,12 +135,18 @@ export type Site = {
   summary: string;
   workflow?: string;
   flow?: string;
+  /** 상자 안의 기술 설명 줄. 이름표와 글로 나눈다 */
+  notes?: { label: string; text: string }[];
   role: string;
   period: string;
   commits: string;
   stack: string[];
-  liveUrl: string;
+  /** 열어 볼 수 없는 사이트는 비우고, closed에 이유를 쓴다 */
+  liveUrl?: string;
+  closed?: string;
   imageAlt: string;
+  /** 데스크톱에서 두 칸을 차지하는 카드 */
+  wide?: boolean;
 };
 
 export type ResumePage = {
