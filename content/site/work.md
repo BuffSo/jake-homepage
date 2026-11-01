@@ -2,13 +2,13 @@
 label: WORK
 title: 포트폴리오
 intro: 직접 설계·개발·배포한 서비스 세 개입니다. 세 곳 모두 지금 열어보실 수 있습니다.
-introSite: 의뢰받아 만든 사이트 두 개도 함께 싣습니다.
+introSite: 의뢰받아 만든 사이트 세 개도 함께 싣습니다.
 sources:
   - 직접 설계·개발·배포한 서비스 세 개입니다. 세 곳 모두 지금 열어보실 수 있습니다.
 sites:
   label: SITES
   title: 의뢰받아 만든 사이트
-  intro: 회사 소개 사이트 두 곳을 의뢰받아 만들었습니다. 두 사이트 모두 소스를 공개 저장소에 두었습니다.
+  intro: 회사 소개 사이트 두 곳과 숙소 안내서 하나를 의뢰받아 만들었습니다.
 chapters:
   - slug: recueve
     detail: 4-1. Recueve

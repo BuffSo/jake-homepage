@@ -18,7 +18,6 @@ stack:
   - Vitest
   - Playwright
 liveUrl: https://aitoolz.kr
-sourceUrl: https://github.com/BuffSo/aitools
 imageAlt: AI TOOLS 사이트 첫 화면
 ---
 

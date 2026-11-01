@@ -203,9 +203,10 @@ describe("techLogo", () => {
     assert.equal(techLogo("Next.js 16"), TECH_LOGOS["Next.js"]);
     assert.equal(techLogo("Tailwind CSS 4"), TECH_LOGOS["Tailwind CSS"]);
     assert.equal(techLogo("Three.js"), TECH_LOGOS["Three.js"]);
+    assert.equal(techLogo("Zod"), TECH_LOGOS["Zod"]);
   });
 
   test("그림이 없는 이름은 undefined다", () => {
-    for (const name of ["AWS", "AWS Lambda", "Motion", "Playwright", "SSE"]) assert.equal(techLogo(name), undefined, name);
+    for (const name of ["AWS", "AWS Lambda", "Motion", "Playwright", "Service Worker", "SSE"]) assert.equal(techLogo(name), undefined, name);
   });
 });

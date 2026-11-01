@@ -8,7 +8,17 @@ import { capturePath, collectErrors } from "./helpers";
 // 기대값은 사이트 전용 글과, 포트폴리오 원문으로 만든 챕터에서 읽는다.
 
 type Project = { slug: string; order: number; title: string; liveUrl: string; liveLabel?: string; imageAlt: string };
-type Site = { slug: string; order: number; title: string; liveUrl: string; sourceUrl: string; imageAlt: string; stack: string[] };
+type Site = {
+  slug: string;
+  order: number;
+  title: string;
+  liveUrl?: string;
+  closed?: string;
+  notes?: { label: string; text: string }[];
+  imageAlt: string;
+  stack: string[];
+  wide?: boolean;
+};
 type Chapter = { slug: string; head: { name: string; url: string; lead: string; stack: string[] }; ai: { title: string } | null };
 type Work = { title: string; sites: { title: string }; chapters: unknown[] };
 
@@ -108,7 +118,7 @@ test("보시는 방법의 굵게 표시가 한글 조사 앞에서도 닫힌다"
   await expect(note.locator("strong").filter({ hasText: "DEMO Login" })).toHaveCount(1);
 });
 
-test("의뢰받아 만든 사이트 카드에 사이트 링크와 소스 링크가 있다", async ({ page }) => {
+test("의뢰받아 만든 작업 카드는 사이트 링크가 있거나 없는 이유를 쓰고, 소스 링크는 없다", async ({ page }) => {
   await page.goto("/work");
   const section = page.getByRole("region", { name: work.sites.title });
   const cards = section.getByRole("article");
@@ -117,9 +127,27 @@ test("의뢰받아 만든 사이트 카드에 사이트 링크와 소스 링크�
     const card = cards.nth(i);
     await expect(card.getByRole("heading", { level: 3 })).toHaveText(site.title);
     await expect(card.getByRole("img", { name: site.imageAlt })).toBeVisible();
-    await expect(card.getByRole("link", { name: /사이트 열기/ })).toHaveAttribute("href", site.liveUrl);
-    await expect(card.getByRole("link", { name: /소스 보기/ })).toHaveAttribute("href", site.sourceUrl);
+    if (site.liveUrl) {
+      await expect(card.getByRole("link", { name: /사이트 열기/ })).toHaveAttribute("href", site.liveUrl);
+    } else {
+      await expect(card.getByRole("link")).toHaveCount(0);
+      await expect(card.getByText(site.closed!)).toBeVisible();
+    }
   }
+  await expect(section.getByRole("link", { name: /소스 보기/ })).toHaveCount(0);
+});
+
+test("넓은 카드는 기술 설명 줄을 보여 주고, 데스크톱에서만 다른 카드보다 넓다", async ({ page }) => {
+  await page.goto("/work");
+  const guide = sites.find((s) => s.wide)!;
+  const cards = page.getByRole("region", { name: work.sites.title }).getByRole("article");
+  const card = cards.filter({ has: page.getByRole("heading", { name: guide.title }) });
+  for (const note of guide.notes!) await expect(card.getByText(note.text)).toBeVisible();
+
+  const width = async (locator: typeof card) => (await locator.boundingBox())!.width;
+  const [wide, other] = [await width(card), await width(cards.first())];
+  if (page.viewportSize()!.width >= 1024) expect(wide).toBeGreaterThan(other * 1.5);
+  else expect(wide).toBe(other);
 });
 
 test("첫 챕터 캡처만 바로 불러오고, 나머지 캡처는 내려올 때 불러온다", async ({ page }) => {

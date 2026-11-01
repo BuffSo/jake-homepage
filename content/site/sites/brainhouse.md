@@ -14,7 +14,6 @@ stack:
   - Three.js
   - Resend
 liveUrl: https://brainhouse.kr
-sourceUrl: https://github.com/BuffSo/brainhouse
 imageAlt: Brain House 사이트 첫 화면
 ---
 
