@@ -140,7 +140,6 @@ export type Site = {
   commits: string;
   stack: string[];
   liveUrl: string;
-  sourceUrl: string;
   imageAlt: string;
 };
 

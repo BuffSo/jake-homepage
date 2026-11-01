@@ -50,7 +50,6 @@ export function SiteCards({ head, sites }: { head: WorkPage["sites"]; sites: Sit
                 <ButtonLink href={site.liveUrl} variant="solid">
                   사이트 열기
                 </ButtonLink>
-                <ButtonLink href={site.sourceUrl}>소스 보기</ButtonLink>
               </div>
             </div>
           </article>
