@@ -239,13 +239,13 @@ test("저장소에서 세는 숫자는 실제 파일과 맞고, 자리 표시는
   }
 });
 
-test("Jake English 글은 만화 넷, 4컷 넷과 장 다섯이고, 숫자는 마지막 장에만 있다", () => {
+test("Jake English 글은 이야기 4컷과 앱 화면 4컷이 네 칸씩, 장이 다섯이고, 숫자는 마지막 장에만 있다", () => {
   const je = read("content/site/jake-english.md");
   for (const key of ["title", "subtitle", "description"]) assert.ok(je[key], `${key}가 없습니다`);
   assert.match(je.video.href, /^https:\/\/www\.youtube\.com\/watch\?v=[\w-]{11}$/);
   assert.ok(je.video.caption);
-  assert.equal(je.comic.length, 4);
-  for (const panel of je.comic) assert.ok(panel.caption);
+  assert.equal(je.story.length, 4);
+  for (const panel of je.story) assert.ok(panel.caption);
   assert.equal(je.panels.length, 4);
   for (const panel of je.panels) assert.ok(panel.caption);
   assert.equal(je.chapters.length, 5);

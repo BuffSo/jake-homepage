@@ -5,12 +5,12 @@ import { ButtonLink } from "@/components/button-link";
 import { ExternalLink } from "@/components/external-link";
 import { SectionHead } from "@/components/section-head";
 import { getHome, getJakeEnglish } from "@/lib/content";
-import { COMIC_IMAGES, FLOW_IMAGES, SLIDE_IMAGES, VIDEO_THUMB } from "@/lib/jake-english-images";
+import { FLOW_IMAGES, SLIDE_IMAGES, STORY_IMAGES, VIDEO_THUMB } from "@/lib/jake-english-images";
 import { pageMetadata } from "@/lib/site-meta";
 
-// Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상 → 4컷 만화 → 연습 흐름 → 본문 다섯 장 → 끝 링크 순서다.
-// 글은 사이트 전용 글(content/site/jake-english.md)이다. 그림은 공개한 소개 영상에서 가져왔고, 4컷 만화만 Gemini 앱으로 그렸다.
-// 그림의 대체 텍스트는 모두 비운다. 영상 썸네일은 링크 글이, 4컷 만화와 연습 흐름은 설명이, 슬라이드는 바로 아래 문단이 같은 내용을 말하기 때문이다(/ai/case와 같은 규칙).
+// Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상 → 이야기 4컷 → 연습 흐름 → 본문 다섯 장 → 끝 링크 순서다.
+// 글은 사이트 전용 글(content/site/jake-english.md)이다. 그림은 공개한 소개 영상에서 가져왔고, 이야기 4컷만 Gemini 앱으로 그렸다.
+// 그림의 대체 텍스트는 모두 비운다. 영상 썸네일은 링크 글이, 이야기 4컷과 연습 흐름은 설명이, 슬라이드는 바로 아래 문단이 같은 내용을 말하기 때문이다(/ai/case와 같은 규칙).
 // 목차가 없는 서브페이지라 /ai/case처럼 맨 위로 버튼과 다음 페이지 버튼은 두지 않는다.
 const je = getJakeEnglish();
 const { ai } = getHome().sections;
@@ -57,11 +57,11 @@ export default function JakeEnglishPage() {
         </span>
       </ExternalLink>
 
-      <section aria-labelledby="comic-title" className="border-t border-fg pt-7 lg:pt-10">
-        <h2 id="comic-title" className="mb-5 text-2xl font-extrabold tracking-[-0.02em] lg:mb-6 lg:text-[2rem]">
-          4컷 만화
+      <section aria-labelledby="story-title" className="border-t border-fg pt-7 lg:pt-10">
+        <h2 id="story-title" className="mb-5 text-2xl font-extrabold tracking-[-0.02em] lg:mb-6 lg:text-[2rem]">
+          이야기 4컷
         </h2>
-        <Panels images={COMIC_IMAGES} captions={je.comic} aspect="aspect-square" eager />
+        <Panels images={STORY_IMAGES} captions={je.story} aspect="aspect-square" eager />
       </section>
 
       <section aria-labelledby="flow-title" className="mt-14 border-t border-line pt-14 lg:mt-24 lg:pt-24">
@@ -109,7 +109,7 @@ export default function JakeEnglishPage() {
   );
 }
 
-// 번호와 설명이 붙은 그림 칸 2열 목록. 4컷 만화(정사각)와 연습 흐름(16:9)이 같이 쓴다. 첫 절의 그림은 eager로 불러온다.
+// 번호와 설명이 붙은 그림 칸 2열 목록. 이야기 4컷(정사각)과 연습 흐름(16:9)이 같이 쓴다. 첫 절의 그림은 eager로 불러온다.
 function Panels({
   images,
   captions,

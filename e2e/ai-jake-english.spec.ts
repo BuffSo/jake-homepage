@@ -10,7 +10,7 @@ const je = parseFrontmatter(readFileSync("content/site/jake-english.md", "utf8")
   title: string;
   subtitle: string;
   video: { href: string; caption: string };
-  comic: { caption: string }[];
+  story: { caption: string }[];
   panels: { caption: string }[];
   chapters: { title: string; body: string; metric?: { value: string; label: string } }[];
 };
@@ -42,18 +42,18 @@ test("영상 썸네일과 아래 한 줄이 유튜브로 가는 링크 하나다
   await expect(link.locator("img")).toHaveCount(1);
 });
 
-test("4컷 만화는 네 칸이고, 칸마다 번호와 설명이 있고, 연습 흐름보다 앞이다", async ({ page }) => {
+test("이야기 4컷은 네 칸이고, 칸마다 번호와 설명이 있고, 연습 흐름보다 앞이다", async ({ page }) => {
   await page.goto(PATH);
-  const comic = page.getByRole("region", { name: "4컷 만화" });
-  const items = comic.getByRole("listitem");
+  const story = page.getByRole("region", { name: "이야기 4컷" });
+  const items = story.getByRole("listitem");
   await expect(items).toHaveCount(4);
-  for (const [i, panel] of je.comic.entries()) {
+  for (const [i, panel] of je.story.entries()) {
     await expect(items.nth(i).locator("figcaption")).toHaveText(`${i + 1}${panel.caption}`);
     const box = await items.nth(i).locator("img").boundingBox();
     expect(Math.abs(box!.width / box!.height - 1)).toBeLessThan(0.02);
   }
   const order = await page.evaluate(() => {
-    const a = document.querySelector('[aria-labelledby="comic-title"]');
+    const a = document.querySelector('[aria-labelledby="story-title"]');
     const b = document.querySelector('[aria-labelledby="flow-title"]');
     return Boolean(a && b && a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
   });
