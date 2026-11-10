@@ -2,7 +2,7 @@
 
 > 정함: 2026-10-20 (커리어 저장소에서 PDF로 만든 AI 도구 활용 사례를 `/ai/case`로 실음), 2026-11-11 (공개한 영상으로 Jake English 페이지 `/ai/jake-english`를 만듦)
 > 코드: `scripts/sync.config.mjs`(사례 세 파일), `scripts/lib/sync.mjs`(그림 동기화), `src/lib/ai-case.mjs`(읽기와 칸 자르기), `src/components/ai/case-panel.tsx`, `src/components/ai/ai-entry.tsx`(`/ai` 맨 위 띠 둘이 같이 씀), `src/app/ai/case/page.tsx`, `src/app/ai/jake-english/page.tsx`, `src/lib/jake-english-images.ts`, `content/site/jake-english.md`, `src/assets/ai/jake-english/`
-> 확인: `e2e/ai-case.spec.ts`, `e2e/ai.spec.ts`의 사례 입구, `scripts/lib/ai-case.test.mjs`, `scripts/lib/sync.test.mjs`, `e2e/ai-jake-english.spec.ts`, `e2e/ai.spec.ts`의 두 입구, `scripts/lib/content.test.mjs`의 Jake English 글
+> 확인: `e2e/ai-case.spec.ts`, `scripts/lib/ai-case.test.mjs`, `scripts/lib/sync.test.mjs`, `e2e/ai-jake-english.spec.ts`, `e2e/ai.spec.ts`의 두 입구, `scripts/lib/content.test.mjs`의 Jake English 글
 > 캡처: [design/ai-case](../design/ai-case/), [design/ai-jake-english](../design/ai-jake-english/)
 
 다른 곳에서 만든 문서(PDF 같은 결과물)를 사이트 페이지로 옮길 때의 기준입니다. 사례가 늘거나 다른 사이트에서 같은 일을 할 때 따릅니다. 옮기며 겪은 문제도 함께 둡니다.
@@ -75,14 +75,15 @@
 | 파일 | 크기 | 만드는 법 |
 |---|---|---|
 | `video.jpg` | 1920×1080 | 영상 썸네일 원본(PNG)을 `ffmpeg -i <썸네일> -q:v 3 video.jpg` |
-| `flow-1.jpg`~`flow-4.jpg` | 1280×720 | 시연 영상의 폰 화면을 잘라 단계, 제목, 말풍선을 HTML로 다시 그려 찍은 4컷 칸. 칸 순서는 첫 화면, 대화 연습하기(상황 정하기), 자유 대화, 대화 연습하기(듣고 따라 말하기)입니다 |
+| `flow-1.jpg`~`flow-4.jpg` | 1280×720 | 시연 영상의 폰 화면을 잘라 단계, 제목, 말풍선을 HTML로 다시 그려 찍은 4컷 칸. 칸 순서는 첫 화면, 대화 연습하기(상황 정하기), 자유 대화, 대화 연습하기(듣고 따라 말하기)입니다. 만드는 법은 표 아래 첫 항목에 있습니다 |
 | `story-1.jpg`~`story-4.jpg` | 1200×1200 | Gemini 앱으로 칸마다 그린 정사각 그림을 1200×1200으로 줄입니다. 띠의 작은 그림도 이 파일을 씁니다 |
 | `slide-1.jpg`~`slide-4.jpg` | 1560×690 | 슬라이드 원본(HTML)을 1920×1080으로 다시 찍고, 제목 줄을 뺀 `crop=1560:690:40:230`을 네 장 모두 같은 자리에서 잘라 JPG로 저장합니다 |
 
+- 앱 화면 4컷(`flow-*.jpg`)은 이렇게 만들었습니다. 앱 시연 영상(1920×1080)에서 칸마다 고른 초의 프레임을 ffmpeg로 뽑고, 폰 화면을 (245, 35)에서 462×1012로 자릅니다. 칸은 1920×1080 HTML 한 쪽입니다. 배경은 #14161c, 폰은 왼쪽(x 245~707, y 35~1047)에 놓습니다. 단계 표시(#9679ff, 40px), 제목(#fed62c, 76px, 굵기 800), 말풍선 상자(#242830, 모서리 22px)를 두고, 상자 안에 화자 이름(라이언 등은 #68abff, 소희는 #5fd08a, 34px)과 대사(48px)를 씁니다. 글은 모두 `word-break: keep-all`입니다. 이 쪽을 Playwright로 1920×1080에 찍어 너비 1280의 JPG로 저장합니다. HTML 틀은 이 저장소에 두지 않았습니다.
 - 1장 슬라이드는 찍을 때만 "말할 때마다 바로 평가받는 앱"을 "말할 때마다 바로 짚어 주는 앱"으로 바꿉니다. 3장 슬라이드는 두 상자 제목을 "Claude Code로 한 것", "제가 정한 것"으로 바꾸고 아래 줄을 뺍니다.
 - 5장은 슬라이드 대신 큰 숫자입니다. 슬라이드 5/5는 오른쪽 인물 자리가 비어 있어 쓰지 않습니다.
 - 숫자를 다시 세려면 jake-english 저장소에서 `gh pr list --state merged`로 기간(2026-11-04부터 11-09까지, 한국 시각)의 머지 PR을 세고, 리뷰 코멘트가 달린 PR 수도 같은 기간 안에서 셉니다.
-- 새 그림을 더하면 `npm run check:units`와 다크 모드 캡처로 가장자리의 흰 화소를 봅니다.
+- 새 그림을 더하면 가장자리에 흰 화소가 없는지 봅니다. 이번에는 sharp로 칸 그림마다 네 모서리 화소를 읽었고(앱 화면 4컷의 모서리는 모두 칸 배경색 #14161c이고 흰색이 없었습니다), 이어서 다크 모드 캡처를 눈으로 확인했습니다. `npm run check:units`는 손으로 쓴 px 길이만 검사하므로 그림 가장자리는 잡지 못합니다.
 
 ### 겪은 문제와 주의할 점
 

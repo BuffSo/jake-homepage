@@ -98,7 +98,7 @@ video:
 panels:
   - caption: 앱을 열면 라이언이 인사하고, 오늘 무엇을 연습할지 묻습니다.
   - caption: 해 보고 싶은 상황을 직접 말하거나 쓰면 그 상황의 대본이 만들어집니다. 목록에서 고르거나 추천받을 수도 있습니다.
-  - caption: 자유 대화에서 말이 막히면 소희가 무엇을 묻는지 알려 주고, 답을 시작할 영어 첫마디를 줍니다.
+  - caption: 자유 대화에서 말이 막히면 소희가 무엇을 묻는지 알려 주고, 답할 힌트를 줍니다.
   - caption: 라이언의 본보기를 듣고 따라 말합니다(섀도잉). 0.6배, 0.8배로 느리게 다시 듣고, 세게 읽을 곳과 한글 발음도 봅니다. 따라 말하면 다르게 들린 낱말을 짚어 줍니다.
 chapters:
   - title: 왜 만들었나
@@ -317,7 +317,7 @@ Task 3 뒤에 사용자가 4컷을 C로 정했습니다. Gemini 앱으로 그린
 - [ ] **Step 2: 글에 칸 설명을 더합니다**
   - `content/site/jake-english.md`의 `panels` 앞에 `story:` 목록을 두고 설계의 W11~W14를 그대로 씁니다.
   - 주석에 남깁니다. 이야기 4컷은 Gemini 앱으로 그린 그림입니다. 이야기 4컷 절 소제목 "이야기 4컷"과 W11~W14는 추천안으로 정한 문구이고 사용자 확인 전입니다(2026-11-11).
-  - `src/lib/content.ts`의 `JakeEnglish`에 `comic`을 더합니다.
+  - `src/lib/content.ts`의 `JakeEnglish`에 `story`를 더합니다.
 - [ ] **Step 3: 그림 모듈을 고칩니다**
   - `src/lib/jake-english-images.ts`에서 `ENTRY_IMAGES`를 `STORY_IMAGES`(story-1~4)로 바꾸고, `entry-*.jpg`를 지웁니다.
   - 머리 주석의 띠 작은 그림 설명은 "이야기 4컷을 띠에서도 작게 쓴다"로 고칩니다.
