@@ -28,6 +28,14 @@ describe("outboundEvent", () => {
     assert.equal(outboundEvent("https://recueve.com/", "https://jakeso.dev/ai/case?x=1#flow")?.from, "/ai/case");
   });
 
+  test("유튜브 영상 링크는 목적지가 같아도 누른 페이지로 구분한다", () => {
+    assert.deepEqual(outboundEvent("https://www.youtube.com/watch?v=5FByJLa8R1k", "https://jakeso.dev/ai/jake-english"), {
+      to: "www.youtube.com/watch",
+      from: "/ai/jake-english",
+    });
+    assert.equal(outboundEvent("https://www.youtube.com/watch?v=l8j7xHA2hTA", "https://jakeso.dev/ai")?.from, "/ai");
+  });
+
   test("이메일 링크는 주소 대신 email을 보낸다", () => {
     assert.deepEqual(outboundEvent("mailto:someone@example.com", "https://jakeso.dev/resume"), {
       to: "email",
