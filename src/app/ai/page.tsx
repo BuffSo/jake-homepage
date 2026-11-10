@@ -8,7 +8,7 @@ import { CasePanel } from "@/components/ai/case-panel";
 import { BackToTop } from "@/components/back-to-top";
 import { SectionHead } from "@/components/section-head";
 import { getAiCase, getAiPage, getAiWorks, getHome, getJakeEnglish } from "@/lib/content";
-import { ENTRY_IMAGES } from "@/lib/jake-english-images";
+import { COMIC_IMAGES } from "@/lib/jake-english-images";
 import { nextPage } from "@/lib/nav";
 import { pageMetadata } from "@/lib/site-meta";
 
@@ -49,7 +49,7 @@ export default function AiPage() {
             ))}
           </AiEntry>
           <AiEntry href="/ai/jake-english" eyebrow={`APP · ${je.subtitle}`} title={je.title}>
-            {ENTRY_IMAGES.map((image) => (
+            {COMIC_IMAGES.map((image) => (
               <Image
                 key={image.src}
                 src={image}

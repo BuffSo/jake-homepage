@@ -177,6 +177,7 @@ export type JakeEnglish = {
   subtitle: string;
   description: string;
   video: { href: string; caption: string };
+  comic: { caption: string }[];
   panels: { caption: string }[];
   chapters: JakeEnglishChapter[];
 };

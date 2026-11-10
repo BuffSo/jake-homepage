@@ -10,6 +10,7 @@ const je = parseFrontmatter(readFileSync("content/site/jake-english.md", "utf8")
   title: string;
   subtitle: string;
   video: { href: string; caption: string };
+  comic: { caption: string }[];
   panels: { caption: string }[];
   chapters: { title: string; body: string; metric?: { value: string; label: string } }[];
 };
@@ -39,6 +40,24 @@ test("영상 썸네일과 아래 한 줄이 유튜브로 가는 링크 하나다
   await expect(link).toHaveAttribute("href", je.video.href);
   await expect(link).toHaveAttribute("target", "_blank");
   await expect(link.locator("img")).toHaveCount(1);
+});
+
+test("4컷 만화는 네 칸이고, 칸마다 번호와 설명이 있고, 연습 흐름보다 앞이다", async ({ page }) => {
+  await page.goto(PATH);
+  const comic = page.getByRole("region", { name: "4컷 만화" });
+  const items = comic.getByRole("listitem");
+  await expect(items).toHaveCount(4);
+  for (const [i, panel] of je.comic.entries()) {
+    await expect(items.nth(i).locator("figcaption")).toHaveText(`${i + 1}${panel.caption}`);
+    const box = await items.nth(i).locator("img").boundingBox();
+    expect(Math.abs(box!.width / box!.height - 1)).toBeLessThan(0.02);
+  }
+  const order = await page.evaluate(() => {
+    const a = document.querySelector('[aria-labelledby="comic-title"]');
+    const b = document.querySelector('[aria-labelledby="flow-title"]');
+    return Boolean(a && b && a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(order).toBe(true);
 });
 
 test("연습 흐름은 네 칸이고, 칸마다 번호와 설명이 있다", async ({ page }) => {
@@ -91,8 +110,8 @@ test("가로 스크롤이 생기지 않는다 (지금 폭과 320)", async ({ pag
 test("그림을 모두 불러온다", async ({ page }) => {
   await page.goto(PATH);
   const images = page.locator("main img");
-  await expect(images).toHaveCount(9);
-  for (let i = 0; i < 9; i++) {
+  await expect(images).toHaveCount(13);
+  for (let i = 0; i < 13; i++) {
     const image = images.nth(i);
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);

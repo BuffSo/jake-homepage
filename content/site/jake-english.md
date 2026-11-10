@@ -5,6 +5,11 @@ description: 해 보고 싶은 상황을 직접 정해 AI 선생님과 영어로
 video:
   href: https://www.youtube.com/watch?v=5FByJLa8R1k
   caption: 소개 영상 · 3분 17초 · YouTube에서 보기
+comic:
+  - caption: 외국인이 길을 물었습니다. 말은 알아들었는데 첫마디가 나오지 않았습니다.
+  - caption: 그 상황을 앱에서 직접 정하고, 라이언과 같은 대화를 연습합니다.
+  - caption: 말이 막히면 소희가 답을 시작할 영어 첫마디를 알려 줍니다.
+  - caption: 다음에 같은 상황이 오면 연습한 첫마디로 바로 답합니다.
 panels:
   - caption: 앱을 열면 라이언이 인사하고, 오늘 무엇을 연습할지 묻습니다.
   - caption: 해 보고 싶은 상황을 직접 말하거나 쓰면 그 상황의 대본이 만들어집니다. 목록에서 고르거나 추천받을 수도 있습니다.
@@ -33,5 +38,6 @@ chapters:
 - PR 수는 jake-english 저장소에서 gh pr list --state merged로 셌다(2026-11-11). 한국 시각 11-04~11-09에 머지한 PR이 78개,
   그 가운데 pr-review 스킬의 리뷰 코멘트가 달린 PR이 58개다. 저장소가 더 자라도 날짜 범위의 값이라 바꾸지 않는다.
 - 영상 아래 한 줄 끝의 화살표는 화면에서 붙인다(읽지 않는 장식).
-- 그림은 src/lib/jake-english-images.ts에 있다. 4컷 칸과 장의 순서는 panels, chapters의 순서와 같다.
+- 만화는 Gemini 앱으로 그린 그림이다. 만화 절 소제목 "4컷 만화"와 comic의 문구(설계의 W11~W14)는 추천안으로 정했고 사용자 확인 전이다(2026-11-11).
+- 그림은 src/lib/jake-english-images.ts에 있다. 만화 칸, 연습 흐름 칸, 장의 순서는 comic, panels, chapters의 순서와 같다.
 -->
