@@ -217,7 +217,7 @@ NestJS·Next.js·AWS를 주력으로 쓰며, 인증·권한, 정산처럼 복잡
 
 ### MLM 솔루션 (ProWith)
 
-**2025.12 ~ 2026.01** | 프리랜서 프로젝트 (FS)
+**2025.12 ~ 2026.02** | 프리랜서 프로젝트 (FS)
 
 `NestJS` `Next.js 16` `TypeScript` `PostgreSQL` `Prisma` `Docker` `AWS`
 
