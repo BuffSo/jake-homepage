@@ -19,14 +19,23 @@ superpowers 플러그인은 이 프로젝트에만 설치했다(`.claude/setting
 
 1. 요청이 PRD 범위에 없으면 구현 전에 PRD에 추가할지 먼저 묻는다.
 2. **기획은 superpowers brainstorming으로 한다.** 사실 확인은 에이전트가 하고 결정은 사람이 한다. 화면 모양을 바꾸는 결정은 개발 서버의 실제 페이지에 CSS를 얹은 시안 2~3개를 지금 화면과 나란히 캡처해 비교판으로 보여 준 뒤 묻는다. 설계는 `docs/superpowers/specs/`에 쓰고, 정한 내용은 IA, 디자인 문서, 스토리보드 캡처(`docs/design/`)에도 남긴다. 기능의 기획이 끝나기 전에는 구현하지 않는다.
-   - brainstorming을 시작하기 전에 main에서 feature 브랜치를 만든다. superpowers는 설계와 계획을 지금 브랜치에 커밋하므로, 설계, 계획, 구현이 PR 하나에 들어간다.
+   - brainstorming은 카드의 feature 브랜치에서 시작한다(아래 "세션과 worktree"). superpowers는 설계와 계획을 지금 브랜치에 커밋하므로, 설계, 계획, 구현이 PR 하나에 들어간다.
    - 이 저장소는 공개라 설계와 계획도 공개된다. `CLAUDE.local.md`와 `docs/private/`의 내용은 쓰지 않는다.
 3. 되돌리기 어려운 결정(구조, 의존성 추가, 외부 서비스, 데이터 저장)은 ADR 초안을 먼저 쓰고 승인받는다.
 4. **구현 계획은 superpowers writing-plans로 쓴다**(`docs/superpowers/plans/`). 바꿀 파일, 방법, 검증 명령, 커밋 나누기를 보여 주고 승인받은 뒤 구현한다. 파일 하나를 고치는 작은 수정은 설계와 계획 없이 한다.
-   - worktree는 만들지 않고 이 폴더에서 feature 브랜치로 일한다. `.env.local`, `.sensitive-terms.local`, `CLAUDE.local.md`가 git 밖에 있어 worktree에는 따라가지 않는다.
    - finishing-a-development-branch에서는 묻지 않고 "push하고 PR 열기"를 고른다. 머지는 아래 "브랜치와 PR"을 따른다.
 5. 구현한 뒤 `npm run verify`를 통과시킨다. 실패하면 마지막 요약 표와 실패 내용을 그대로 보고한다. 로컬 전용 검사가 건너뛰어졌으면 그것도 밝힌다.
 6. 기능 하나가 끝났을 때, 또는 그 사이에 AI 제안과 판단이 갈린 일이 있었을 때 `docs/devlog/`에 요약을 남긴다. 형식은 `docs/devlog/README.md`를 따른다.
+
+## 세션과 worktree
+
+기능 하나는 오르카 worktree에 띄운 새 Claude 세션(카드)이 맡는다. 원래 폴더의 세션(main 세션)은 무엇을 할지 의논하고, 카드를 띄우고, 카드의 질문과 머지 요청을 사용자에게 전한다.
+
+- **카드 띄우기:** `orca worktree create --name <영어-주제> --branch <type>/<영어-주제> --no-parent --agent claude --prompt "<넘길 글>"`. 넘길 글에는 정한 것, 읽을 문서, 사용자에게 물을 것, main 세션의 이름을 적는다. 새 세션은 앞 대화를 모른다.
+- **카드가 하는 일:** 설계, 계획, 구현, PR, devlog. 사용자에게 할 말(질문, 볼 화면의 주소, 머지 준비 됨)은 `SendMessage`로 main 세션에 보내고, main 세션이 사용자에게 전한다. 받는 이름은 `ListAgents`에 보이는 이름을 그대로 쓴다.
+- **머지:** 사용자가 main 세션에서 요청하면 main 세션이 한다(아래 "브랜치와 PR"). 머지한 뒤 원래 폴더의 main을 맞추고 worktree를 지우는 것도 main 세션이 한다.
+- **git에 없는 로컬 파일:** worktree에는 git에 든 파일만 펼쳐진다. 오르카의 이 프로젝트 설정 스크립트가 `.env.local`, `.sensitive-terms.local`, `CLAUDE.local.md`, `docs/private/`를 원래 폴더에서 복사하고 `npm install`을 돌린다. Claude Code 도구로 만든 worktree에는 `.worktreeinclude`가 같은 목록을 복사한다. 복사본이라 고칠 때는 원래 폴더의 파일을 고친다.
+- **포트:** 원래 폴더의 개발 서버가 3300을 쓴다. 카드는 `npx next dev -p 3301`처럼 다른 포트를 쓴다. E2E(포트 3210)는 한 번에 한 카드만 돌리도록 main 세션이 순서를 정한다.
 
 ## 진행 규칙
 
