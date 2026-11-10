@@ -46,6 +46,9 @@ next-env.d.ts
 /blob-report/
 /playwright/.cache/
 
+# superpowers work files
+.superpowers/
+
 # local only (ADR-0006)
 .sensitive-terms.local
 .claude/settings.local.json
