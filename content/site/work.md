@@ -22,7 +22,7 @@ chapters:
   - slug: prowith
     detail: 4-2. ProWith
     ai: 2. AI 활용 - 개발
-    aiUntil: 개발 외의 일
+    aiUntil: 코드 작성 외의 일
     howToView: ProWith
     drop:
       - '<img src="assets/prowith-genealogy-minimap.png"'
