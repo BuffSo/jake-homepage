@@ -8,9 +8,9 @@ import { getHome, getJakeEnglish } from "@/lib/content";
 import { FLOW_IMAGES, SLIDE_IMAGES, STORY_IMAGES, VIDEO_THUMB } from "@/lib/jake-english-images";
 import { pageMetadata } from "@/lib/site-meta";
 
-// Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상 → 이야기 4컷 → 연습 흐름 → 본문 다섯 장 → 끝 링크 순서다.
+// Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상 → 이야기 4컷 → 연습하는 방법 → 본문 다섯 장 → 끝 링크 순서다.
 // 글은 사이트 전용 글(content/site/jake-english.md)이다. 그림은 공개한 소개 영상에서 가져왔고, 이야기 4컷만 Gemini 앱으로 그렸다.
-// 그림의 대체 텍스트는 모두 비운다. 영상 썸네일은 링크 글이, 이야기 4컷과 연습 흐름은 설명이, 슬라이드는 바로 아래 문단이 같은 내용을 말하기 때문이다(/ai/case와 같은 규칙).
+// 그림의 대체 텍스트는 모두 비운다. 영상 썸네일은 링크 글이, 이야기 4컷과 연습하는 방법은 설명이, 슬라이드는 바로 아래 문단이 같은 내용을 말하기 때문이다(/ai/case와 같은 규칙).
 // 목차가 없는 서브페이지라 /ai/case처럼 맨 위로 버튼과 다음 페이지 버튼은 두지 않는다.
 const je = getJakeEnglish();
 const { ai } = getHome().sections;
@@ -61,14 +61,14 @@ export default function JakeEnglishPage() {
         <h2 id="story-title" className="mb-5 text-2xl font-extrabold tracking-[-0.02em] lg:mb-6 lg:text-[2rem]">
           이야기 4컷
         </h2>
-        <Panels images={STORY_IMAGES} captions={je.story} aspect="aspect-square" />
+        <Panels images={STORY_IMAGES} captions={je.story} aspect="aspect-square" numbered />
       </section>
 
       <section aria-labelledby="flow-title" className="mt-14 border-t border-line pt-14 lg:mt-24 lg:pt-24">
         <h2 id="flow-title" className="mb-5 text-2xl font-extrabold tracking-[-0.02em] lg:mb-6 lg:text-[2rem]">
-          연습 흐름
+          연습하는 방법
         </h2>
-        <Panels images={FLOW_IMAGES} captions={je.panels} aspect="aspect-video" />
+        <Panels images={FLOW_IMAGES} captions={je.panels} aspect="aspect-video" numbered={false} />
       </section>
 
       <div className="mt-14 border-t border-line pt-14 lg:mt-24 lg:pt-24">
@@ -109,15 +109,17 @@ export default function JakeEnglishPage() {
   );
 }
 
-// 번호와 설명이 붙은 그림 칸 2열 목록. 이야기 4컷(정사각)과 연습 흐름(16:9)이 같이 쓴다. 두 절 모두 영상 아래라 그림은 기본(lazy)으로 불러온다.
+// 설명이 붙은 그림 칸 2열 목록. 이야기 4컷(정사각, 번호 있음)과 연습하는 방법(16:9, 번호 없음)이 같이 쓴다. 연습하는 방법은 칸마다 연습 종류가 달라 번호를 붙이지 않는다. 두 절 모두 영상 아래라 그림은 기본(lazy)으로 불러온다.
 function Panels({
   images,
   captions,
   aspect,
+  numbered,
 }: {
   images: StaticImageData[];
   captions: { caption: string }[];
   aspect: "aspect-square" | "aspect-video";
+  numbered: boolean;
 }) {
   return (
     <ol className="grid gap-7 lg:max-w-[52rem] lg:grid-cols-2 lg:gap-10">
@@ -130,15 +132,19 @@ function Panels({
               sizes="(min-width: 64rem) 26rem, 100vw"
               className={`${aspect} w-full rounded-[0.625rem] border border-line`}
             />
-            <figcaption className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2.5 text-sm leading-[1.65] lg:text-[0.9375rem]">
-              <span
-                aria-hidden="true"
-                className="mt-[0.0625rem] flex size-6 items-center justify-center rounded-full bg-accent text-xs font-bold text-on-accent"
-              >
-                {i + 1}
-              </span>
-              <span>{panel.caption}</span>
-            </figcaption>
+            {numbered ? (
+              <figcaption className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2.5 text-sm leading-[1.65] lg:text-[0.9375rem]">
+                <span
+                  aria-hidden="true"
+                  className="mt-[0.0625rem] flex size-6 items-center justify-center rounded-full bg-accent text-xs font-bold text-on-accent"
+                >
+                  {i + 1}
+                </span>
+                <span>{panel.caption}</span>
+              </figcaption>
+            ) : (
+              <figcaption className="text-sm leading-[1.65] lg:text-[0.9375rem]">{panel.caption}</figcaption>
+            )}
           </figure>
         </li>
       ))}

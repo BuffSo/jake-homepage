@@ -42,7 +42,7 @@ test("영상 썸네일과 아래 한 줄이 유튜브로 가는 링크 하나다
   await expect(link.locator("img")).toHaveCount(1);
 });
 
-test("이야기 4컷은 네 칸이고, 칸마다 번호와 설명이 있고, 연습 흐름보다 앞이다", async ({ page }) => {
+test("이야기 4컷은 네 칸이고, 칸마다 번호와 설명이 있고, 연습하는 방법보다 앞이다", async ({ page }) => {
   await page.goto(PATH);
   const story = page.getByRole("region", { name: "이야기 4컷" });
   const items = story.getByRole("listitem");
@@ -60,12 +60,13 @@ test("이야기 4컷은 네 칸이고, 칸마다 번호와 설명이 있고, 연
   expect(order).toBe(true);
 });
 
-test("연습 흐름은 네 칸이고, 칸마다 번호와 설명이 있다", async ({ page }) => {
+test("연습하는 방법은 네 칸이고, 칸마다 설명만 있고 번호는 없다", async ({ page }) => {
   await page.goto(PATH);
-  const items = page.getByRole("region", { name: "연습 흐름" }).getByRole("listitem");
+  const items = page.getByRole("region", { name: "연습하는 방법" }).getByRole("listitem");
   await expect(items).toHaveCount(4);
   for (const [i, panel] of je.panels.entries()) {
-    await expect(items.nth(i).locator("figcaption")).toHaveText(`${i + 1}${panel.caption}`);
+    await expect(items.nth(i).locator("figcaption")).toHaveText(panel.caption);
+    await expect(items.nth(i).locator("figcaption span[aria-hidden]")).toHaveCount(0);
   }
 });
 
