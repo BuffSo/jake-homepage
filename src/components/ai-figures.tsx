@@ -43,12 +43,12 @@ export function WikiFlow({ className = "" }: { className?: string }) {
   );
 }
 
-/** Jake Hermes: 텔레그램 ⇄ 에이전트 ⇄ 로컬 모델, 그리고 예약 작업 */
+/** Jake Hermes: 슬랙 ⇄ 에이전트 ⇄ 로컬 모델, 그리고 예약 작업 */
 export function HermesFlow({ className = "" }: { className?: string }) {
   return (
     <div aria-hidden="true" className={`${FRAME} ${className}`}>
       <div className="flex items-center gap-1.5 lg:gap-3">
-        <div className={SIDE}>텔레그램</div>
+        <div className={SIDE}>슬랙</div>
         <span className="lg:text-lg">⇄</span>
         <div className={CORE}>
           <span className="text-xs font-semibold lg:text-sm">Hermes Agent</span>
