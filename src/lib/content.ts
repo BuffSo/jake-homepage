@@ -168,6 +168,19 @@ export type AiCasePanel = { crop: [number, number, number, number]; caption: str
 /** 동기화한 AI 도구 활용 사례 (src/lib/ai-case.mjs, /ai/case) */
 export type AiCase = { title: string; subtitle: string; heading: string; panels: AiCasePanel[]; body: string[] };
 
+/** Jake English 페이지의 장 하나. 숫자 장은 슬라이드 그림 대신 metric을 보여 준다 (/ai/jake-english) */
+export type JakeEnglishChapter = { title: string; body: string; metric?: Metric };
+
+/** Jake English 사이트 전용 글 (content/site/jake-english.md, /ai 맨 위 띠와 /ai/jake-english) */
+export type JakeEnglish = {
+  title: string;
+  subtitle: string;
+  description: string;
+  video: { href: string; caption: string };
+  panels: { caption: string }[];
+  chapters: JakeEnglishChapter[];
+};
+
 /** content/site/ 아래의 글 하나 */
 function read<T>(relative: string): T {
   const text = readFileSync(path.join(SITE_DIR, relative), "utf8");
@@ -245,4 +258,9 @@ export function getResume(): Resume {
 /** 사례의 json과 본문을 읽는다. 형식이 맞지 않으면 빌드가 멈춘다. */
 export function getAiCase(): AiCase {
   return parseAiCase(readFileSync(AI_CASE, "utf8"), readFileSync(AI_CASE_BODY, "utf8")) as AiCase;
+}
+
+/** Jake English 글. content/site/ai/ 밖에 두어 /ai의 항목 목록에는 잡히지 않는다. */
+export function getJakeEnglish(): JakeEnglish {
+  return read<JakeEnglish>("jake-english.md");
 }

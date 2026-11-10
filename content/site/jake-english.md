@@ -1,0 +1,37 @@
+---
+title: 직접 만들어 쓰는 영어 말하기 연습 앱
+subtitle: Jake English
+description: 해 보고 싶은 상황을 직접 정해 AI 선생님과 영어로 대화하고, 듣고 따라 말하며 연습하는 앱입니다.
+video:
+  href: https://www.youtube.com/watch?v=5FByJLa8R1k
+  caption: 소개 영상 · 3분 17초 · YouTube에서 보기
+panels:
+  - caption: 앱을 열면 라이언이 인사하고, 오늘 무엇을 연습할지 묻습니다.
+  - caption: 해 보고 싶은 상황을 직접 말하거나 쓰면 그 상황의 대본이 만들어집니다. 목록에서 고르거나 추천받을 수도 있습니다.
+  - caption: 자유 대화에서 말이 막히면 소희가 무엇을 묻는지 알려 주고, 답을 시작할 영어 첫마디를 줍니다.
+  - caption: 라이언의 본보기를 듣고 따라 말합니다(섀도잉). 0.6배, 0.8배로 느리게 다시 듣고, 세게 읽을 곳과 한글 발음도 봅니다. 따라 말하면 다르게 들린 낱말을 짚어 줍니다.
+chapters:
+  - title: 왜 만들었나
+    body: 외국인이 길을 물었을 때 말은 알아들었는데 첫마디가 나오지 않았습니다. 유튜브로 섀도잉도 해 봤지만 따라 하기만 해서 흥미가 이어지지 않았고, 제대로 말하는지도 알 수 없었습니다. 그래서 어떤 상황이든 직접 정해 대화를 연습하고, 말할 때마다 바로 짚어 주는 앱을 만들었습니다.
+  - title: 어떻게 동작하나
+    body: 폰 앱은 화면과 녹음, 재생만 합니다. 받아쓰기(whisper.cpp)와 목소리(Qwen3-TTS)는 제 Mac에서 만들고, Claude API에는 글만 보냅니다. 집 밖에서는 폰이 개인 망(Tailscale)으로 Mac에 붙습니다.
+  - title: AI와 일한 방식
+    body: 기능마다 Claude Code로 스펙과 계획을 쓰고, 코드와 테스트를 만들고, PR을 리뷰했습니다. 무엇을 만들지, 여러 안 가운데 무엇을 고를지, 머지할지는 제가 정했습니다.
+  - title: 일하는 구조
+    body: 기능마다 git worktree를 하나씩 만들고 세션을 따로 띄워 동시에 작업합니다. 저는 프로젝트마다 main 세션 하나와 이야기하며 무엇을 할지 정하고 머지를 판단합니다. 세션마다 컨텍스트가 따로라 여러 프로젝트를 함께 진행해도 main 세션만 챙기면 됩니다.
+  - title: 닷새 남짓 동안 머지한 PR
+    metric:
+      value: PR 78개
+      label: '2026-11-04 ~ 11-09 · 머지한 PR'
+    body: 닷새 남짓 동안 PR 78개를 머지했습니다. 그 가운데 58개는 리뷰 에이전트(pr-review)가 먼저 검토했고, AI의 제안과 제 판단은 기능마다 작업 일지에 남겼습니다.
+---
+
+<!--
+/ai/jake-english 페이지와 /ai 맨 위 Jake English 띠의 글 (docs/02-ia.md, docs/superpowers/specs/2026-11-11-ai-jake-english-design.md).
+사이트 전용 글이다. 이력서와 포트폴리오에는 없다(ADR-0003). 문구는 설계에서 고른 그대로 쓴다.
+- 앱의 구성(Android 앱과 Mac 서버, whisper.cpp, Qwen3-TTS, Claude API, Tailscale)은 본인이 확인했다(2026-11-11).
+- PR 수는 jake-english 저장소에서 gh pr list --state merged로 셌다(2026-11-11). 한국 시각 11-04~11-09에 머지한 PR이 78개,
+  그 가운데 pr-review 스킬의 리뷰 코멘트가 달린 PR이 58개다. 저장소가 더 자라도 날짜 범위의 값이라 바꾸지 않는다.
+- 영상 아래 한 줄 끝의 화살표는 화면에서 붙인다(읽지 않는 장식).
+- 그림은 src/lib/jake-english-images.ts에 있다. 4컷 칸과 장의 순서는 panels, chapters의 순서와 같다.
+-->
