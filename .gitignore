@@ -50,3 +50,4 @@ next-env.d.ts
 .sensitive-terms.local
 .claude/settings.local.json
 CLAUDE.local.md
+docs/private/
