@@ -296,39 +296,39 @@ EOF
 
 ---
 
-### Task 3b: 4컷 만화 (4컷 C 결정, 2026-11-11)
+### Task 3b: 이야기 4컷 (4컷 C 결정, 2026-11-11)
 
-Task 3 뒤에 사용자가 4컷을 C로 정했습니다. Gemini 앱으로 그린 4컷 만화를 페이지의 첫 4컷과 띠의 작은 그림으로 쓰고, B-a는 "연습 흐름"으로 그대로 둡니다. 설계 문서의 "정한 것", "그림", "문구"(W11~W14)를 함께 고쳤습니다.
+Task 3 뒤에 사용자가 4컷을 C로 정했습니다. Gemini 앱으로 그린 이야기 4컷을 페이지의 첫 4컷과 띠의 작은 그림으로 쓰고, B-a는 "연습 흐름"으로 그대로 둡니다. 설계 문서의 "정한 것", "그림", "문구"(W11~W14)를 함께 고쳤습니다.
 
 **Files:**
-- Create: `src/assets/ai/jake-english/comic-1.jpg`~`comic-4.jpg` (1200×1200, 컨트롤러가 미리 둡니다)
+- Create: `src/assets/ai/jake-english/story-1.jpg`~`story-4.jpg` (1200×1200, 컨트롤러가 미리 둡니다)
 - Delete: `src/assets/ai/jake-english/entry-1.jpg`~`entry-4.jpg`
 - Modify: `content/site/jake-english.md`, `src/lib/content.ts`, `src/lib/jake-english-images.ts`, `src/app/ai/page.tsx`, `src/app/ai/jake-english/page.tsx`
 - Test: `scripts/lib/content.test.mjs`, `e2e/ai-jake-english.spec.ts`
 
 **Interfaces:**
-- Produces: `JakeEnglish.comic: { caption: string }[]`, `COMIC_IMAGES: StaticImageData[]` (만화 칸 순서). `ENTRY_IMAGES`는 없앱니다.
+- Produces: `JakeEnglish.story: { caption: string }[]`, `STORY_IMAGES: StaticImageData[]` (이야기 4컷 칸 순서). `ENTRY_IMAGES`는 없앱니다.
 
 - [ ] **Step 1: 테스트를 고칩니다**
-  - `scripts/lib/content.test.mjs`의 Jake English 테스트에 `assert.equal(je.comic.length, 4)`와 칸마다 `caption` 확인을 더합니다. 실패를 확인합니다.
+  - `scripts/lib/content.test.mjs`의 Jake English 테스트에 `assert.equal(je.story.length, 4)`와 칸마다 `caption` 확인을 더합니다. 실패를 확인합니다.
   - `e2e/ai-jake-english.spec.ts` (돌리지 않음)
-    - 새 테스트 `"4컷 만화는 네 칸이고, 칸마다 번호와 설명이 있고, 연습 흐름보다 앞이다"`: region "4컷 만화"의 `listitem` 넷, `figcaption`이 `${i + 1}${caption}`, 그림 상자가 정사각에 가깝습니다(폭/높이와 1의 차이 0.02 미만), 문서 순서가 "연습 흐름"보다 앞입니다.
-    - "그림을 모두 불러온다"의 장 수를 9에서 13(영상 1, 만화 4, 연습 흐름 4, 슬라이드 4)으로 고칩니다.
-- [ ] **Step 2: 글에 만화 칸 설명을 더합니다**
-  - `content/site/jake-english.md`의 `panels` 앞에 `comic:` 목록을 두고 설계의 W11~W14를 그대로 씁니다.
-  - 주석에 남깁니다. 만화는 Gemini 앱으로 그린 그림입니다. 만화 절 소제목 "4컷 만화"와 W11~W14는 추천안으로 정한 문구이고 사용자 확인 전입니다(2026-11-11).
+    - 새 테스트 `"이야기 4컷은 네 칸이고, 칸마다 번호와 설명이 있고, 연습 흐름보다 앞이다"`: region "이야기 4컷"의 `listitem` 넷, `figcaption`이 `${i + 1}${caption}`, 그림 상자가 정사각에 가깝습니다(폭/높이와 1의 차이 0.02 미만), 문서 순서가 "연습 흐름"보다 앞입니다.
+    - "그림을 모두 불러온다"의 장 수를 9에서 13(영상 1, 이야기 4컷 4, 연습 흐름 4, 슬라이드 4)으로 고칩니다.
+- [ ] **Step 2: 글에 칸 설명을 더합니다**
+  - `content/site/jake-english.md`의 `panels` 앞에 `story:` 목록을 두고 설계의 W11~W14를 그대로 씁니다.
+  - 주석에 남깁니다. 이야기 4컷은 Gemini 앱으로 그린 그림입니다. 이야기 4컷 절 소제목 "이야기 4컷"과 W11~W14는 추천안으로 정한 문구이고 사용자 확인 전입니다(2026-11-11).
   - `src/lib/content.ts`의 `JakeEnglish`에 `comic`을 더합니다.
 - [ ] **Step 3: 그림 모듈을 고칩니다**
-  - `src/lib/jake-english-images.ts`에서 `ENTRY_IMAGES`를 `COMIC_IMAGES`(comic-1~4)로 바꾸고, `entry-*.jpg`를 지웁니다.
-  - 머리 주석의 띠 작은 그림 설명은 "4컷 만화를 띠에서도 작게 쓴다"로 고칩니다.
-- [ ] **Step 4: 띠의 작은 그림을 만화로 바꿉니다**
-  - `src/app/ai/page.tsx`의 Jake English 띠가 `COMIC_IMAGES`를 씁니다. 클래스와 `sizes`는 그대로 둡니다.
-- [ ] **Step 5: 페이지에 만화 절을 더합니다**
+  - `src/lib/jake-english-images.ts`에서 `ENTRY_IMAGES`를 `STORY_IMAGES`(story-1~4)로 바꾸고, `entry-*.jpg`를 지웁니다.
+  - 머리 주석의 띠 작은 그림 설명은 "이야기 4컷을 띠에서도 작게 쓴다"로 고칩니다.
+- [ ] **Step 4: 띠의 작은 그림을 이야기 4컷으로 바꿉니다**
+  - `src/app/ai/page.tsx`의 Jake English 띠가 `STORY_IMAGES`를 씁니다. 클래스와 `sizes`는 그대로 둡니다.
+- [ ] **Step 5: 페이지에 이야기 4컷 절을 더합니다**
   - 영상 다음, 연습 흐름 앞에 둡니다.
-  - 만화 절은 `section aria-labelledby="comic-title" className="border-t border-fg pt-7 lg:pt-10"`이고 h2는 "4컷 만화"입니다. 연습 흐름 절은 `mt-14 border-t border-line pt-14 lg:mt-24 lg:pt-24`로 바꿉니다(본문 절과 같은 간격).
+  - 이야기 4컷 절은 `section aria-labelledby="story-title" className="border-t border-fg pt-7 lg:pt-10"`이고 h2는 "이야기 4컷"입니다. 연습 흐름 절은 `mt-14 border-t border-line pt-14 lg:mt-24 lg:pt-24`로 바꿉니다(본문 절과 같은 간격).
   - 두 절의 목록과 칸 마크업은 같으므로, 페이지 파일 안의 작은 컴포넌트 `Panels({ images, captions, aspect })` 하나로 그립니다. `aspect`는 `"aspect-square"` 또는 `"aspect-video"`입니다.
-  - 만화 칸 그림은 `alt=""`, `sizes="(min-width: 64rem) 26rem, 100vw"`입니다. 첫 절이므로 eager로 둡니다.
-  - 파일 머리 주석의 순서에 4컷 만화를 더합니다.
+  - 이야기 4컷 칸 그림은 `alt=""`, `sizes="(min-width: 64rem) 26rem, 100vw"`입니다. 첫 절이므로 eager로 둡니다.
+  - 파일 머리 주석의 순서에 이야기 4컷을 더합니다.
 - [ ] **Step 6: 검사와 커밋**
 
 Run: `npm run typecheck && npm run lint && npm run check:units && npm test`, curl로 `/ai`와 `/ai/jake-english`가 200
@@ -358,7 +358,7 @@ Expected: 요약 표에서 실패 없음. 로컬 전용 검사가 건너뛰어�
 - [ ] **Step 2: 캡처를 봅니다**
 
 `test-results/captures/`의 `ai-*`, `ai-jake-english-*` 여덟 장을 엽니다.
-Expected: 다크 모드에서 만화, 연습 흐름 칸과 띠 작은 그림에 흰 테두리가 없습니다. 1280에서 두 띠가 나란히, 375에서 사례 띠 아래에 Jake English 띠가 있습니다. 설계 시안과 짜임이 같습니다.
+Expected: 다크 모드에서 이야기 4컷, 연습 흐름 칸과 띠 작은 그림에 흰 테두리가 없습니다. 1280에서 두 띠가 나란히, 375에서 사례 띠 아래에 Jake English 띠가 있습니다. 설계 시안과 짜임이 같습니다.
 
 - [ ] **Step 3: 개발 서버를 다시 띄웁니다**
 
@@ -386,7 +386,7 @@ Task 4의 캡처에서 만듭니다.
 - `docs/02-ia.md`
   - 페이지 표에 `/ai/jake-english` 줄(1차 뒤 추가, 2026-11-11, 헤더 메뉴에 없고 `/ai` 맨 위 띠로 들어감)
   - `/ai` "머리와 목차"의 사례 입구 항목에 두 띠의 배치(데스크톱 나란히, 모바일 사례 먼저)와 비교한 안(위아래 두 가지)
-  - 새 절 `### /ai/jake-english Jake English`: `/ai/case` 절과 같은 표(메시지, 사실과 출처, 구성, 움직임)와 항목. 4컷을 C(만화와 연습 흐름 둘 다)로 정한 것과 이유, F3 "항목마다 따로 페이지를 만들지 않는다"의 두 번째 예외인 이유, 메뉴, 돌아가기, 머리, 영상(재생기 없이 유튜브로), 4컷, 본문 다섯 장, 숫자의 기준(날짜 범위로 고정), 끝 링크, 맨 위로 버튼 없음, 검색과 공유. 설계의 「(AI 판단)」 표시를 그대로 옮깁니다.
+  - 새 절 `### /ai/jake-english Jake English`: `/ai/case` 절과 같은 표(메시지, 사실과 출처, 구성, 움직임)와 항목. 4컷을 C(이야기 4컷과 연습 흐름 둘 다)로 정한 것과 이유, F3 "항목마다 따로 페이지를 만들지 않는다"의 두 번째 예외인 이유, 메뉴, 돌아가기, 머리, 영상(재생기 없이 유튜브로), 4컷, 본문 다섯 장, 숫자의 기준(날짜 범위로 고정), 끝 링크, 맨 위로 버튼 없음, 검색과 공유. 설계의 「(AI 판단)」 표시를 그대로 옮깁니다.
   - 새 절 `### Jake English 시안`: Step 1의 캡처 표
 - `docs/03-design.md`: `## Jake English에서 정한 값`을 `## AI 사례에서 정한 값` 다음에 두고, 입구 띠 둘(배치, 사이, 작은 그림)과 페이지(영상, 재생 표시, 4컷 16:9, 장 머리글과 소제목, 그림, 숫자, 장 사이, 끝 링크)의 값을 모바일과 데스크톱 표로 씁니다. "AI 사례에서 정한 값"의 입구 "배치" 줄은 새 절을 가리키게 고칩니다.
 
