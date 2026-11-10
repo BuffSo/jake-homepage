@@ -155,7 +155,7 @@ test("lg 최소 폭에서도 두 입구의 작은 그림 줄이 같은 높이다
     await page.goto("/ai");
     const tops = await Promise.all(
       ["/ai/case", "/ai/jake-english"].map((href) =>
-        page.locator(`main a[href="${href}"] img`).first().evaluate((el) => el.getBoundingClientRect().top),
+        page.locator(`main a[href="${href}"]`).first().evaluate((el) => el.lastElementChild!.getBoundingClientRect().top),
       ),
     );
     expect(Math.abs(tops[0] - tops[1])).toBeLessThan(1);
