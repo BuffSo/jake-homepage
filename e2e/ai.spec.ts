@@ -102,27 +102,70 @@ test("짧은 카드는 /work의 AI 절로 보낸다", async ({ page }) => {
   }
 });
 
-test("머리 아래, 목차 위의 사례 입구가 /ai/case로 간다", async ({ page }) => {
+const je = read("content/site/jake-english.md") as { title: string };
+const entries = [
+  ["AI 도구 활용 사례 자세히 보기", "/ai/case"],
+  [`${je.title} 자세히 보기`, "/ai/jake-english"],
+];
+
+test("머리 아래, 목차 위의 두 입구가 각자 페이지로 간다", async ({ page }) => {
+  for (const [name, href] of entries) {
+    await page.goto("/ai");
+    const entry = page.getByRole("link", { name });
+    await expect(entry).toHaveAttribute("href", href);
+    // 입구는 목차보다 앞에 있다
+    const order = await entry.evaluate((el) => {
+      const nav = document.getElementById("page-index")!;
+      return el.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING;
+    });
+    expect(order).toBeTruthy();
+    // 작은 그림 네 칸은 장식이라 대체 텍스트를 비운다. 링크 이름이 뜻을 말한다.
+    await expect(entry.locator("img")).toHaveCount(4);
+    for (const image of await entry.locator("img").all()) await expect(image).toHaveAttribute("alt", "");
+    await entry.click();
+    await expect(page).toHaveURL(new RegExp(`${href}$`));
+  }
+  // 사례 입구가 Jake English 입구보다 앞이다
   await page.goto("/ai");
-  const entry = page.getByRole("link", { name: "AI 도구 활용 사례 자세히 보기" });
-  await expect(entry).toHaveAttribute("href", "/ai/case");
-  // 입구는 목차보다 앞에 있다
-  const order = await entry.evaluate((el) => {
-    const nav = document.getElementById("page-index")!;
-    return el.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING;
-  });
-  expect(order).toBeTruthy();
-  // 작은 그림 네 칸은 장식이라 대체 텍스트를 비운다. 링크 이름이 뜻을 말한다.
-  await expect(entry.locator("img")).toHaveCount(4);
-  for (const image of await entry.locator("img").all()) await expect(image).toHaveAttribute("alt", "");
-  await entry.click();
-  await expect(page).toHaveURL(/\/ai\/case$/);
+  const first = await page.getByRole("link", { name: entries[0][0] }).evaluate((el, selector) => {
+    const other = document.querySelector(selector)!;
+    return el.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING;
+  }, 'a[href="/ai/jake-english"]');
+  expect(first).toBeTruthy();
+});
+
+test("데스크톱은 두 입구가 한 줄에 나란히, 모바일은 사례 입구 아래에 Jake English 입구가 있다", async ({ page }, testInfo) => {
+  await page.goto("/ai");
+  const caseBox = await page.locator('main a[href="/ai/case"]').boundingBox();
+  const appBox = await page.locator('main a[href="/ai/jake-english"]').boundingBox();
+  expect(caseBox).not.toBeNull();
+  expect(appBox).not.toBeNull();
+  if (testInfo.project.name === "mobile") {
+    expect(appBox!.y).toBeGreaterThanOrEqual(caseBox!.y + caseBox!.height);
+  } else {
+    expect(Math.abs(appBox!.y - caseBox!.y)).toBeLessThan(1);
+    expect(appBox!.x).toBeGreaterThan(caseBox!.x);
+  }
+});
+
+test("lg 최소 폭에서도 두 입구의 작은 그림 줄이 같은 높이다", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile", "모바일은 두 입구가 위아래로 쌓인다");
+  for (const width of [1024, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/ai");
+    const tops = await Promise.all(
+      ["/ai/case", "/ai/jake-english"].map((href) =>
+        page.locator(`main a[href="${href}"] img`).first().evaluate((el) => el.getBoundingClientRect().top),
+      ),
+    );
+    expect(Math.abs(tops[0] - tops[1])).toBeLessThan(1);
+  }
 });
 
 test("이미지마다 대체 텍스트가 있고, 내려오면 불러온다", async ({ page }) => {
   await page.goto("/ai");
-  // 사례 입구의 장식 그림은 위 테스트에서 따로 본다.
-  const images = page.locator('main img:not(a[href="/ai/case"] img)');
+  // 두 입구의 장식 그림은 위 테스트에서 따로 본다.
+  const images = page.locator('main img:not(a[href="/ai/case"] img):not(a[href="/ai/jake-english"] img)');
   const count = await images.count();
   expect(count).toBeGreaterThan(0);
   for (let i = 0; i < count; i++) {
