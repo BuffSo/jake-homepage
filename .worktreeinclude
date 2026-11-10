@@ -1,0 +1,6 @@
+# Claude Code가 새 worktree를 만들 때 복사해 넣는, git에서 뺀 파일 (CLAUDE.md "세션과 worktree")
+# 복사본이다. 고칠 때는 원래 폴더의 파일을 고친다.
+.env.local
+.sensitive-terms.local
+CLAUDE.local.md
+docs/private/
