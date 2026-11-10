@@ -61,7 +61,7 @@ export default function JakeEnglishPage() {
         <h2 id="story-title" className="mb-5 text-2xl font-extrabold tracking-[-0.02em] lg:mb-6 lg:text-[2rem]">
           이야기 4컷
         </h2>
-        <Panels images={STORY_IMAGES} captions={je.story} aspect="aspect-square" eager />
+        <Panels images={STORY_IMAGES} captions={je.story} aspect="aspect-square" />
       </section>
 
       <section aria-labelledby="flow-title" className="mt-14 border-t border-line pt-14 lg:mt-24 lg:pt-24">
@@ -109,17 +109,15 @@ export default function JakeEnglishPage() {
   );
 }
 
-// 번호와 설명이 붙은 그림 칸 2열 목록. 이야기 4컷(정사각)과 연습 흐름(16:9)이 같이 쓴다. 첫 절의 그림은 eager로 불러온다.
+// 번호와 설명이 붙은 그림 칸 2열 목록. 이야기 4컷(정사각)과 연습 흐름(16:9)이 같이 쓴다. 두 절 모두 영상 아래라 그림은 기본(lazy)으로 불러온다.
 function Panels({
   images,
   captions,
   aspect,
-  eager = false,
 }: {
   images: StaticImageData[];
   captions: { caption: string }[];
   aspect: "aspect-square" | "aspect-video";
-  eager?: boolean;
 }) {
   return (
     <ol className="grid gap-7 lg:max-w-[52rem] lg:grid-cols-2 lg:gap-10">
@@ -130,7 +128,6 @@ function Panels({
               src={images[i]}
               alt=""
               sizes="(min-width: 64rem) 26rem, 100vw"
-              loading={eager ? "eager" : undefined}
               className={`${aspect} w-full rounded-[0.625rem] border border-line`}
             />
             <figcaption className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2.5 text-sm leading-[1.65] lg:text-[0.9375rem]">
