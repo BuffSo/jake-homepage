@@ -154,6 +154,7 @@ test("lg 최소 폭에서도 두 입구의 작은 그림 줄이 같은 높이다
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/ai");
     const tops = await Promise.all(
+      // 띠 링크의 마지막 자식이 작은 그림 줄 컨테이너다. 사례 띠의 img는 칸 안에서 잘린 큰 그림이라 위치가 다르다.
       ["/ai/case", "/ai/jake-english"].map((href) =>
         page.locator(`main a[href="${href}"]`).first().evaluate((el) => el.lastElementChild!.getBoundingClientRect().top),
       ),
