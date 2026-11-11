@@ -4,7 +4,7 @@
 // - 저장소에서 세는 숫자의 자리 표시는 아는 이름만 쓴다.
 
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 import { parseFrontmatter } from "../../src/lib/frontmatter.mjs";
@@ -139,9 +139,11 @@ test("AI 작업 글은 항목에 필요한 값을 모두 갖고, 순서가 겹�
   const groups = new Set(read("content/site/ai-page.md").groups.map((g) => g.id));
   const figures = new Set(["wiki-flow", "image", "hermes-flow", "site-steps", "review-flow", "mcp-flow", "workbench-flow"]);
   for (const { file, data } of aiWorks) {
-    for (const key of ["slug", "order", "group", "eyebrow", "title", "problem", "built"]) {
+    for (const key of ["slug", "order", "group", "eyebrow", "title", "problem"]) {
       assert.ok(data[key], `${file}: ${key} 없음`);
     }
+    // 만든 것은 항목에 하나 쓰거나, 영상 목록이 있으면 영상마다 쓴다
+    assert.ok(Boolean(data.built) !== Boolean(data.videos), `${file}: built와 videos 가운데 하나만 씀`);
     assert.equal(`${data.slug}.md`, file);
     assert.ok(groups.has(data.group), `${file}: 모르는 묶음 ${data.group}`);
     assert.ok(data.metric?.value && data.metric?.label, `${file}: metric 없음`);
@@ -155,11 +157,40 @@ test("AI 작업 글은 항목에 필요한 값을 모두 갖고, 순서가 겹�
       if (data.figure === "image") assert.ok(data.image && data.imageAlt, `${file}: 이미지 정보 없음`);
       // 개인 도구는 결과 대신 쓰는 법을 쓴다 (docs/02-ia.md /ai)
       if (data.group === "personal") assert.ok(data.usage && !data.result, `${file}: 개인 도구는 usage만 씀`);
+      // 영상 목록이 있으면 영상마다 숫자 칸과 링크가 결과를 말해, 항목의 결과는 없어도 된다
+      else if (data.videos) assert.ok(!data.usage, `${file}: 영상 목록이 있는 항목은 usage를 쓰지 않음`);
       else assert.ok(data.result && !data.usage, `${file}: result 없음`);
     }
   }
   const orders = aiWorks.map((w) => w.data.order).sort((a, b) => a - b);
   assert.deepEqual(orders, orders.map((_, i) => i + 1));
+});
+
+test("영상 목록은 영상마다 필요한 값과 실제 썸네일 파일을 갖고, 순서가 겹치지 않는다", () => {
+  const withVideos = aiWorks.filter((w) => w.data.videos);
+  assert.ok(withVideos.length > 0, "영상 목록이 있는 항목이 없습니다");
+  for (const { file, data } of withVideos) {
+    assert.ok(Array.isArray(data.videos) && data.videos.length > 0, `${file}: videos가 비었음`);
+    for (const video of data.videos) {
+      const name = `${file} · ${video.title}`;
+      for (const key of ["order", "title", "thumbnail", "thumbnailAlt", "built"]) assert.ok(video[key], `${name}: ${key} 없음`);
+      assert.ok(video.metric?.value && video.metric?.label, `${name}: metric 없음`);
+      assert.ok(video.link?.label && video.link?.href, `${name}: link 없음`);
+      // 화면은 src/assets 아래 jpg, png만 미리 불러 둔다 (src/components/ai/ai-videos.tsx)
+      assert.match(video.thumbnail, /^src\/assets\/.+\.(jpg|png)$/, `${name}: 썸네일은 src/assets 아래 jpg나 png`);
+      assert.ok(existsSync(path.join(ROOT, video.thumbnail)), `${name}: 썸네일 파일이 없음 ${video.thumbnail}`);
+    }
+    const orders = data.videos.map((v) => v.order);
+    assert.equal(new Set(orders).size, orders.length, `${file}: 영상 순서가 겹침`);
+    // 홈 카드는 영상 한 편을 보인다. 카드의 숫자, 링크, 그림 설명은 그 영상의 것과 같아야 한다.
+    if (data.home !== undefined) {
+      const homeLink = data.links.find((l) => l.home);
+      const video = data.videos.find((v) => v.link.href === homeLink?.href);
+      assert.ok(video, `${file}: 홈 카드의 링크가 영상 목록에 없음`);
+      assert.deepEqual(data.metric, video.metric, `${file}: 홈 카드 숫자와 ${video.title}의 숫자가 다름`);
+      assert.equal(data.imageAlt, video.thumbnailAlt, `${file}: 홈 카드 그림 설명과 ${video.title}의 썸네일 설명이 다름`);
+    }
+  }
 });
 
 test("홈 AI 카드는 네 장이고, 카드에 필요한 값을 갖는다", () => {
@@ -223,7 +254,7 @@ test("의뢰받아 만든 사이트 글은 카드에 필요한 값을 모두 갖
 });
 
 test("Recueve와 Recoeve의 소스 저장소 링크는 싣지 않는다", () => {
-  const links = aiWorks.flatMap((w) => w.data.links).map((l) => l.href);
+  const links = aiWorks.flatMap((w) => [...w.data.links, ...(w.data.videos ?? []).map((v) => v.link)]).map((l) => l.href);
   for (const href of links) assert.doesNotMatch(href, /github\.com\/[^/]+\/rec[ou]e?ve/i);
 });
 

@@ -66,7 +66,21 @@ export type Project = {
 
 export type AiGroup = "dev" | "product" | "beyond" | "personal";
 
-/** content/site/ai/의 글. 상세 항목은 그림과 결과(또는 쓰는 법)를, 짧은 카드는 more(/work#…)를 갖는다. */
+/** 영상 목록이 있는 항목(영상 제작)의 영상 한 편. thumbnail은 저장소 기준 그림 경로(src/assets/…)다. */
+export type AiVideo = {
+  order: number; // 항목 안 순서
+  title: string;
+  thumbnail: string;
+  thumbnailAlt: string;
+  built: string;
+  metric: Metric;
+  link: Link;
+};
+
+/**
+ * content/site/ai/의 글. 상세 항목은 그림과 결과(또는 쓰는 법)를, 짧은 카드는 more(/work#…)를 갖는다.
+ * videos가 있는 항목은 /ai에서 그림, 만든 것, 숫자, 링크를 영상마다 따로 보인다. 항목의 그림, 숫자, 링크는 홈 카드에만 쓴다.
+ */
 export type AiWork = {
   slug: string;
   order: number; // /ai 안 순서
@@ -78,7 +92,7 @@ export type AiWork = {
   desc?: string; // 홈 카드 설명
   note?: string; // 홈 카드 아래 한 줄
   problem: string;
-  built: string;
+  built?: string; // 영상 목록이 있으면 영상마다 쓴다
   result?: string;
   usage?: string; // 개인 도구는 결과 대신 쓰는 법
   metric: Metric;
@@ -87,6 +101,7 @@ export type AiWork = {
   imageAlt?: string;
   links: (Link & { home?: boolean })[];
   more?: string;
+  videos?: AiVideo[];
 };
 
 export type AiPage = { groups: { id: AiGroup; title: string }[] };
@@ -231,6 +246,7 @@ export function getAiWorks(): AiWork[] {
   return readDir<AiWork>("ai").map((work) => ({
     ...work,
     metric: { value: fillRepoStats(work.metric.value), label: work.metric.label },
+    videos: work.videos && [...work.videos].sort((a, b) => a.order - b.order),
   }));
 }
 

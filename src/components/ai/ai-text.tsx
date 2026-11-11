@@ -14,7 +14,10 @@ export function Eyebrow({ text }: { text: string }) {
   );
 }
 
-/** 문제 · 만든 것 · 결과(개인 도구는 쓰는 법). 데스크톱은 이름 칸을 왼쪽에 둔다. */
+/**
+ * 문제 · 만든 것 · 결과(개인 도구는 쓰는 법). 데스크톱은 이름 칸을 왼쪽에 둔다.
+ * 영상 목록이 있는 항목은 만든 것을 영상마다 쓰고 결과는 없을 수 있어, 글이 없는 단락은 그리지 않는다.
+ */
 export function Facts({ work }: { work: AiWork }) {
   const rows: [string, string | undefined][] = [
     ["문제", work.problem],
@@ -23,7 +26,7 @@ export function Facts({ work }: { work: AiWork }) {
   ];
   return (
     <dl className="grid text-sm leading-[1.65] lg:grid-cols-[4.5rem_minmax(0,1fr)] lg:gap-x-4 lg:gap-y-2.5 lg:text-[0.9375rem]">
-      {rows.map(([label, text]) => (
+      {rows.filter(([, text]) => text).map(([label, text]) => (
         <Fragment key={label}>
           <dt className="mt-2 text-xs text-subtle first:mt-0 lg:mt-0 lg:pt-0.5 lg:text-[0.8125rem]">{label}</dt>
           <dd>{text}</dd>

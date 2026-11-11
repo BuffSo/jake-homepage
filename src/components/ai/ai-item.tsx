@@ -14,6 +14,7 @@ import { ButtonLink } from "@/components/button-link";
 import { Metric } from "@/components/section-head";
 import type { AiWork } from "@/lib/content";
 import { Eyebrow, Facts } from "./ai-text";
+import { AiVideos } from "./ai-videos";
 
 // /ai의 상세 항목 (docs/02-ia.md /ai). 데스크톱은 글 왼쪽, 그림 오른쪽 두 칸이고 모바일은 이름 다음에 그림을 둔다.
 // id는 slug다. 홈 AI 카드의 "자세히 보기"(/ai#slug)가 이곳을 가리킨다.
@@ -48,14 +49,33 @@ function Figure({ work }: { work: AiWork }) {
 
 export function AiItem({ work, first }: { work: AiWork; first: boolean }) {
   const titleId = `${work.slug}-title`;
+  const frame = `grid scroll-mt-4 grid-cols-1 gap-3 pt-10 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-3.5 lg:pt-14 ${
+    first ? "" : "mt-10 border-t border-line-soft lg:mt-14"
+  }`;
+
+  // 영상 목록이 있는 항목(영상 제작): 머리는 다른 항목의 글 칸 너비로 두고, 그림, 만든 것, 숫자, 링크는 영상마다 아래에 둔다.
+  if (work.videos) {
+    return (
+      <article id={work.slug} aria-labelledby={titleId} className={frame}>
+        <div className="flex flex-col gap-2 lg:col-start-1 lg:gap-3">
+          <Eyebrow text={work.eyebrow} />
+          <h3 id={titleId} className="text-[1.375rem] font-extrabold tracking-[-0.02em] lg:text-[1.75rem]">
+            {work.title}
+          </h3>
+        </div>
+        <div className="flex flex-col gap-3 lg:col-start-1 lg:gap-3.5">
+          <p className="mt-1 text-[1.0625rem] leading-[1.45] font-semibold lg:mt-0 lg:text-xl">{work.headline}</p>
+          <Facts work={work} />
+        </div>
+        <div className="mt-5 lg:col-span-2 lg:mt-6.5">
+          <AiVideos videos={work.videos} />
+        </div>
+      </article>
+    );
+  }
+
   return (
-    <article
-      id={work.slug}
-      aria-labelledby={titleId}
-      className={`grid scroll-mt-4 grid-cols-1 gap-3 pt-10 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-3.5 lg:pt-14 ${
-        first ? "" : "mt-10 border-t border-line-soft lg:mt-14"
-      }`}
-    >
+    <article id={work.slug} aria-labelledby={titleId} className={`${frame} lg:grid-rows-[auto_1fr]`}>
       <div className="flex flex-col gap-2 lg:col-start-1 lg:row-start-1 lg:gap-3">
         <Eyebrow text={work.eyebrow} />
         <h3 id={titleId} className="text-[1.375rem] font-extrabold tracking-[-0.02em] lg:text-[1.75rem]">
