@@ -13,6 +13,7 @@ const je = parseFrontmatter(readFileSync("content/site/jake-english.md", "utf8")
   story: { caption: string }[];
   panels: { caption: string }[];
   chapters: { title: string; body: string; metric?: { value: string; label: string } }[];
+  stack: { group: string; items: string[] }[];
 };
 
 const PATH = "/ai/jake-english";
@@ -104,6 +105,24 @@ test("슬라이드는 40rem 아래에서 모바일 판, 그 위에서 데스크�
     expect(src).toContain(mobile ? `slide-${i + 1}-mobile.` : `slide-${i + 1}.`);
     expect(Math.abs(ratio - natural) / natural).toBeLessThan(0.01);
   }
+});
+
+test("기술 스택은 본문 다섯 장 뒤, 끝 링크 앞에 묶음과 기술 이름을 글자로만 보여 준다", async ({ page }) => {
+  await page.goto(PATH);
+  const stack = page.getByRole("region", { name: "기술 스택" });
+  await expect(stack.getByRole("heading", { level: 2 })).toHaveText("기술 스택");
+  await expect(stack.locator("dt")).toHaveText(je.stack.map((s) => s.group));
+  await expect(stack.locator("dd")).toHaveText(je.stack.map((s) => s.items.join(" · ")));
+  await expect(stack.locator("img, svg")).toHaveCount(0);
+  const order = await page.evaluate(() => {
+    const last = document.querySelector("#chapter-5")?.closest("section");
+    const stack = document.querySelector('[aria-labelledby="stack-title"]');
+    const end = [...document.querySelectorAll("main a")].find((a) => a.textContent?.includes("영상 보기"));
+    const after = (a?: Element | null, b?: Element | null) =>
+      Boolean(a && b && a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    return after(last, stack) && after(stack, end);
+  });
+  expect(order).toBe(true);
 });
 
 test("끝 링크는 영상 보기와 AI로 일하는 방식이다", async ({ page }) => {

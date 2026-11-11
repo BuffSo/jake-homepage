@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Image, { getImageProps, type StaticImageData } from "next/image";
 import Link from "next/link";
+import { Fragment } from "react";
 import { ButtonLink } from "@/components/button-link";
 import { ExternalLink } from "@/components/external-link";
 import { SectionHead } from "@/components/section-head";
-import { getHome, getJakeEnglish } from "@/lib/content";
+import { getHome, getJakeEnglish, type JakeEnglishStack } from "@/lib/content";
 import { FLOW_IMAGES, SLIDE_IMAGES, STORY_IMAGES, VIDEO_THUMB, type SlideImage } from "@/lib/jake-english-images";
 import { pageMetadata } from "@/lib/site-meta";
 
-// Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상 → 이야기 4컷 → 연습하는 방법 → 본문 다섯 장 → 끝 링크 순서다.
+// Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상 → 이야기 4컷 → 연습하는 방법 → 본문 다섯 장 → 기술 스택 → 끝 링크 순서다.
 // 글은 사이트 전용 글(content/site/jake-english.md)이다. 그림은 공개한 소개 영상에서 가져왔고, 이야기 4컷만 Gemini 앱으로 그렸다.
 // 그림의 대체 텍스트는 모두 비운다. 영상 썸네일은 링크 글이, 이야기 4컷과 연습하는 방법은 설명이, 슬라이드는 바로 아래 문단이 같은 내용을 말하기 때문이다(/ai/case와 같은 규칙).
 // 목차가 없는 서브페이지라 /ai/case처럼 맨 위로 버튼과 다음 페이지 버튼은 두지 않는다.
@@ -92,13 +93,23 @@ export default function JakeEnglishPage() {
               <p className="mt-4 text-[0.9375rem] leading-[1.75] lg:text-[1.0625rem]">{chapter.body}</p>
             </section>
           ))}
-          <div className="mt-12 flex flex-wrap gap-2">
-            <ButtonLink href={je.video.href} variant="solid">
-              영상 보기
-            </ButtonLink>
-            <ButtonLink href="/ai">{ai.title}</ButtonLink>
-          </div>
         </div>
+      </div>
+
+      <section aria-labelledby="stack-title" className="mt-14 border-t border-line pt-14 lg:mt-24 lg:pt-24">
+        <div className="max-w-[45rem]">
+          <h2 id="stack-title" className="mb-5 text-2xl font-extrabold tracking-[-0.02em] lg:mb-6 lg:text-[2rem]">
+            기술 스택
+          </h2>
+          <Stack groups={je.stack} />
+        </div>
+      </section>
+
+      <div className="mt-12 flex flex-wrap gap-2">
+        <ButtonLink href={je.video.href} variant="solid">
+          영상 보기
+        </ButtonLink>
+        <ButtonLink href="/ai">{ai.title}</ButtonLink>
       </div>
     </main>
   );
@@ -126,6 +137,31 @@ function SlidePicture({ desktop, mobile }: SlideImage) {
       <source srcSet={mobileSet} sizes={rest.sizes} width={rest.width} height={rest.height} />
       <img {...rest} alt="" className="h-auto w-full rounded-[0.625rem] border border-line" />
     </picture>
+  );
+}
+
+// 기술 스택. 로고 없이 글자로만 쓴다. 묶음 이름은 본문 글꼴, 기술 이름은 고정폭이다(docs/03-design.md 타이포그래피).
+// 기술 이름 하나가 두 줄로 갈리지 않게 이름마다 줄을 바꾸지 않는다.
+function Stack({ groups }: { groups: JakeEnglishStack[] }) {
+  return (
+    <dl className="border-t border-line-soft">
+      {groups.map(({ group, items }) => (
+        <div
+          key={group}
+          className="grid gap-1 border-b border-line-soft py-3 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-4 lg:py-3.5"
+        >
+          <dt className="text-sm text-muted lg:text-[0.9375rem]">{group}</dt>
+          <dd className="font-mono text-sm lg:text-[0.9375rem]">
+            {items.map((item, i) => (
+              <Fragment key={item}>
+                {i > 0 && <span className="text-subtle"> · </span>}
+                <span className="whitespace-nowrap">{item}</span>
+              </Fragment>
+            ))}
+          </dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
