@@ -1,8 +1,8 @@
 # AI 사례와 Jake English 페이지
 
-> 정함: 2026-10-20 (커리어 저장소에서 PDF로 만든 AI 도구 활용 사례를 `/ai/case`로 실음), 2026-11-11 (공개한 영상으로 Jake English 페이지 `/ai/jake-english`를 만듦)
-> 코드: `scripts/sync.config.mjs`(사례 세 파일), `scripts/lib/sync.mjs`(그림 동기화), `src/lib/ai-case.mjs`(읽기와 칸 자르기), `src/components/ai/case-panel.tsx`, `src/components/ai/ai-entry.tsx`(`/ai` 맨 위 띠 둘이 같이 씀), `src/app/ai/case/page.tsx`, `src/app/ai/jake-english/page.tsx`, `src/lib/jake-english-images.ts`, `content/site/jake-english.md`, `src/assets/ai/jake-english/`
-> 확인: `e2e/ai-case.spec.ts`, `scripts/lib/ai-case.test.mjs`, `scripts/lib/sync.test.mjs`, `e2e/ai-jake-english.spec.ts`, `e2e/ai.spec.ts`의 두 입구, `scripts/lib/content.test.mjs`의 Jake English 글
+> 정함: 2026-10-20 (커리어 저장소에서 PDF로 만든 AI 도구 활용 사례를 `/ai/case`로 실음), 2026-11-11 (공개한 영상으로 Jake English 페이지 `/ai/jake-english`를 만듦, `/ai` 영상 제작 항목에 영상 목록을 둠)
+> 코드: `scripts/sync.config.mjs`(사례 세 파일), `scripts/lib/sync.mjs`(그림 동기화), `src/lib/ai-case.mjs`(읽기와 칸 자르기), `src/components/ai/case-panel.tsx`, `src/components/ai/ai-entry.tsx`(`/ai` 맨 위 띠 둘이 같이 씀), `src/app/ai/case/page.tsx`, `src/app/ai/jake-english/page.tsx`, `src/lib/jake-english-images.ts`, `content/site/jake-english.md`, `src/assets/ai/jake-english/`, `content/site/ai/video.md`(영상 목록), `src/components/ai/ai-videos.tsx`
+> 확인: `e2e/ai-case.spec.ts`, `scripts/lib/ai-case.test.mjs`, `scripts/lib/sync.test.mjs`, `e2e/ai-jake-english.spec.ts`, `e2e/ai.spec.ts`의 두 입구, `scripts/lib/content.test.mjs`의 Jake English 글과 영상 목록, `e2e/ai.spec.ts`의 영상 칸
 > 캡처: [design/ai-case](../design/ai-case/), [design/ai-jake-english](../design/ai-jake-english/)
 
 다른 곳에서 만든 문서(PDF 같은 결과물)를 사이트 페이지로 옮길 때의 기준입니다. 사례가 늘거나 다른 사이트에서 같은 일을 할 때 따릅니다. 옮기며 겪은 문제도 함께 둡니다.
@@ -99,3 +99,39 @@
 
 - 첫 커밋(11-04 18시 31분)부터 마지막 머지(11-09 22시 37분)까지는 닷새하고 네 시간 남짓입니다. 그런데 날짜로 세면 4, 5, 6, 7, 8, 9일로 엿새에 걸쳐 있습니다. 영상의 "닷새 동안"을 그대로 쓰면 날짜 범위(2026-11-04 ~ 11-09)와 어긋나 보입니다.
 - 그래서 "닷새 남짓 동안"으로 쓰고 날짜 범위를 함께 둡니다. 기간을 말할 때는 시각으로 잰 길이와 날짜 칸의 수를 구분합니다.
+
+## 한 항목 안의 영상 목록 (영상 제작, 2026-11-11)
+
+`/ai`의 영상 제작 항목에 영상을 한 편씩 더하는 기준입니다. 개수가 늘어나는 목록을 데이터만 더해 늘리고 싶을 때도 같은 방식을 씁니다.
+
+### 정한 것
+
+| 항목 | 정한 것 | 이유 |
+|---|---|---|
+| 짜임 | 영상마다 항목을 따로 두지 않고, 영상 제작이라는 큰 꼭지 안에 영상을 넣습니다 | 일하는 방식(편집 도구를 직접 다루지 않고 만들기)은 하나이고 영상은 그 예입니다. 영상이 늘어도 목차와 홈 카드가 늘지 않습니다 |
+| 공통 문구 | 머리글, 제목 문장, 문제는 특정 영상에 묶이지 않는 말로 씁니다. 만든 방법, 길이, 링크는 영상 칸에 씁니다 | 영상이 더해질 때 공통 문구를 다시 고치지 않게 합니다 |
+| 데이터 | `video.md`의 `videos` 목록에 영상마다 한 덩이를 둡니다. 순서 값으로 차례를 정합니다 | 새 영상은 한 덩이와 썸네일 그림 하나만 더하고 코드는 고치지 않습니다 |
+| 넣는 영상 | 공개한 영상만 넣습니다 | 공개 저장소라 데이터에 넣으면 화면에 그리지 않아도 저장소에 남습니다 |
+| 모양 | 데스크톱은 두 칸씩 나란히 두고 셋째부터 다음 줄로 넘깁니다. 모바일은 위아래로 쌓습니다. 숫자와 버튼은 칸 아래에 붙입니다 | 편수가 홀수여도 칸 너비가 바뀌지 않고, 같은 줄의 칸끼리 글 길이가 달라도 나란해 보입니다 |
+| 홈 카드 | 영상 한 편(Recueve 소개 영상)만 보입니다. 항목의 홈 카드용 칸을 따로 둡니다 | 홈 카드는 그림이 한 장인 틀입니다. 숫자와 링크가 목록의 영상과 어긋나지 않게 내용 시험이 비교합니다 |
+
+### 만드는 방법
+
+- **영상을 더할 때**: 썸네일을 `src/assets/` 아래에 jpg나 png로 두고, `videos`에 순서 값, 이름, 썸네일 경로(`src/assets/…`), 썸네일 설명, 만든 방법, 숫자, 링크를 한 덩이로 더합니다. 사이트 전용 사실이면 `video.md` 주석에 확인한 날짜와 근거를 남깁니다.
+- **그림을 경로로 찾기**: 화면 코드는 `import.meta.glob(["/src/assets/**/*.jpg", "/src/assets/**/*.png"], { eager: true })`로 그림 모듈을 빌드할 때 한꺼번에 불러 두고, 글에 적은 경로(`/src/assets/…`)를 열쇠로 찾아 모듈의 `default`를 꺼냅니다. 값은 정적 import와 같은 `StaticImageData`라 `next/image`의 크기 정보와 최적화를 그대로 씁니다. 그림 파일을 `public/`으로 옮기거나 복사하지 않아도 됩니다.
+- **확인**: `scripts/lib/content.test.mjs`가 영상마다 칸이 다 있는지, 썸네일 파일이 실제로 있는지, 순서 값이 겹치지 않는지, 홈 카드의 숫자와 링크가 목록의 영상과 같은지 봅니다. `e2e/ai.spec.ts`가 영상 칸의 이름, 썸네일 설명, 링크와 두 칸 배치를 봅니다.
+- 세 편일 때 줄이 넘어가는지는 임시 데이터로 개발 서버에서 찍어 보고 되돌렸습니다. 시험용 영상은 커밋하지 않습니다.
+
+### 겪은 문제와 주의할 점
+
+#### `import: "default"`가 빌드에서만 비어 있음 (2026-11-11, 구현)
+
+- **증상**: 개발 서버의 `/ai`에는 두 썸네일이 보였는데, `npm run build`가 `/ai`를 미리 그리다 "영상 썸네일이 없습니다"로 멈췄습니다.
+- **원인**: `import.meta.glob(…, { eager: true, import: "default" })`의 결과를 찍어 보니, 빌드에서는 열쇠(경로)는 다 있는데 값이 모두 `undefined`였습니다(Next.js 16.4.2의 Turbopack). 개발 서버에서는 값이 들어 있었습니다.
+- **고친 것**: `import` 옵션을 빼고 모듈째 불러 `module.default`를 직접 꺼냅니다.
+- **막는 방법**: `import.meta.glob`처럼 빌드 도구가 처리하는 기능을 새로 쓰면 개발 서버만 보지 말고 `npm run build`로 미리 그린 결과(`.next/server/app/*.html`)에 값이 들어갔는지 확인합니다. 찾지 못하면 오류를 내게 해 두면 빌드가 조용히 빈 그림으로 지나가지 않습니다.
+
+#### 주의할 점
+
+- `import.meta.glob`은 Turbopack에서만 됩니다. 이 저장소는 개발 서버와 빌드 모두 Turbopack(Next.js 16 기본)입니다. webpack으로 빌드하도록 바꾸면 이 코드가 동작하지 않습니다.
+- 글의 경로에 그림이 없으면 화면 코드가 오류를 내 빌드가 멈춥니다. 내용 시험이 먼저 같은 것을 잡습니다.
