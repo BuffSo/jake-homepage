@@ -23,7 +23,6 @@ type AiWork = {
   order: number;
   home?: number;
   headline: string;
-  links: { label: string; href: string; home?: boolean }[];
 };
 
 const read = (file: string) => parseFrontmatter(readFileSync(file, "utf8"), file).data;
@@ -555,7 +554,7 @@ test.describe("아래 섹션", () => {
     await expect(cards.first()).toBeInViewport();
   });
 
-  test("AI 카드 네 장에 제목과 링크가 있고, 저장소에서 센 숫자가 채워져 있다", async ({ page }) => {
+  test("AI 카드 네 장에 제목과 자세히 보기 하나가 있고, 저장소에서 센 숫자가 채워져 있다", async ({ page }) => {
     await page.goto("/");
     const section = page.getByRole("region", { name: "AI로 일하는 방식" });
     const cards = section.getByRole("article");
@@ -563,10 +562,11 @@ test.describe("아래 섹션", () => {
     for (const [i, work] of aiWorks.entries()) {
       const card = cards.nth(i);
       await expect(card.getByRole("heading", { level: 3 })).toHaveText(work.headline);
-      for (const link of work.links.filter((l) => l.home)) {
-        await expect(card.getByRole("link", { name: new RegExp(link.label) })).toHaveAttribute("href", link.href);
-      }
-      await expect(card.getByRole("link", { name: "자세히 보기" })).toHaveAttribute("href", `/ai#${work.slug}`);
+      // 바깥 링크(영상, 저장소)는 /ai 항목에서 연다. 홈 카드의 링크는 자세히 보기 하나다.
+      const links = card.getByRole("link");
+      await expect(links).toHaveCount(1);
+      await expect(links.first()).toHaveText("자세히 보기");
+      await expect(links.first()).toHaveAttribute("href", `/ai#${work.slug}`);
     }
     // {adrCount} 같은 자리가 그대로 남지 않았는지
     await expect(section).not.toContainText("{");

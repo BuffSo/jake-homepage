@@ -182,14 +182,16 @@ test("영상 목록은 영상마다 필요한 값과 실제 썸네일 파일을 
     }
     const orders = data.videos.map((v) => v.order);
     assert.equal(new Set(orders).size, orders.length, `${file}: 영상 순서가 겹침`);
-    // 홈 카드는 영상 한 편을 보인다. 카드의 숫자, 링크, 그림 설명은 그 영상의 것과 같아야 한다.
-    if (data.home !== undefined) {
-      const homeLink = data.links.find((l) => l.home);
-      const video = data.videos.find((v) => v.link.href === homeLink?.href);
-      assert.ok(video, `${file}: 홈 카드의 링크가 영상 목록에 없음`);
-      assert.deepEqual(data.metric, video.metric, `${file}: 홈 카드 숫자와 ${video.title}의 숫자가 다름`);
-      assert.equal(data.imageAlt, video.thumbnailAlt, `${file}: 홈 카드 그림 설명과 ${video.title}의 썸네일 설명이 다름`);
-    }
+  }
+});
+
+test("홈 AI 카드에는 바깥 링크를 띄우지 않는다", () => {
+  // 홈 카드의 버튼은 자세히 보기(/ai#slug) 하나다. 바깥 링크는 /ai 항목에서 연다 (docs/02-ia.md 홈 3).
+  for (const { file, data } of aiWorks) {
+    assert.ok(
+      data.links.every((l) => !("home" in l)),
+      `${file}: links에 home이 남음`,
+    );
   }
 });
 

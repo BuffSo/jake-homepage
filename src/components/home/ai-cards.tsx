@@ -52,14 +52,8 @@ export function AiCards() {
                 <div className="mt-auto">
                   <Metric {...work.metric} />
                 </div>
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {work.links
-                    .filter((link) => link.home)
-                    .map((link) => (
-                      <ButtonLink key={link.href} href={link.href} variant="solid">
-                        {link.label}
-                      </ButtonLink>
-                    ))}
+                {/* 바깥 링크(영상, 저장소)는 /ai 항목에서 연다. 홈 카드의 버튼은 자세히 보기 하나다. */}
+                <div className="mt-1">
                   <ButtonLink href={`/ai#${work.slug}`}>자세히 보기</ButtonLink>
                 </div>
               </div>

@@ -15,10 +15,7 @@ metric:
 figure: image
 image: video
 imageAlt: Recueve 소개 영상의 썸네일
-links:
-  - label: 영상 보기
-    href: https://www.youtube.com/watch?v=l8j7xHA2hTA
-    home: true
+links: []
 videos:
   - order: 1
     title: Recueve 소개 영상

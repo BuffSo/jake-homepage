@@ -17,7 +17,6 @@ figure: site-steps
 links:
   - label: 저장소
     href: https://github.com/BuffSo/jake-homepage
-    home: true
   - label: ADR 목록
     href: https://github.com/BuffSo/jake-homepage/tree/main/docs/adr
   - label: 작업 일지
@@ -28,5 +27,5 @@ links:
 숫자는 적어 두지 않고 빌드할 때 센다 (src/lib/content.ts).
 {adrCount}는 docs/adr/의 ADR 파일 수, {ciCheckCount}는 .github/workflows/ci.yml에서 npm ci 뒤의 검사 단계 수다.
 만든 것의 훅은 .githooks/pre-commit(민감정보 검사), .githooks/commit-msg(형식 검사), .claude/settings.json의 scripts/hooks/guard-git-commit.mjs다.
-links의 home: true인 링크만 홈 카드에 보인다.
+홈 카드에는 바깥 링크를 두지 않는다. 링크는 /ai 항목에서 연다 (docs/02-ia.md 홈 3).
 -->

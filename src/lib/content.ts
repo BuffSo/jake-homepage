@@ -99,7 +99,7 @@ export type AiWork = {
   figure?: "wiki-flow" | "image" | "hermes-flow" | "site-steps" | "review-flow" | "mcp-flow" | "workbench-flow";
   image?: string;
   imageAlt?: string;
-  links: (Link & { home?: boolean })[];
+  links: Link[];
   more?: string;
   videos?: AiVideo[];
 };
