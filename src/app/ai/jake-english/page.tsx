@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Image, { type StaticImageData } from "next/image";
+import Image, { getImageProps, type StaticImageData } from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "@/components/button-link";
 import { ExternalLink } from "@/components/external-link";
 import { SectionHead } from "@/components/section-head";
 import { getHome, getJakeEnglish } from "@/lib/content";
-import { FLOW_IMAGES, SLIDE_IMAGES, STORY_IMAGES, VIDEO_THUMB } from "@/lib/jake-english-images";
+import { FLOW_IMAGES, SLIDE_IMAGES, STORY_IMAGES, VIDEO_THUMB, type SlideImage } from "@/lib/jake-english-images";
 import { pageMetadata } from "@/lib/site-meta";
 
 // Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상 → 이야기 4컷 → 연습하는 방법 → 본문 다섯 장 → 끝 링크 순서다.
@@ -87,12 +87,7 @@ export default function JakeEnglishPage() {
                   <span className="text-xs text-subtle">{chapter.metric.label}</span>
                 </div>
               ) : (
-                <Image
-                  src={SLIDE_IMAGES[i]}
-                  alt=""
-                  sizes="(min-width: 64rem) 45rem, 100vw"
-                  className="w-full rounded-[0.625rem] border border-line"
-                />
+                <SlidePicture {...SLIDE_IMAGES[i]} />
               )}
               <p className="mt-4 text-[0.9375rem] leading-[1.75] lg:text-[1.0625rem]">{chapter.body}</p>
             </section>
@@ -106,6 +101,31 @@ export default function JakeEnglishPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+// 본문 1~4장의 슬라이드. 40rem 아래 화면은 같은 글을 좁은 폭에 맞게 다시 짠 모바일 판을 쓴다(art direction, /work 안내서 카드와 같은 방식).
+// 데스크톱 판은 45rem 폭에서, 모바일 판은 375 화면에서 슬라이드 글자가 각각 약 16px, 12px 이상이 되게 찍었다(docs/03-design.md).
+// 두 판은 가로세로 비율이 달라서, 그림을 불러오기 전에도 자리가 맞게 source마다 width와 height를 준다.
+function SlidePicture({ desktop, mobile }: SlideImage) {
+  const {
+    props: { srcSet: desktopSet, sizes: desktopSizes, width: desktopWidth, height: desktopHeight },
+  } = getImageProps({ src: desktop, alt: "", sizes: "(min-width: 64rem) 45rem, 100vw" });
+  const {
+    props: { srcSet: mobileSet, ...rest },
+  } = getImageProps({ src: mobile, alt: "", sizes: "100vw" });
+  return (
+    <picture className="block">
+      <source
+        media="(min-width: 40rem)"
+        srcSet={desktopSet}
+        sizes={desktopSizes}
+        width={desktopWidth}
+        height={desktopHeight}
+      />
+      <source srcSet={mobileSet} sizes={rest.sizes} width={rest.width} height={rest.height} />
+      <img {...rest} alt="" className="h-auto w-full rounded-[0.625rem] border border-line" />
+    </picture>
   );
 }
 

@@ -87,6 +87,25 @@ test("본문 다섯 장은 순서대로 머리글, 소제목, 문단이고, 1~4�
   }
 });
 
+test("슬라이드는 40rem 아래에서 모바일 판, 그 위에서 데스크톱 판을 쓰고, 그림 비율대로 보인다", async ({ page }) => {
+  await page.goto(PATH);
+  const mobile = page.viewportSize()!.width < 640;
+  for (const [i, chapter] of je.chapters.entries()) {
+    if (chapter.metric) continue;
+    const image = page.getByRole("region", { name: chapter.title }).locator("picture img");
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
+    // clientWidth와 clientHeight는 테두리를 뺀 그림 자리다
+    const { src, ratio, natural } = await image.evaluate((el: HTMLImageElement) => ({
+      src: decodeURIComponent(el.currentSrc),
+      ratio: el.clientWidth / el.clientHeight,
+      natural: el.naturalWidth / el.naturalHeight,
+    }));
+    expect(src).toContain(mobile ? `slide-${i + 1}-mobile.` : `slide-${i + 1}.`);
+    expect(Math.abs(ratio - natural) / natural).toBeLessThan(0.01);
+  }
+});
+
 test("끝 링크는 영상 보기와 AI로 일하는 방식이다", async ({ page }) => {
   await page.goto(PATH);
   const main = page.locator("main");
