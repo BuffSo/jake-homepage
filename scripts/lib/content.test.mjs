@@ -177,7 +177,7 @@ test("영상 목록은 영상마다 필요한 값과 실제 썸네일 파일을 
       for (const key of ["order", "title", "thumbnail", "thumbnailAlt", "built"]) assert.ok(video[key], `${name}: ${key} 없음`);
       assert.ok(video.metric?.value && video.metric?.label, `${name}: metric 없음`);
       assert.ok(video.link?.label && video.link?.href, `${name}: link 없음`);
-      // 화면은 src/assets 아래 jpg, png만 미리 불러 둔다 (src/components/ai/ai-videos.tsx)
+      // 화면은 src/assets 아래 jpg, png만 미리 불러 둔다 (src/lib/asset-images.ts)
       assert.match(video.thumbnail, /^src\/assets\/.+\.(jpg|png)$/, `${name}: 썸네일은 src/assets 아래 jpg나 png`);
       assert.ok(existsSync(path.join(ROOT, video.thumbnail)), `${name}: 썸네일 파일이 없음 ${video.thumbnail}`);
     }

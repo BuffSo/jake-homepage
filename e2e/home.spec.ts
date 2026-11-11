@@ -593,14 +593,17 @@ test.describe("아래 섹션", () => {
     const front = (await imgs.nth(1).boundingBox())!;
     expect(front.x).toBeGreaterThan(back.x);
     expect(front.y).toBeGreaterThan(back.y);
+    // 나란히가 아니라 겹친다
+    expect(front.x).toBeLessThan(back.x + back.width);
+    expect(front.y).toBeLessThan(back.y + back.height);
     // 두 장은 같은 크기다
     expect(Math.round(front.width)).toBe(Math.round(back.width));
   });
 
   test("영상 카드의 썸네일은 화면 폭이 달라도 그림 칸 안에 든다", async ({ page }, testInfo) => {
-    // 휴대폰보다 넓은 한 칸 화면(600, 744)과 두 칸 화면(800). 375와 1280은 두 프로젝트가 본다.
+    // 휴대폰(375), 휴대폰보다 넓은 한 칸 화면(600, 744), 두 칸 화면(800), 데스크톱(1024, 1280)
     test.skip(testInfo.project.name !== "desktop", "폭을 직접 바꿔 보므로 한 번만 돈다");
-    for (const width of [600, 744, 800]) {
+    for (const width of [375, 600, 744, 800, 1024, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/");
       const card = page
