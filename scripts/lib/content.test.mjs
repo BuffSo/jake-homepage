@@ -286,3 +286,18 @@ test("Jake English 글은 이야기 4컷과 앱 화면 4컷이 네 칸씩, 장�
   });
   assert.deepEqual(je.chapters[4].metric, { value: "PR 78개", label: "2026-11-04 ~ 11-09 · 머지한 PR" });
 });
+
+test("Jake English 기술 스택은 묶음마다 이름과 기술이 있고, 한 기술이 두 묶음에 나오지 않는다", () => {
+  const je = read("content/site/jake-english.md");
+  assert.ok(Array.isArray(je.stack) && je.stack.length > 0, "stack이 없습니다");
+  const seen = new Set();
+  for (const { group, items } of je.stack) {
+    assert.ok(group, "묶음 이름이 없습니다");
+    assert.ok(Array.isArray(items) && items.length > 0, `${group}: 기술이 없습니다`);
+    for (const item of items) {
+      assert.equal(typeof item, "string", `${group}: 기술 이름은 글자여야 합니다`);
+      assert.ok(!seen.has(item), `${item}이 두 묶음에 있습니다`);
+      seen.add(item);
+    }
+  }
+});

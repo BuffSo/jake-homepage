@@ -29,6 +29,17 @@ chapters:
       value: PR 78개
       label: '2026-11-04 ~ 11-09 · 머지한 PR'
     body: 닷새 남짓 동안 PR 78개를 머지했습니다. 그 가운데 58개는 리뷰 에이전트(pr-review)가 먼저 검토했고, AI의 제안과 제 판단은 기능마다 작업 일지에 남겼습니다.
+stack:
+  - group: 폰 앱
+    items: [React Native, Expo, TypeScript]
+  - group: Mac 서버
+    items: [Python, FastAPI]
+  - group: 음성 (Mac에서 실행)
+    items: [whisper.cpp, Qwen3-TTS]
+  - group: AI
+    items: [Claude API]
+  - group: 연결
+    items: [Tailscale]
 ---
 
 <!--
@@ -41,5 +52,8 @@ chapters:
 - 이야기 4컷은 Gemini 앱으로 그린 그림이다. 이야기 4컷 절 소제목 "이야기 4컷"과 story의 1, 2번 문구(설계의 W11, W12)는 추천안으로 정했고 사용자가 확인했다(2026-11-11). story의 3, 4번과 panels의 3번은 2026-11-11에 사용자가 직접 고쳐 썼다.
 - chapters의 1장 문단(설계의 W9-1)은 2026-11-11에 사용자가 화면을 보고 여러 번 고쳐 썼다. 순서는 첫마디가 나오지 않은 일, 외국인 관광객이 늘어 일상 영어를 다시 연습하려 함, AI 활용이 일상이 되며 많이 생긴 AI 튜터가 입맛에 맞지 않음, 입맛에 맞게 반응하는 앱이 필요함, 직접 만듦이다. AI 튜터를 무엇으로 만들었는지는 근거가 없어 시대는 AI 코딩이 아니라 AI 활용으로 쓴다. 말할 때마다 바로 짚어 주는 것은 다른 AI 튜터도 하는 일이라 다른 점으로 내세우지 않고, 제 입맛에 맞게 반응하는 앱을 직접 만들었다는 것을 앞에 둔다. 1장 그림의 세 줄(첫마디, AI 튜터, 그래서)도 이 문단에 맞춰 바꿨다.
 - 연습하는 방법 절의 소제목 연습하는 방법과 panels의 네 칸 문구는 앱 코드에서 확인한 사실로 정한 추천안이다(2026-11-11). 번호와 연습 흐름이라는 순서는 번호 순서가 라이언이 늘 먼저 묻는 흐름처럼 읽혀서 뺐다.
+- stack은 본문 다섯 장 뒤의 기술 스택 절이다. 묶음 이름과 항목은 본인이 확인했고(2026-11-11), 기술 이름은 jake-english 저장소의 코드로 확인했다(ADR-0010의 원칙, 2026-11-11).
+  폰 앱은 app/package.json(expo ~58, react-native 0.88, typescript), Mac 서버는 server/pyproject.toml(requires-python >=3.12, fastapi),
+  whisper.cpp는 server/je_server/asr.py, Qwen3-TTS와 Tailscale은 README, Claude API는 server/pyproject.toml의 anthropic이다. 로고는 넣지 않는다.
 - 그림은 src/lib/jake-english-images.ts에 있다. 이야기 4컷 칸, 연습하는 방법 칸, 장의 순서는 story, panels, chapters의 순서와 같다.
 -->
