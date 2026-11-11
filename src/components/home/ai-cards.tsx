@@ -24,7 +24,9 @@ function Figure({ work }: { work: AiWork }) {
 // (docs/03-design.md 홈 영상 카드). 자리는 칸 가운데 2:1 무대를 기준으로 잡아, 휴대폰보다 넓은 한 칸 화면에서도
 // 썸네일이 칸 높이를 넘지 않는다. 썸네일 한 장은 무대 폭의 64%다.
 const THUMB = "absolute aspect-video w-[64%] rounded-md border border-line object-cover lg:rounded-lg";
-const THUMB_SIZES = "(min-width: 80rem) 23rem, (min-width: 48rem) 29vw, 60vw";
+// 썸네일은 무대 폭의 64%이고, 무대 폭은 칸 높이의 두 배를 넘지 않는다.
+// 64rem 아래는 칸 높이 11.25rem이라 썸네일이 14.4rem을 넘지 않고, 위는 카드 폭(약 44vw)의 64%다.
+const THUMB_SIZES = "(min-width: 80rem) 22.5rem, (min-width: 64rem) 28vw, 14.5rem";
 
 function VideoStack({ videos }: { videos: AiVideo[] }) {
   const [back, front] = videos.slice(-2);
