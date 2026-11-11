@@ -1,5 +1,3 @@
-import Image from "next/image";
-import video from "@/assets/home/video.jpg";
 import {
   HermesFlow,
   ITEM_FRAME,
@@ -33,15 +31,6 @@ function Figure({ work }: { work: AiWork }) {
       return <WorkbenchFlow className={ITEM_FRAME} />;
     case "site-steps":
       return <SiteSteps className={ITEM_FRAME_STEPS} />;
-    case "image":
-      return (
-        <Image
-          src={video}
-          alt={work.imageAlt ?? ""}
-          sizes="(min-width: 80rem) 35rem, (min-width: 64rem) 45vw, 100vw"
-          className="h-[12.5rem] w-full rounded-[0.625rem] border border-line object-cover lg:h-80 lg:rounded-xl"
-        />
-      );
     default:
       return null;
   }

@@ -79,7 +79,7 @@ export type AiVideo = {
 
 /**
  * content/site/ai/의 글. 상세 항목은 그림과 결과(또는 쓰는 법)를, 짧은 카드는 more(/work#…)를 갖는다.
- * videos가 있는 항목은 /ai에서 그림, 만든 것, 숫자, 링크를 영상마다 따로 보인다. 항목의 그림, 숫자, 링크는 홈 카드에만 쓴다.
+ * videos가 있는 항목은 /ai에서 그림, 만든 것, 숫자, 링크를 영상마다 따로 보인다. 항목의 그림(videos)과 숫자는 홈 카드에만 쓴다.
  */
 export type AiWork = {
   slug: string;
@@ -96,9 +96,7 @@ export type AiWork = {
   result?: string;
   usage?: string; // 개인 도구는 결과 대신 쓰는 법
   metric: Metric;
-  figure?: "wiki-flow" | "image" | "hermes-flow" | "site-steps" | "review-flow" | "mcp-flow" | "workbench-flow";
-  image?: string;
-  imageAlt?: string;
+  figure?: "wiki-flow" | "videos" | "hermes-flow" | "site-steps" | "review-flow" | "mcp-flow" | "workbench-flow";
   links: Link[];
   more?: string;
   videos?: AiVideo[];

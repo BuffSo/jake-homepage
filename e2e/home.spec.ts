@@ -43,6 +43,12 @@ const projects = readDir<Project>("content/site/projects");
 const aiWorks = readDir<AiWork>("content/site/ai")
   .filter((w) => w.home !== undefined)
   .sort((a, b) => a.home! - b.home!);
+// 영상 카드는 영상 목록의 마지막 두 편을 겹친다. 앞선 편이 뒤, 나중 편이 앞이다.
+const videoWork = read("content/site/ai/video.md") as {
+  headline: string;
+  videos: { order: number; thumbnailAlt: string }[];
+};
+const [backVideo, frontVideo] = [...videoWork.videos].sort((a, b) => a.order - b.order).slice(-2);
 
 test("홈이 열리고 콘솔 오류와 실패한 요청이 없다", async ({ page }) => {
   const errors = collectErrors(page);
@@ -571,6 +577,47 @@ test.describe("아래 섹션", () => {
     // {adrCount} 같은 자리가 그대로 남지 않았는지
     await expect(section).not.toContainText("{");
     await expect(section).toContainText(/ADR \d+개/);
+  });
+
+  test("영상 카드는 두 영상의 썸네일을 겹치고, 나중 영상이 앞 오른쪽 아래에 있다", async ({ page }) => {
+    await page.goto("/");
+    const card = page
+      .getByRole("region", { name: "AI로 일하는 방식" })
+      .getByRole("article")
+      .filter({ hasText: videoWork.headline });
+    const imgs = card.getByRole("img");
+    await expect(imgs).toHaveCount(2);
+    await expect(imgs.nth(0)).toHaveAttribute("alt", backVideo.thumbnailAlt);
+    await expect(imgs.nth(1)).toHaveAttribute("alt", frontVideo.thumbnailAlt);
+    const back = (await imgs.nth(0).boundingBox())!;
+    const front = (await imgs.nth(1).boundingBox())!;
+    expect(front.x).toBeGreaterThan(back.x);
+    expect(front.y).toBeGreaterThan(back.y);
+    // 두 장은 같은 크기다
+    expect(Math.round(front.width)).toBe(Math.round(back.width));
+  });
+
+  test("영상 카드의 썸네일은 화면 폭이 달라도 그림 칸 안에 든다", async ({ page }, testInfo) => {
+    // 휴대폰보다 넓은 한 칸 화면(600, 744)과 두 칸 화면(800). 375와 1280은 두 프로젝트가 본다.
+    test.skip(testInfo.project.name !== "desktop", "폭을 직접 바꿔 보므로 한 번만 돈다");
+    for (const width of [600, 744, 800]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+      const card = page
+        .getByRole("region", { name: "AI로 일하는 방식" })
+        .getByRole("article")
+        .filter({ hasText: videoWork.headline });
+      const imgs = card.getByRole("img");
+      // 그림 칸은 무대(썸네일의 부모)의 부모다
+      const frame = (await imgs.first().locator("xpath=../..").boundingBox())!;
+      for (const img of await imgs.all()) {
+        const box = (await img.boundingBox())!;
+        expect(box.x, `${width}: 왼쪽`).toBeGreaterThanOrEqual(frame.x - 1);
+        expect(box.y, `${width}: 위`).toBeGreaterThanOrEqual(frame.y - 1);
+        expect(box.x + box.width, `${width}: 오른쪽`).toBeLessThanOrEqual(frame.x + frame.width + 1);
+        expect(box.y + box.height, `${width}: 아래`).toBeLessThanOrEqual(frame.y + frame.height + 1);
+      }
+    }
   });
 
   test("About에 소개, 동료 평가, 이력서와 연락 링크가 있다", async ({ page }) => {

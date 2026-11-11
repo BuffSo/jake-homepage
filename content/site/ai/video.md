@@ -6,15 +6,12 @@ home: 2
 eyebrow: VIDEO · 영상 제작
 title: 영상 제작
 headline: 편집 도구를 직접 다루지 않고도 영상을 만듭니다.
-desc: Claude Code의 computer use로 에이전트가 CapCut을 조작해 나레이션을 만들고, ffmpeg로 자막과 전환, 음악을 조립했습니다. 저는 목소리와 음악을 고르고 결과를 판단했습니다.
-note: 음악은 AI가 추천한 곳에서 유튜브용 라이선스를 확인해 선정했습니다.
+desc: Recueve 영상은 computer use로 에이전트에게 CapCut을 조작하게 해서 만들었습니다. Jake English 영상은 대본 초안과 HTML 슬라이드, 자막을 AI로 만들고, 말하는 진행자는 클라우드 GPU에서 영상 생성 모델을 돌려 만들었습니다.
 problem: 영상이 필요했지만 편집 도구를 다뤄 본 적이 없었습니다.
 metric:
-  value: 71.9초 · 6장면 · 1080p
-  label: 완성본
-figure: image
-image: video
-imageAlt: Recueve 소개 영상의 썸네일
+  value: 영상 2편 · 1080p
+  label: 유튜브에 공개한 완성본
+figure: videos
 links: []
 videos:
   - order: 1
@@ -46,9 +43,11 @@ sources:
 
 <!--
 영상 제작 항목이다. 영상은 videos에 한 편씩 두고, order 순서로 /ai에 그린다.
-- 영상을 더할 때는 videos에 한 덩이를 더하고 썸네일 그림을 src/assets 아래에 둔다. 코드는 고치지 않는다(src/components/ai/ai-videos.tsx).
+- 영상을 더할 때는 videos에 한 덩이를 더하고 썸네일 그림을 src/assets 아래에 둔다. 코드는 고치지 않는다(src/lib/asset-images.ts가 경로로 찾는다).
 - 공개한 영상만 넣는다.
-- 항목의 desc, note, metric, links, figure, image, imageAlt는 홈 AI 카드에만 쓴다. 홈 카드는 Recueve 소개 영상을 보인다.
+- 항목의 desc, metric, figure는 홈 AI 카드에만 쓴다. 홈 카드에는 바깥 링크를 두지 않아 links는 비운다.
+- 홈 카드 그림은 videos의 마지막 두 편을 같은 크기로 겹치고, 앞선 편(먼저 만든 Recueve)을 뒤에 둔다. 나중 영상이 더 나아간 것이 차례로 보이게 한 것이다(2026-11-11 사용자).
+- 홈 카드 설명은 두 영상을 이름으로 말하고, 숫자는 편수를 말한다. 영상을 더하면 둘을 함께 고친다(내용 시험이 편수를 본다). 홈 카드에는 영상 길이를 쓰지 않는다.
 
 Recueve 소개 영상
 - 공개된 유튜브 영상이다. 무엇에 제출한 영상인지는 쓰지 않는다.
