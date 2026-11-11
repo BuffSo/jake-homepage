@@ -1,5 +1,5 @@
 ---
-title: 직접 만들어 쓰는 영어 회화 연습 앱
+title: 직접 만든 영어 회화 연습 앱
 subtitle: Jake English
 description: 해 보고 싶은 상황을 직접 정해 AI 선생님과 영어로 대화하고, 듣고 따라 말하며 연습하는 앱입니다.
 video:
