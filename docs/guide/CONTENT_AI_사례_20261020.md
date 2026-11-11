@@ -1,9 +1,9 @@
 # AI 사례와 Jake English 페이지
 
-> 정함: 2026-10-20 (커리어 저장소에서 PDF로 만든 AI 도구 활용 사례를 `/ai/case`로 실음), 2026-11-11 (공개한 영상으로 Jake English 페이지 `/ai/jake-english`를 만듦, 같은 날 기술 스택 절을 더하고 슬라이드를 사이트 폭에 맞춰 다시 찍음, `/ai` 영상 제작 항목에 영상 목록을 둠)
-> 코드: `scripts/sync.config.mjs`(사례 세 파일), `scripts/lib/sync.mjs`(그림 동기화), `src/lib/ai-case.mjs`(읽기와 칸 자르기), `src/components/ai/case-panel.tsx`, `src/components/ai/ai-entry.tsx`(`/ai` 맨 위 띠 둘이 같이 씀), `src/app/ai/case/page.tsx`, `src/app/ai/jake-english/page.tsx`, `src/lib/jake-english-images.ts`, `content/site/jake-english.md`, `src/assets/ai/jake-english/`, `content/site/ai/video.md`(영상 목록), `src/components/ai/ai-videos.tsx`
-> 확인: `e2e/ai-case.spec.ts`, `scripts/lib/ai-case.test.mjs`, `scripts/lib/sync.test.mjs`, `e2e/ai-jake-english.spec.ts`, `e2e/ai.spec.ts`의 두 입구와 영상 칸, `scripts/lib/content.test.mjs`의 Jake English 글과 영상 목록
-> 캡처: [design/ai-case](../design/ai-case/), [design/ai-jake-english](../design/ai-jake-english/), [design/ai-video](../design/ai-video/)
+> 정함: 2026-10-20 (커리어 저장소에서 PDF로 만든 AI 도구 활용 사례를 `/ai/case`로 실음), 2026-11-11 (공개한 영상으로 Jake English 페이지 `/ai/jake-english`를 만듦, 같은 날 기술 스택 절을 더하고 슬라이드를 사이트 폭에 맞춰 다시 찍음, `/ai` 영상 제작 항목에 영상 목록을 둠, 홈 영상 카드가 목록의 두 편을 겹쳐 보임)
+> 코드: `scripts/sync.config.mjs`(사례 세 파일), `scripts/lib/sync.mjs`(그림 동기화), `src/lib/ai-case.mjs`(읽기와 칸 자르기), `src/components/ai/case-panel.tsx`, `src/components/ai/ai-entry.tsx`(`/ai` 맨 위 띠 둘이 같이 씀), `src/app/ai/case/page.tsx`, `src/app/ai/jake-english/page.tsx`, `src/lib/jake-english-images.ts`, `content/site/jake-english.md`, `src/assets/ai/jake-english/`, `content/site/ai/video.md`(영상 목록), `src/components/ai/ai-videos.tsx`, `src/lib/asset-images.ts`(그림을 경로로 찾기, `/ai` 영상 목록과 홈 영상 카드가 같이 씀), `src/components/home/ai-cards.tsx`(홈 영상 카드)
+> 확인: `e2e/ai-case.spec.ts`, `scripts/lib/ai-case.test.mjs`, `scripts/lib/sync.test.mjs`, `e2e/ai-jake-english.spec.ts`, `e2e/ai.spec.ts`의 두 입구와 영상 칸, `scripts/lib/content.test.mjs`의 Jake English 글과 영상 목록, `e2e/home.spec.ts`의 홈 영상 카드
+> 캡처: [design/ai-case](../design/ai-case/), [design/ai-jake-english](../design/ai-jake-english/), [design/ai-video](../design/ai-video/), [design/home-ai-cards](../design/home-ai-cards/)
 
 다른 곳에서 만든 문서(PDF 같은 결과물)를 사이트 페이지로 옮길 때의 기준입니다. 사례가 늘거나 다른 사이트에서 같은 일을 할 때 따릅니다. 옮기며 겪은 문제도 함께 둡니다.
 
