@@ -16,6 +16,7 @@ type AiWork = {
   usage?: string;
   links: { label: string; href: string }[];
   more?: string;
+  videos?: { order: number; title: string; thumbnailAlt: string; link: { label: string; href: string } }[];
 };
 
 const read = (file: string) => parseFrontmatter(readFileSync(file, "utf8"), file).data;
@@ -27,6 +28,9 @@ const works = readdirSync("content/site/ai")
   .sort((a, b) => a.order - b.order);
 const details = works.filter((w) => !w.more);
 const shorts = works.filter((w) => w.more);
+// 영상 목록이 있는 항목(영상 제작). 영상은 order 순서로 그린다.
+const withVideos = works.filter((w) => w.videos);
+const videosOf = (work: AiWork) => [...work.videos!].sort((a, b) => a.order - b.order);
 
 test("AI 페이지가 열리고 콘솔 오류와 실패한 요청이 없다", async ({ page }) => {
   const errors = collectErrors(page);
@@ -80,6 +84,21 @@ test("상세 항목에 문제, 만든 것, 결과 또는 쓰는 법과 링크가
   for (const work of details) {
     const item = page.locator(`article#${work.slug}`);
     const terms = item.locator("dt");
+    if (work.videos) {
+      // 영상 목록이 있는 항목은 공통 단락(문제, 있으면 결과)만 두고, 만든 것과 숫자, 링크는 영상마다 둔다
+      await expect(terms).toHaveText(work.result ? ["문제", "결과"] : ["문제"]);
+      const cards = item.getByRole("listitem");
+      await expect(cards).toHaveCount(work.videos.length);
+      for (const [i, video] of videosOf(work).entries()) {
+        const card = cards.nth(i);
+        await expect(card.getByRole("heading", { level: 4 })).toHaveText(video.title);
+        await expect(card.getByRole("img")).toHaveAttribute("alt", video.thumbnailAlt);
+        const anchor = card.getByRole("link", { name: new RegExp(video.link.label) });
+        await expect(anchor).toHaveAttribute("href", video.link.href);
+        await expect(anchor).toHaveAttribute("target", "_blank");
+      }
+      continue;
+    }
     await expect(terms).toHaveText(["문제", "만든 것", work.usage ? "쓰는 법" : "결과"]);
     // 개인 도구는 결과 대신 쓰는 법을 쓴다
     if (work.group === "personal") await expect(terms.last()).toHaveText("쓰는 법");
@@ -87,6 +106,31 @@ test("상세 항목에 문제, 만든 것, 결과 또는 쓰는 법과 링크가
       const anchor = item.getByRole("link", { name: new RegExp(link.label) });
       await expect(anchor).toHaveAttribute("href", link.href);
       await expect(anchor).toHaveAttribute("target", "_blank");
+    }
+  }
+});
+
+test("영상 칸은 데스크톱에서 두 칸씩 나란히, 모바일에서 위아래로 쌓인다", async ({ page }, testInfo) => {
+  for (const work of withVideos) {
+    await page.goto("/ai");
+    const cards = page.locator(`article#${work.slug}`).getByRole("listitem");
+    const boxes = await Promise.all((await cards.all()).map((card) => card.boundingBox()));
+    const buttons = await Promise.all(
+      (await cards.all()).map((card, i) => card.getByRole("link", { name: new RegExp(videosOf(work)[i].link.label) }).boundingBox()),
+    );
+    for (const [i, box] of boxes.entries()) {
+      expect(box).not.toBeNull();
+      if (i === 0) continue;
+      const prev = boxes[i - 1]!;
+      if (testInfo.project.name === "mobile" || i % 2 === 0) {
+        // 모바일은 모든 칸이, 데스크톱은 셋째 칸부터 앞 칸 아래 줄로 간다
+        expect(box!.y).toBeGreaterThanOrEqual(prev.y + prev.height);
+      } else {
+        // 데스크톱은 같은 줄의 두 칸이 위와 버튼 높이를 맞춘다
+        expect(Math.abs(box!.y - prev.y)).toBeLessThan(1);
+        expect(box!.x).toBeGreaterThan(prev.x);
+        expect(Math.abs(buttons[i]!.y - buttons[i - 1]!.y)).toBeLessThan(1);
+      }
     }
   }
 });
