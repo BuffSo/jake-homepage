@@ -171,6 +171,9 @@ export type AiCase = { title: string; subtitle: string; heading: string; panels:
 /** Jake English 페이지의 장 하나. 숫자 장은 슬라이드 그림 대신 metric을 보여 준다 (/ai/jake-english) */
 export type JakeEnglishChapter = { title: string; body: string; metric?: Metric };
 
+/** Jake English 기술 스택의 묶음 하나. 이름은 글자로만 보여 준다 (/ai/jake-english) */
+export type JakeEnglishStack = { group: string; items: string[] };
+
 /** Jake English 사이트 전용 글 (content/site/jake-english.md, /ai 맨 위 띠와 /ai/jake-english) */
 export type JakeEnglish = {
   title: string;
@@ -180,6 +183,7 @@ export type JakeEnglish = {
   story: { caption: string }[];
   panels: { caption: string }[];
   chapters: JakeEnglishChapter[];
+  stack: JakeEnglishStack[];
 };
 
 /** content/site/ 아래의 글 하나 */
