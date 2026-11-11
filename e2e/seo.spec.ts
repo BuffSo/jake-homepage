@@ -6,7 +6,7 @@ import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 // 공유 정보는 운영 주소(https://jakeso.dev)를 가리키므로, 그림은 주소의 경로만 떼어 이 서버에서 받아 본다.
 
 const SITE = "https://jakeso.dev";
-const PAGES = ["/", "/work", "/ai", "/ai/case", "/resume"];
+const PAGES = ["/", "/work", "/ai", "/ai/case", "/ai/jake-english", "/resume"];
 const home = parseFrontmatter(readFileSync("content/site/home.md", "utf8"), "home.md").data as {
   lines: string[];
   contact: { github: string };

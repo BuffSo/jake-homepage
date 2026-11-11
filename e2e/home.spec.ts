@@ -116,11 +116,12 @@ test("헤더에 지금 보는 페이지가 표시된다", async ({ page }, testI
   const open = async () => {
     if (mobile) await page.locator("header summary").click();
   };
-  // 메뉴 아래의 페이지(/ai/case)는 밑줄은 같고, 화면 읽기 프로그램에는 "true"로 알린다.
+  // 메뉴 아래의 페이지(/ai/case, /ai/jake-english)는 밑줄은 같고, 화면 읽기 프로그램에는 "true"로 알린다.
   for (const [path, label, state] of [
     ["/work", "Work", "page"],
     ["/ai", "AI", "page"],
     ["/ai/case", "AI", "true"],
+    ["/ai/jake-english", "AI", "true"],
     ["/resume", "Resume", "page"],
   ]) {
     await page.goto(path);

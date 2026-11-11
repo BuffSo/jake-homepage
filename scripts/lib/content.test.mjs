@@ -238,3 +238,20 @@ test("저장소에서 세는 숫자는 실제 파일과 맞고, 자리 표시는
     }
   }
 });
+
+test("Jake English 글은 이야기 4컷과 앱 화면 4컷이 네 칸씩, 장이 다섯이고, 숫자는 마지막 장에만 있다", () => {
+  const je = read("content/site/jake-english.md");
+  for (const key of ["title", "subtitle", "description"]) assert.ok(je[key], `${key}가 없습니다`);
+  assert.match(je.video.href, /^https:\/\/www\.youtube\.com\/watch\?v=[\w-]{11}$/);
+  assert.ok(je.video.caption);
+  assert.equal(je.story.length, 4);
+  for (const panel of je.story) assert.ok(panel.caption);
+  assert.equal(je.panels.length, 4);
+  for (const panel of je.panels) assert.ok(panel.caption);
+  assert.equal(je.chapters.length, 5);
+  je.chapters.forEach((chapter, i) => {
+    assert.ok(chapter.title && chapter.body, `${i + 1}장에 소제목이나 문단이 없습니다`);
+    assert.equal(Boolean(chapter.metric), i === 4, `${i + 1}장의 숫자`);
+  });
+  assert.deepEqual(je.chapters[4].metric, { value: "PR 78개", label: "2026-11-04 ~ 11-09 · 머지한 PR" });
+});

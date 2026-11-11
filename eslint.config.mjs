@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // git에서 뺀 로컬 메모 폴더. 시안을 찍는 임시 스크립트가 들어 있어도 사이트 코드가 아니다.
+    "docs/private/**",
   ]),
 ]);
 
