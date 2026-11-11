@@ -1,7 +1,7 @@
 import Image from "next/image";
-import video from "@/assets/home/video.jpg";
 import { ButtonLink } from "@/components/button-link";
-import { getHome, getHomeAiWorks, type AiWork } from "@/lib/content";
+import { assetImage } from "@/lib/asset-images";
+import { getHome, getHomeAiWorks, type AiVideo, type AiWork } from "@/lib/content";
 import { CARD_FRAME, CARD_FRAME_STEPS, HermesFlow, SiteSteps, WikiFlow } from "@/components/ai-figures";
 import { Metric, SectionHead } from "@/components/section-head";
 
@@ -15,16 +15,39 @@ function Figure({ work }: { work: AiWork }) {
       return <HermesFlow className={CARD_FRAME} />;
     case "site-steps":
       return <SiteSteps className={CARD_FRAME_STEPS} />;
-    case "image":
-      return (
-        <Image
-          src={video}
-          alt={work.imageAlt ?? ""}
-          sizes="(min-width: 80rem) 36rem, (min-width: 48rem) 45vw, 100vw"
-          className="h-[11.875rem] w-full border-b border-line object-cover lg:h-[17.5rem]"
-        />
-      );
+    case "videos":
+      return <VideoStack videos={work.videos!} />;
   }
+}
+
+// 영상 카드 그림: 목록의 마지막 두 편을 같은 크기로 겹친다. 먼저 만든 편이 뒤 왼쪽 위, 나중 편이 앞 오른쪽 아래다
+// (docs/03-design.md 홈 영상 카드). 자리는 칸 가운데 2:1 무대를 기준으로 잡아, 휴대폰보다 넓은 한 칸 화면에서도
+// 썸네일이 칸 높이를 넘지 않는다. 썸네일 한 장은 무대 폭의 64%다.
+const THUMB = "absolute aspect-video w-[64%] rounded-md border border-line object-cover lg:rounded-lg";
+// 썸네일은 무대 폭의 64%이고, 무대 폭은 칸 높이의 두 배를 넘지 않는다.
+// 64rem 아래는 칸 높이 11.25rem이라 썸네일이 14.4rem을 넘지 않고, 위는 카드 폭(약 44vw)의 64%다.
+const THUMB_SIZES = "(min-width: 80rem) 22.5rem, (min-width: 64rem) 28vw, 14.5rem";
+
+function VideoStack({ videos }: { videos: AiVideo[] }) {
+  const [back, front] = videos.slice(-2);
+  return (
+    <div className={`${CARD_FRAME} bg-surface`}>
+      <div className="relative mx-auto aspect-[2/1] h-full max-w-full">
+        {[
+          { video: back, place: "top-[9%] left-[7%]" },
+          { video: front, place: "right-[7%] bottom-[9%]" },
+        ].map(({ video, place }) => (
+          <Image
+            key={video.thumbnail}
+            src={assetImage(video.thumbnail)}
+            alt={video.thumbnailAlt}
+            sizes={THUMB_SIZES}
+            className={`${THUMB} ${place}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function AiCards() {
@@ -52,14 +75,8 @@ export function AiCards() {
                 <div className="mt-auto">
                   <Metric {...work.metric} />
                 </div>
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {work.links
-                    .filter((link) => link.home)
-                    .map((link) => (
-                      <ButtonLink key={link.href} href={link.href} variant="solid">
-                        {link.label}
-                      </ButtonLink>
-                    ))}
+                {/* 바깥 링크(영상, 저장소)는 /ai 항목에서 연다. 홈 카드의 버튼은 자세히 보기 하나다. */}
+                <div className="mt-1">
                   <ButtonLink href={`/ai#${work.slug}`}>자세히 보기</ButtonLink>
                 </div>
               </div>

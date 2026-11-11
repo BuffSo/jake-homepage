@@ -137,7 +137,7 @@ test("서비스 글은 카드에 필요한 값을 모두 갖고, 순서가 겹�
 
 test("AI 작업 글은 항목에 필요한 값을 모두 갖고, 순서가 겹치지 않는다", () => {
   const groups = new Set(read("content/site/ai-page.md").groups.map((g) => g.id));
-  const figures = new Set(["wiki-flow", "image", "hermes-flow", "site-steps", "review-flow", "mcp-flow", "workbench-flow"]);
+  const figures = new Set(["wiki-flow", "videos", "hermes-flow", "site-steps", "review-flow", "mcp-flow", "workbench-flow"]);
   for (const { file, data } of aiWorks) {
     for (const key of ["slug", "order", "group", "eyebrow", "title", "problem"]) {
       assert.ok(data[key], `${file}: ${key} 없음`);
@@ -154,7 +154,8 @@ test("AI 작업 글은 항목에 필요한 값을 모두 갖고, 순서가 겹�
     } else {
       assert.ok(data.headline, `${file}: headline 없음`);
       assert.ok(figures.has(data.figure), `${file}: 모르는 figure ${data.figure}`);
-      if (data.figure === "image") assert.ok(data.image && data.imageAlt, `${file}: 이미지 정보 없음`);
+      // 홈 카드 그림은 영상 목록의 마지막 두 편을 겹친다 (src/components/home/ai-cards.tsx)
+      if (data.figure === "videos") assert.ok(data.videos?.length >= 2, `${file}: 영상이 두 편 이상이어야 함`);
       // 개인 도구는 결과 대신 쓰는 법을 쓴다 (docs/02-ia.md /ai)
       if (data.group === "personal") assert.ok(data.usage && !data.result, `${file}: 개인 도구는 usage만 씀`);
       // 영상 목록이 있으면 영상마다 숫자 칸과 링크가 결과를 말해, 항목의 결과는 없어도 된다
@@ -176,20 +177,27 @@ test("영상 목록은 영상마다 필요한 값과 실제 썸네일 파일을 
       for (const key of ["order", "title", "thumbnail", "thumbnailAlt", "built"]) assert.ok(video[key], `${name}: ${key} 없음`);
       assert.ok(video.metric?.value && video.metric?.label, `${name}: metric 없음`);
       assert.ok(video.link?.label && video.link?.href, `${name}: link 없음`);
-      // 화면은 src/assets 아래 jpg, png만 미리 불러 둔다 (src/components/ai/ai-videos.tsx)
+      // 화면은 src/assets 아래 jpg, png만 미리 불러 둔다 (src/lib/asset-images.ts)
       assert.match(video.thumbnail, /^src\/assets\/.+\.(jpg|png)$/, `${name}: 썸네일은 src/assets 아래 jpg나 png`);
       assert.ok(existsSync(path.join(ROOT, video.thumbnail)), `${name}: 썸네일 파일이 없음 ${video.thumbnail}`);
     }
     const orders = data.videos.map((v) => v.order);
     assert.equal(new Set(orders).size, orders.length, `${file}: 영상 순서가 겹침`);
-    // 홈 카드는 영상 한 편을 보인다. 카드의 숫자, 링크, 그림 설명은 그 영상의 것과 같아야 한다.
+    // 홈 카드의 숫자는 영상 수를 말한다. 영상을 더하면 실패해, 홈 카드의 설명과 그림도 다시 보게 한다.
     if (data.home !== undefined) {
-      const homeLink = data.links.find((l) => l.home);
-      const video = data.videos.find((v) => v.link.href === homeLink?.href);
-      assert.ok(video, `${file}: 홈 카드의 링크가 영상 목록에 없음`);
-      assert.deepEqual(data.metric, video.metric, `${file}: 홈 카드 숫자와 ${video.title}의 숫자가 다름`);
-      assert.equal(data.imageAlt, video.thumbnailAlt, `${file}: 홈 카드 그림 설명과 ${video.title}의 썸네일 설명이 다름`);
+      const count = Number(data.metric.value.match(/^영상 (\d+)편/)?.[1]);
+      assert.equal(count, data.videos.length, `${file}: 홈 카드 숫자의 편수와 영상 수가 다름`);
     }
+  }
+});
+
+test("홈 AI 카드에는 바깥 링크를 띄우지 않는다", () => {
+  // 홈 카드의 버튼은 자세히 보기(/ai#slug) 하나다. 바깥 링크는 /ai 항목에서 연다 (docs/02-ia.md 홈 3).
+  for (const { file, data } of aiWorks) {
+    assert.ok(
+      data.links.every((l) => !("home" in l)),
+      `${file}: links에 home이 남음`,
+    );
   }
 });
 
