@@ -1,7 +1,7 @@
 // Jake English 그림 (/ai 맨 위 띠, /ai/jake-english). 이야기 4컷을 뺀 그림은 공개한 소개 영상에서 가져왔다.
 // 썸네일은 영상 썸네일 그대로, 연습하는 방법 4컷은 시연 영상의 폰 화면에 단계와 제목과 말풍선을 HTML로 다시 그려 찍은 것,
 // 이야기 4컷은 Gemini 앱으로 그린 그림이고 띠에서도 작게 쓴다. 슬라이드는 영상 슬라이드의 글과 색을 그대로 두고,
-// 사이트 폭에서 글자가 읽히게 칸과 글자 크기만 바꿔 데스크톱 판과 모바일 판으로 다시 찍은 것이다(제목 줄과 앱 화면은 뺌).
+// 사이트 폭에서 글자가 읽히게 칸과 글자 크기만 바꿔 데스크톱 판과 모바일 판으로 다시 찍은 것이다(제목 줄은 뺌).
 // 만든 방법과 크기는 docs/guide/CONTENT_AI_사례_20261020.md에 있다.
 import type { StaticImageData } from "next/image";
 import flow1 from "@/assets/ai/jake-english/flow-1.jpg";
