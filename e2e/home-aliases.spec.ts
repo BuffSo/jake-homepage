@@ -48,16 +48,19 @@ for (const path of ALIASES) {
     expect(errors).toEqual([]);
 
     expect(await snapshot(page)).toEqual(home);
-    // 홈처럼 헤더 메뉴의 어느 항목에도 지금 페이지 표시가 없고, 다음 페이지는 포트폴리오다.
+    // 홈처럼 헤더 메뉴의 어느 항목에도 지금 페이지 표시가 없다.
     await expect(page.locator("header [aria-current]")).toHaveCount(0);
-    // 다음 페이지 버튼은 끝까지 내리기 전에는 hidden이라 이름으로 찾지 못한다. main 바로 뒤의 버튼 칸에서 찾는다.
-    const next = page.locator("main + div a");
+    // 다음 페이지는 포트폴리오다. 버튼은 끝까지 내려야 보인다(e2e/back-to-top.spec.ts).
+    // 숨은 채로 includeHidden으로 찾으면 aria-hidden인 화살표까지 이름에 들어가 이름이 맞지 않는다.
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    const next = page.getByRole("link", { name: "다음 페이지: 포트폴리오", exact: true });
+    await expect(next).toBeVisible();
     await expect(next).toHaveAttribute("href", "/work");
-    await expect(next).toContainText("포트폴리오");
   });
 }
 
 test("끝 슬래시와 쿼리가 붙어도 그 주소로 열린다", async ({ page }) => {
+  const errors = collectErrors(page);
   for (const [url, path] of [
     ["/about/", "/about"],
     ["/about?stats=off", "/about"],
@@ -66,9 +69,12 @@ test("끝 슬래시와 쿼리가 붙어도 그 주소로 열린다", async ({ pa
     expect(response?.status()).toBe(200);
     expect(new URL(page.url()).pathname).toBe(path);
   }
+  await page.waitForLoadState("networkidle");
+  expect(errors).toEqual([]);
 });
 
-// 미리보기·검색 봇에게는 미리 만든 페이지 대신 요청마다 서버에서 새로 그린다(검색과 공유 가이드의 봇에게만 500).
+// 미리보기·검색 봇에게는 미리 만든 페이지 대신 요청마다 서버에서 새로 그린다. 그 렌더가 되는지 본다.
+// Vercel에서만 나는 파일 추적 누락(검색과 공유 가이드의 봇에게만 500)은 로컬 next start로는 잡히지 않아, 배포 뒤 운영 주소로 본다.
 test("미리보기 봇에게도 열 개 모두 200이고 대표 주소가 홈이다", async ({ request }) => {
   for (const path of ALIASES) {
     const response = await request.get(path, { headers: { "user-agent": BOT } });
@@ -93,7 +99,7 @@ test("짧은 주소에서 메뉴로 옮겨 다닐 수 있다", async ({ page }) 
   await expect(page).toHaveURL(/\/work$/);
   await expect(nav.getByRole("link", { name: "Work" })).toHaveAttribute("aria-current", "page");
   await banner.getByRole("link", { name: "Jake" }).click();
-  await expect(page).toHaveURL(/127\.0\.0\.1:\d+\/$/);
+  await expect(page).toHaveURL((url) => url.pathname === "/");
   await page.waitForLoadState("networkidle");
   expect(errors).toEqual([]);
 });
