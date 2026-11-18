@@ -9,7 +9,7 @@ import { getHome, getJakeEnglish, type JakeEnglishStack } from "@/lib/content";
 import { FLOW_IMAGES, SLIDE_IMAGES, STORY_IMAGES, VIDEO_THUMB, type SlideImage } from "@/lib/jake-english-images";
 import { pageMetadata } from "@/lib/site-meta";
 
-// Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상 → 이야기 4컷 → 연습하는 방법 → 본문 다섯 장 → 기술 스택 → 끝 링크 순서다.
+// Jake English 소개 (docs/02-ia.md /ai/jake-english). 돌아가기 링크 → 머리 → 영상과 저장소 링크 → 이야기 4컷 → 연습하는 방법 → 본문 다섯 장 → 기술 스택 → 끝 링크 순서다.
 // 글은 사이트 전용 글(content/site/jake-english.md)이다. 그림은 공개한 소개 영상에서 가져왔고, 이야기 4컷만 Gemini 앱으로 그렸다.
 // 그림의 대체 텍스트는 모두 비운다. 영상 썸네일은 링크 글이, 이야기 4컷과 연습하는 방법은 설명이, 슬라이드는 바로 아래 문단이 같은 내용을 말하기 때문이다(/ai/case와 같은 규칙).
 // 목차가 없는 서브페이지라 /ai/case처럼 맨 위로 버튼과 다음 페이지 버튼은 두지 않는다.
@@ -35,28 +35,39 @@ export default function JakeEnglishPage() {
         <SectionHead as="h1" id="je-title" label="AI / APP" title={je.title} intro={je.subtitle} />
       </div>
 
-      <ExternalLink href={je.video.href} className="group mb-10 block lg:mb-14 lg:max-w-[52rem]">
-        <span className="relative block overflow-hidden rounded-xl border border-line">
-          <Image
-            src={VIDEO_THUMB}
-            alt=""
-            sizes="(min-width: 64rem) 52rem, 100vw"
-            className="aspect-video w-full object-cover"
-            loading="eager"
-          />
-          <span
-            aria-hidden="true"
-            className="absolute top-1/2 left-1/2 flex h-[3.125rem] w-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[0.875rem] bg-black/72"
-          >
-            <svg viewBox="0 0 18 20" className="ml-0.5 w-[1.125rem] fill-white">
-              <path d="M0 0L18 10L0 20Z" />
-            </svg>
+      {/* 영상과 저장소 링크. 아래 여백은 둘을 감싼 블록이 가져 이야기 4컷 선까지의 간격이 저장소 링크를 넣기 전과 같다. */}
+      <div className="mb-10 lg:mb-14">
+        <ExternalLink href={je.video.href} className="group block lg:max-w-[52rem]">
+          <span className="relative block overflow-hidden rounded-xl border border-line">
+            <Image
+              src={VIDEO_THUMB}
+              alt=""
+              sizes="(min-width: 64rem) 52rem, 100vw"
+              className="aspect-video w-full object-cover"
+              loading="eager"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute top-1/2 left-1/2 flex h-[3.125rem] w-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[0.875rem] bg-black/72"
+            >
+              <svg viewBox="0 0 18 20" className="ml-0.5 w-[1.125rem] fill-white">
+                <path d="M0 0L18 10L0 20Z" />
+              </svg>
+            </span>
           </span>
-        </span>
-        <span className="mt-3 block text-sm text-muted group-hover:text-fg">
-          {je.video.caption} <span aria-hidden="true">→</span>
-        </span>
-      </ExternalLink>
+          <span className="mt-3 block text-sm text-muted group-hover:text-fg">
+            {je.video.caption} <span aria-hidden="true">→</span>
+          </span>
+        </ExternalLink>
+        {/* 영상 아래 한 줄과 같은 작은 회색 글. 누를 수 있는 곳은 글 폭까지이고, 높이는 누르기 쉽게 2.75rem이다(돌아가기 링크와 같음). */}
+        <ExternalLink
+          href={je.repo.href}
+          className="mt-1 flex min-h-11 w-fit items-center gap-1 text-sm text-muted hover:text-fg"
+        >
+          {je.repo.caption}
+          <span aria-hidden="true">↗</span>
+        </ExternalLink>
+      </div>
 
       <section aria-labelledby="story-title" className="border-t border-fg pt-7 lg:pt-10">
         <h2 id="story-title" className="mb-5 text-2xl font-extrabold tracking-[-0.02em] lg:mb-6 lg:text-[2rem]">
@@ -109,6 +120,7 @@ export default function JakeEnglishPage() {
         <ButtonLink href={je.video.href} variant="solid">
           영상 보기
         </ButtonLink>
+        <ButtonLink href={je.repo.href}>저장소</ButtonLink>
         <ButtonLink href="/ai">{ai.title}</ButtonLink>
       </div>
     </main>

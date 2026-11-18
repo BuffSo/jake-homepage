@@ -10,6 +10,7 @@ const je = parseFrontmatter(readFileSync("content/site/jake-english.md", "utf8")
   title: string;
   subtitle: string;
   video: { href: string; caption: string };
+  repo: { href: string; caption: string };
   story: { caption: string }[];
   panels: { caption: string }[];
   chapters: { title: string; body: string; metric?: { value: string; label: string } }[];
@@ -41,6 +42,24 @@ test("영상 썸네일과 아래 한 줄이 유튜브로 가는 링크 하나다
   await expect(link).toHaveAttribute("href", je.video.href);
   await expect(link).toHaveAttribute("target", "_blank");
   await expect(link.locator("img")).toHaveCount(1);
+});
+
+test("영상 아래에 GitHub 저장소 글 링크가 있고, 새 창으로 열리고, 이야기 4컷까지 간격은 그대로다", async ({ page }) => {
+  await page.goto(PATH);
+  const link = page.locator("main").getByRole("link", { name: je.repo.caption });
+  await expect(link).toHaveCount(1);
+  await expect(link).toHaveAttribute("href", je.repo.href);
+  await expect(link).toHaveAttribute("target", "_blank");
+  // 누르기 쉬운 높이 2.75rem
+  const box = (await link.boundingBox())!;
+  expect(box.height).toBeGreaterThanOrEqual(44);
+  // main의 링크 순서: 돌아가기, 영상, 저장소, ...
+  const hrefs = await page.locator("main a").evaluateAll((els) => els.map((a) => a.getAttribute("href")));
+  expect(hrefs.indexOf(je.repo.href)).toBe(hrefs.indexOf(je.video.href) + 1);
+  // 영상이 갖던 아래 여백(2.5rem, lg 3.5rem)이 저장소 링크 아래로 옮겨 가 이야기 4컷 선까지 그대로다
+  const story = (await page.getByRole("region", { name: "이야기 4컷" }).boundingBox())!;
+  const gap = page.viewportSize()!.width >= 1024 ? 56 : 40;
+  expect(Math.abs(story.y - (box.y + box.height) - gap)).toBeLessThanOrEqual(1);
 });
 
 test("이야기 4컷은 네 칸이고, 칸마다 번호와 설명이 있고, 연습하는 방법보다 앞이다", async ({ page }) => {
@@ -125,12 +144,18 @@ test("기술 스택은 본문 다섯 장 뒤, 끝 링크 앞에 묶음과 기술
   expect(order).toBe(true);
 });
 
-test("끝 링크는 영상 보기와 AI로 일하는 방식이다", async ({ page }) => {
+test("끝 링크는 영상 보기, 저장소, AI로 일하는 방식 순서이고 한 줄에 든다", async ({ page }) => {
   await page.goto(PATH);
-  const main = page.locator("main");
-  await expect(main.getByRole("link", { name: "영상 보기" })).toHaveAttribute("href", je.video.href);
-  await expect(main.getByRole("link", { name: "AI로 일하는 방식" })).toHaveCount(2);
-  await main.getByRole("link", { name: "AI로 일하는 방식" }).first().click();
+  const end = page.locator("main > div").last().getByRole("link");
+  await expect(end).toHaveText([/^영상 보기/, /^저장소/, /^AI로 일하는 방식$/]);
+  await expect(end.nth(0)).toHaveAttribute("href", je.video.href);
+  await expect(end.nth(1)).toHaveAttribute("href", je.repo.href);
+  await expect(end.nth(0)).toHaveAttribute("target", "_blank");
+  await expect(end.nth(1)).toHaveAttribute("target", "_blank");
+  const tops = await end.evaluateAll((els) => els.map((a) => Math.round(a.getBoundingClientRect().top)));
+  expect(new Set(tops).size).toBe(1);
+  await expect(page.locator("main").getByRole("link", { name: "AI로 일하는 방식" })).toHaveCount(2);
+  await end.nth(2).click();
   await expect(page).toHaveURL(/\/ai$/);
 });
 
