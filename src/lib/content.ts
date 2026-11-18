@@ -193,6 +193,8 @@ export type JakeEnglish = {
   subtitle: string;
   description: string;
   video: { href: string; caption: string };
+  /** 앱 저장소. caption은 영상 아래 둘째 줄의 글이고, 끝 버튼 줄의 저장소 버튼도 같은 주소로 간다 */
+  repo: { href: string; caption: string };
   story: { caption: string }[];
   panels: { caption: string }[];
   chapters: JakeEnglishChapter[];
