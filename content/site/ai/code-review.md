@@ -16,13 +16,13 @@ links:
   - label: 리뷰 코멘트 보기
     href: https://github.com/BuffSo/jake-homepage/pull/3#issuecomment-6191984638
 sources:
-  - 리뷰 축을 나눠
-  - 기준 점수 이상만 보고
-  - 누락·스코프 크립
+  - 리뷰 축을 나눈
+  - 기준 점수 이상인 이슈만
 ---
 
 <!--
-포트폴리오 "2. AI 활용 - 개발 > 코드 작성 외의 일"의 PR 리뷰 줄에 있는 작업이다. sources는 원문과 대조한다 (scripts/lib/content.test.mjs).
+포트폴리오 "3-1" 끝 문단의 PR 리뷰 문장에 있는 작업이다. sources는 원문과 대조한다 (scripts/lib/content.test.mjs).
+스펙 축이 누락과 스코프 크립을 대조한다는 것은 원문에 같은 문장이 없고 본인이 확인했다(2026-11-23).
 리뷰어 구성과 50점 기준은 리뷰 스킬(pr-review)의 SKILL.md에서 확인했다(2026-10-17). 기준은 이날 80점에서 50점으로 낮췄다. 스킬 저장소는 비공개라 링크하지 않는다.
 이름은 이력서의 "PR 리뷰 스킬"과 같게 쓴다(2026-10-29). slug는 주소가 바뀌지 않게 code-review로 둔다.
 -->

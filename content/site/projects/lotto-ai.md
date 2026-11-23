@@ -25,7 +25,7 @@ sources:
 ---
 
 <!--
-홈 카드용 글. 사실은 포트폴리오 "1. 한눈에 보기"와 "4-3"에 있다.
+홈 카드용 글. 사실은 포트폴리오 "1. 한눈에 보기"와 "2-3"에 있다.
 sources의 문장은 동기화한 포트폴리오에 그대로 있어야 한다 (scripts/lib/content.test.mjs).
-상세는 /work가 포트폴리오 "4-3"에서 그린다 (content/site/work.md).
+상세는 /work가 포트폴리오 "2-3"과 "5-1"에서 그린다 (content/site/work.md).
 -->

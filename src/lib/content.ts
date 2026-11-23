@@ -117,31 +117,35 @@ export type WorkPage = {
   introSite: string;
   sites: { label: string; title: string; intro: string };
   chapters: {
-    slug: ProjectSlug;
+    slug: WorkSlug;
     detail: string;
-    ai?: string;
-    aiUntil?: string;
-    howToView: string;
+    lead?: "glance";
+    after?: { section: string; until?: string; id: string };
+    /** 서비스 글(content/site/projects/)이 없는 챕터의 머리 그림 (src/lib/project-images.ts) */
+    image?: "jake-english-video";
+    imageAlt?: string;
     drop?: string[];
     replace?: { find: string; to: string }[];
   }[];
 };
 
 /** 포트폴리오 원문으로 만든 /work 챕터 (src/lib/portfolio.mjs) */
+export type WorkSlug = ProjectSlug | "jake-english";
+
 export type WorkChapter = {
-  slug: ProjectSlug;
+  slug: WorkSlug;
   head: {
     name: string;
     subtitle: string;
     period: string;
     role: string;
-    url: string;
+    links: { url: string; label: string | null }[];
     stack: string[];
     lead: string;
   };
   howToView: string;
   body: string;
-  ai: { title: string; body: string } | null;
+  after: { id: string; title: string; body: string } | null;
 };
 
 export type SiteSlug = "brainhouse" | "aitools" | "house9";

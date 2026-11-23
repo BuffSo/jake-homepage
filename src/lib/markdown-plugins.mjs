@@ -3,11 +3,64 @@
 
 import { techLogo } from "./tech-logos.mjs";
 
-/** 원문 HTML이 정한 style 속성을 버린다 (rehype). 모양은 globals.css의 .md가 정한다. */
+/** 원문 HTML이 정한 style 속성과 style 요소(인쇄용 규칙)를 버린다 (rehype). 모양은 globals.css의 .md가 정한다. */
 export function rehypeDropStyle() {
   const walk = (node) => {
     if (node.properties) delete node.properties.style;
+    if (node.children) node.children = node.children.filter((c) => !(c.type === "element" && c.tagName === "style"));
     node.children?.forEach(walk);
+  };
+  return (tree) => walk(tree);
+}
+
+/**
+ * 원문의 그림 묶음(div.fig: 인라인 svg와 설명 한 줄)에서 svg를 상자(div.md-figure)로 감싼다 (rehype).
+ * 그림은 폭 700 기준으로 그려져 좁은 화면에 맞춰 줄이면 글자가 읽히지 않는다. 상자 안에서만 옆으로 넘기고 설명 줄은 넘기지 않는다.
+ * 넓은 표의 상자처럼 키보드로도 넘길 수 있게 역할과 이름, 초점을 준다. 이름은 svg의 aria-label에서 콜론 앞이다.
+ * 모양은 globals.css의 .md-figure가 정한다.
+ */
+export function rehypeFigures() {
+  const isFig = (node) => node.type === "element" && node.tagName === "div" && (node.properties?.className ?? []).includes("fig");
+  const wrap = (svg) => ({
+    type: "element",
+    tagName: "div",
+    properties: {
+      className: ["md-figure"],
+      role: "region",
+      ariaLabel: String(svg.properties?.ariaLabel ?? "").split(":")[0].trim() || "그림",
+      tabIndex: 0,
+    },
+    children: [svg],
+  });
+  const walk = (node) => {
+    if (!node.children) return;
+    if (isFig(node)) {
+      node.children = node.children.map((c) => (c.type === "element" && c.tagName === "svg" ? wrap(c) : c));
+      return;
+    }
+    node.children.forEach(walk);
+  };
+  return (tree) => walk(tree);
+}
+
+/**
+ * 첫 칸의 글이 긴 표에 표시(md-long-first)를 붙인다 (rehype).
+ * .md 표의 첫 칸은 이름표라 줄을 바꾸지 않는다. "기술적 결정" 표처럼 첫 칸이 문장이면 첫 칸이 표를 다 차지해 둘째 칸이 좁아진다.
+ * 그런 표만 첫 칸도 줄을 바꾸게 한다. 모양은 globals.css의 .md-long-first가 정한다.
+ */
+export function rehypeLongFirstColumn({ over = 30 } = {}) {
+  const text = (node) => (node.type === "text" ? node.value : (node.children ?? []).map(text).join(""));
+  const elements = (node, tag) => (node?.children ?? []).filter((c) => c.type === "element" && c.tagName === tag);
+  const mark = (table) => {
+    const rows = elements(table, "tbody").flatMap((tbody) => elements(tbody, "tr"));
+    const long = rows.some((tr) => text(elements(tr, "td")[0] ?? { children: [] }).trim().length > over);
+    if (long) table.properties = { ...table.properties, className: [...(table.properties?.className ?? []), "md-long-first"] };
+  };
+  const walk = (node) => {
+    for (const child of node.children ?? []) {
+      if (child.type === "element" && child.tagName === "table") mark(child);
+      else walk(child);
+    }
   };
   return (tree) => walk(tree);
 }

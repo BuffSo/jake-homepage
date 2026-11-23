@@ -250,6 +250,46 @@
     font-weight: 700;
   }
 
+  /*
+    원문의 그림(구성도, 흐름도)과 그 아래 설명 (rehypeFigures, docs/03-design.md "그림에서 정한 값").
+    원문 style 속성은 버리므로 폭을 여기서 준다. 그림은 본문 칸을 채우고, 40rem보다 좁은 칸에서는 상자 안에서만 옆으로 넘긴다.
+    색과 테두리는 svg 안에 있어 다크 화면에서도 흰 카드로 보인다.
+  */
+  .md .fig {
+    margin: 1.5rem 0;
+  }
+  .md .md-figure {
+    overflow-x: auto;
+  }
+  .md .md-figure svg {
+    display: block;
+    width: 100%;
+    min-width: 40rem;
+    height: auto;
+  }
+  .md .fig p {
+    margin: 0.625rem 0 0;
+    text-align: center;
+  }
+  .md .fig sub {
+    @apply text-subtle;
+    vertical-align: baseline;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+  /* 챕터 뒤에 붙는 절(h3) 안의 소제목(h4) 아래 단계. ProWith "AI 활용 - 개발"의 "무엇을 자동화했나"다. */
+  .md h5 {
+    margin: 1.5rem 0 0.625rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  /* 첫 칸이 문장인 표(rehypeLongFirstColumn). 첫 칸도 줄을 바꾸고 표의 2/5를 쓴다. */
+  .md .md-long-first td:first-child {
+    width: 40%;
+    white-space: normal;
+  }
+
   /* "보시는 방법"처럼 상자 안의 짧은 글 */
   .md-note {
     font-size: 0.875rem;

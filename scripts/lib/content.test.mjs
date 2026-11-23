@@ -209,10 +209,10 @@ test("홈 AI 카드는 네 장이고, 카드에 필요한 값을 갖는다", () 
   }
 });
 
-test("짧은 카드가 가리키는 /work의 AI 절은 실제로 있다", () => {
-  const withAi = new Set(work.chapters.filter((c) => c.ai).map((c) => `/work#${c.slug}-ai`));
+test("짧은 카드가 가리키는 /work의 절은 실제로 있다", () => {
+  const anchors = new Set(work.chapters.filter((c) => c.after).map((c) => `/work#${c.after.id}`));
   for (const { file, data } of aiWorks.filter((w) => w.data.more)) {
-    assert.ok(withAi.has(data.more), `${file}: ${data.more}는 AI 절이 있는 챕터가 아님`);
+    assert.ok(anchors.has(data.more), `${file}: ${data.more}는 /work에 없는 절`);
   }
 });
 
@@ -220,28 +220,56 @@ test("포트폴리오 챕터는 work.md의 구성대로 만들어지고, 서비�
   const chapters = composeChapters(portfolio, work.chapters);
   const bySlug = new Map(projects.map((p) => [p.data.slug, p.data]));
   const ordered = [...bySlug.values()].sort((a, b) => a.order - b.order).map((p) => p.slug);
-  assert.deepEqual(chapters.map((c) => c.slug), ordered);
+  // 서비스 셋 다음에 서비스 글이 없는 Jake English가 온다
+  assert.deepEqual(chapters.map((c) => c.slug), [...ordered, "jake-english"]);
   for (const chapter of chapters) {
-    const project = bySlug.get(chapter.slug);
-    assert.equal(chapter.head.url, project.liveUrl, `${chapter.slug}: 원문 주소와 서비스 글의 liveUrl이 다름`);
-    assert.equal(chapter.head.name, project.title, `${chapter.slug}: 원문 이름과 서비스 글의 title이 다름`);
     assert.ok(chapter.howToView, `${chapter.slug}: 보시는 방법 없음`);
+    const project = bySlug.get(chapter.slug);
+    const config = work.chapters.find((c) => c.slug === chapter.slug);
+    if (!project) {
+      assert.ok(config.image && config.imageAlt, `${chapter.slug}: 서비스 글이 없으면 work.md에 image와 imageAlt가 있어야 함`);
+      continue;
+    }
+    assert.equal(chapter.head.links.length, 1, `${chapter.slug}: 서비스 주소는 하나`);
+    assert.equal(chapter.head.links[0].url, project.liveUrl, `${chapter.slug}: 원문 주소와 서비스 글의 liveUrl이 다름`);
+    assert.equal(chapter.head.name, project.title, `${chapter.slug}: 원문 이름과 서비스 글의 title이 다름`);
+    assert.equal(chapter.head.period, project.period, `${chapter.slug}: 원문 기간과 서비스 글의 period가 다름`);
   }
+  const jake = chapters.find((c) => c.slug === "jake-english");
+  assert.deepEqual(jake.head.links.map((l) => l.label), ["소개 영상", "공개 저장소"]);
 });
 
 test("챕터에는 원문 이미지와 다른 절을 가리키는 문장이 남지 않는다", () => {
   for (const chapter of composeChapters(portfolio, work.chapters)) {
-    const text = `${chapter.body}\n${chapter.ai?.body ?? ""}`;
-    assert.doesNotMatch(text, /<img|<sub>/, `${chapter.slug}: 원문 이미지나 그 설명 줄이 남음`);
-    assert.doesNotMatch(text, /\d절 참조|앞의 하네스/, `${chapter.slug}: 다른 절을 가리키는 문장이 남음`);
+    const text = `${chapter.body}\n${chapter.after?.body ?? ""}`;
+    assert.doesNotMatch(text, /<img|<style/, `${chapter.slug}: 원문 이미지나 인쇄용 규칙이 남음`);
+    assert.doesNotMatch(text, /\d절 참조|앞의 하네스|\(\d-\d\)/, `${chapter.slug}: 다른 절을 가리키는 문장이 남음`);
   }
 });
 
-test("ProWith 상세의 첫 줄은 홈 서비스 목록의 소개와 같다", () => {
-  // 원문 첫 줄(레거시 전환)을 work.md의 replace로 바꿔, 설정과 쇼핑몰이 먼저 보이게 한다.
+test("그림은 구성도 넷과 자동 채우기 흐름도 하나다", () => {
+  const chapters = composeChapters(portfolio, work.chapters);
+  const count = (text) => text.split("<svg").length - 1;
+  const figures = Object.fromEntries(chapters.map((c) => [c.slug, [count(c.body), count(c.after?.body ?? "")]]));
+  assert.deepEqual(figures, { recueve: [1, 1], prowith: [1, 0], "lotto-ai": [1, 0], "jake-english": [1, 0] });
+});
+
+test("사이트에만 남긴 상세가 챕터 본문에 있다", () => {
+  // 동기화 규칙(scripts/sync.config.mjs)이 넣은 블록이다. 본문 제목은 h3부터다.
+  const body = Object.fromEntries(composeChapters(portfolio, work.chapters).map((c) => [c.slug, c.body]));
+  assert.ok(body.recueve.includes("### 기술적 결정"));
+  assert.ok(body.prowith.includes("### 기술적 결정"));
+  assert.ok(body.prowith.includes("**동적 시스템 설정 엔진**"));
+  assert.ok(body["lotto-ai"].includes("### 로그는 NoSQL인 MongoDB에 분리해서 저장했습니다"));
+  assert.ok(body["lotto-ai"].includes("### 개발 모드에서 등급별 계정을 선택해 바로 테스트하게 했습니다"));
+});
+
+test("ProWith 상세의 큰 글씨 첫 줄은 홈 서비스 목록의 소개로 시작한다", () => {
+  // 한눈에 보기 표의 문장을 쓴다(work.md의 lead: glance). 원문 인용은 본문 맨 앞에 남는다.
   const chapter = composeChapters(portfolio, work.chapters).find((c) => c.slug === "prowith");
   const project = projects.find((p) => p.data.slug === "prowith").data;
-  assert.equal(chapter.head.lead, project.summary);
+  assert.ok(chapter.head.lead.startsWith(project.summary), chapter.head.lead);
+  assert.ok(chapter.body.startsWith("> **풍부한 관리자 설정이 핵심인"));
 });
 
 test("의뢰받아 만든 사이트 글은 카드에 필요한 값을 모두 갖고, 순서가 겹치지 않는다", () => {

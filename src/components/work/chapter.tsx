@@ -1,23 +1,29 @@
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { ButtonLink } from "@/components/button-link";
 import { MarkdownText } from "@/components/markdown";
-import type { Project, WorkChapter } from "@/lib/content";
-import { PROJECT_IMAGES } from "@/lib/project-images";
+import type { WorkChapter } from "@/lib/content";
 import { StackChips } from "./stack-chips";
 
-// 서비스 챕터 (docs/02-ia.md /work). 머리는 포트폴리오 "4-x" 절의 첫 줄들로, 본문은 원문 그대로 그린다.
+// 프로젝트 챕터 (docs/02-ia.md /work). 머리는 포트폴리오 "2-x" 절의 첫 줄들로, 본문은 원문 그대로 그린다.
 // 데스크톱은 머리를 두 칸(글 왼쪽, 캡처 오른쪽)으로 두고, 모바일은 이름 다음에 캡처를 둔다.
-// id는 서비스 slug다. 홈 카드의 "자세히 보기"(/work#slug)가 이곳을 가리킨다.
+// id는 챕터 slug다. 홈 카드의 "자세히 보기"(/work#slug)가 이곳을 가리킨다.
+// 버튼은 원문 주소 줄의 주소마다 하나다. 주소 뒤 괄호의 이름(소개 영상, 공개 저장소)이 있으면 그 이름을, 없으면 liveLabel을 쓴다.
 export function Chapter({
   chapter,
-  project,
+  order,
   total,
   first,
+  image,
+  imageAlt,
+  liveLabel = "서비스 열기",
 }: {
   chapter: WorkChapter;
-  project: Project;
+  order: number;
   total: number;
   first: boolean;
+  image: StaticImageData;
+  imageAlt: string;
+  liveLabel?: string;
 }) {
   const { head } = chapter;
   const titleId = `${chapter.slug}-title`;
@@ -32,7 +38,7 @@ export function Chapter({
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-3.5">
         <div className="flex flex-col gap-3 lg:col-start-1 lg:row-start-1 lg:gap-3.5">
           <span className="font-mono text-[0.6875rem] tracking-[0.04em] text-subtle lg:text-[0.8125rem]">
-            {String(project.order).padStart(2, "0")} / {String(total).padStart(2, "0")} · {head.name.toUpperCase()}
+            {String(order).padStart(2, "0")} / {String(total).padStart(2, "0")} · {head.name.toUpperCase()}
           </span>
           <div className="flex flex-col gap-0.5 lg:gap-1">
             <h2 id={titleId} className="text-[1.75rem] font-extrabold tracking-[-0.025em] lg:text-[2.5rem]">
@@ -44,8 +50,8 @@ export function Chapter({
 
         {/* 첫 챕터 캡처는 모바일 첫 화면에 보이는 LCP 요소라 바로 불러온다. 나머지는 내려올 때 불러온다. */}
         <Image
-          src={PROJECT_IMAGES[chapter.slug]}
-          alt={project.imageAlt}
+          src={image}
+          alt={imageAlt}
           loading={first ? "eager" : "lazy"}
           fetchPriority={first ? "high" : "auto"}
           sizes="(min-width: 80rem) 35rem, (min-width: 64rem) 45vw, 100vw"
@@ -58,10 +64,12 @@ export function Chapter({
             {head.period} · {head.role}
           </p>
           <StackChips items={head.stack} />
-          <div className="mt-1 lg:mt-1.5">
-            <ButtonLink href={head.url} variant="solid">
-              {project.liveLabel ?? "서비스 열기"}
-            </ButtonLink>
+          <div className="mt-1 flex flex-wrap gap-2.5 lg:mt-1.5">
+            {head.links.map((link, i) => (
+              <ButtonLink key={link.url} href={link.url} variant={i === 0 ? "solid" : "outline"}>
+                {link.label ?? liveLabel}
+              </ButtonLink>
+            ))}
           </div>
           <div className="w-full rounded-[0.625rem] border border-line-soft bg-surface px-4 py-3.5 lg:mt-1.5 lg:rounded-xl lg:px-[1.125rem] lg:py-4">
             <p className="mb-1.5 text-[0.6875rem] text-subtle lg:text-xs">보시는 방법</p>
@@ -70,15 +78,15 @@ export function Chapter({
         </div>
       </div>
 
-      {/* AI 절 제목에는 id를 붙인다. /ai의 짧은 카드가 /work#slug-ai로 이곳을 가리킨다. */}
+      {/* 뒤에 붙는 절 제목에는 work.md가 정한 id를 붙인다. /ai의 짧은 카드가 /work#prowith-ai, /work#recueve-ai로 이곳을 가리킨다. */}
       <div className="md mt-10 max-w-[47.5rem] lg:mt-16">
         <MarkdownText bare>{chapter.body}</MarkdownText>
-        {chapter.ai && (
+        {chapter.after && (
           <>
-            <h3 id={`${chapter.slug}-ai`} className="scroll-mt-4">
-              {chapter.ai.title}
+            <h3 id={chapter.after.id} className="scroll-mt-4">
+              {chapter.after.title}
             </h3>
-            <MarkdownText bare>{chapter.ai.body}</MarkdownText>
+            <MarkdownText bare>{chapter.after.body}</MarkdownText>
           </>
         )}
       </div>

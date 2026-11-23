@@ -5,7 +5,7 @@ type Item = { href: string; num: string; name: string; note: string };
 export function WorkIndex({ items }: { items: Item[] }) {
   return (
     <nav id="page-index" tabIndex={-1} aria-label="이 페이지의 목차" className="border-t border-b border-t-fg border-b-line">
-      <ul className="grid lg:grid-cols-4">
+      <ul className="grid lg:grid-cols-5">
         {items.map((item, i) => (
           <li key={item.href} className={i > 0 ? "border-t border-line-soft lg:border-t-0 lg:border-l" : ""}>
             <a

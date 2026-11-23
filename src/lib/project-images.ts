@@ -6,10 +6,16 @@ import prowithCard from "@/assets/home/prowith-card.png";
 import prowith from "@/assets/home/prowith.png";
 import recueveCard from "@/assets/home/recueve-card.jpg";
 import recueve from "@/assets/home/recueve.png";
-import type { ProjectSlug } from "./content";
+import type { ProjectSlug, WorkSlug } from "./content";
+import { VIDEO_THUMB } from "./jake-english-images";
 
-/** /work 챕터의 캡처 */
-export const PROJECT_IMAGES: Record<ProjectSlug, StaticImageData> = { recueve, prowith, "lotto-ai": lotto };
+/** /work 챕터의 캡처. Jake English는 열어 볼 서비스가 없어 소개 영상 썸네일을 쓴다(content/site/work.md의 image) */
+export const WORK_IMAGES: Record<WorkSlug, StaticImageData> = {
+  recueve,
+  prowith,
+  "lotto-ai": lotto,
+  "jake-english": VIDEO_THUMB,
+};
 
 /** 홈 "운영 중인 서비스" 카드의 캡처 */
 export const CARD_IMAGES: Record<ProjectSlug, StaticImageData> = {

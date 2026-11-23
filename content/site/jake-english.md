@@ -3,7 +3,7 @@ title: 직접 만든 영어 회화 연습 앱
 subtitle: Jake English
 description: 해 보고 싶은 상황을 직접 정해 AI 선생님과 영어로 대화하고, 듣고 따라 말하며 연습하는 앱입니다.
 video:
-  href: https://www.youtube.com/watch?v=5FByJLa8R1k
+  href: https://www.youtube.com/watch?v=SrAWg5lS0lQ
   caption: 소개 영상 · 3분 17초 · YouTube에서 보기
 repo:
   href: https://github.com/BuffSo/jake-english
@@ -47,7 +47,8 @@ stack:
 
 <!--
 /ai/jake-english 페이지와 /ai 맨 위 Jake English 띠의 글 (docs/02-ia.md, docs/superpowers/specs/2026-11-11-ai-jake-english-design.md).
-사이트 전용 글이다. 이력서와 포트폴리오에는 없다(ADR-0003). 문구는 설계에서 고른 그대로 쓴다.
+사이트 전용 글이다. 문구는 설계에서 고른 그대로 쓴다. 앱은 2026-11-23부터 이력서와 포트폴리오에도 실려 /work에 챕터가 있다. 이 페이지의 글은 그 원문과 따로 쓴 것이다(ADR-0003).
+- 영상을 새로 올려 video.href가 바뀌었다(2026-11-23). 길이 3분 17초와 장 구성은 같다.
 - 앱의 구성(Android 앱과 Mac 서버, whisper.cpp, Qwen3-TTS, Claude API, Tailscale)은 본인이 확인했다(2026-11-11).
 - PR 수는 jake-english 저장소에서 gh pr list --state merged로 셌다(2026-11-11). 한국 시각 11-04~11-09에 머지한 PR이 78개,
   그 가운데 pr-review 스킬의 리뷰 코멘트가 달린 PR이 58개다. 저장소가 더 자라도 날짜 범위의 값이라 바꾸지 않는다.

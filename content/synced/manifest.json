@@ -1,6 +1,6 @@
 {
   "source": {
-    "commit": "49a90a905ddb387c644b35ecca79268c06f1f59a",
+    "commit": "b9ac1b26993a816dc4df27735a22175740c530c3",
     "dirty": false
   },
   "files": [
@@ -14,7 +14,11 @@
     },
     {
       "output": "portfolio.md",
-      "transforms": []
+      "transforms": [
+        "insert-before #### 기술적 결정",
+        "insert-before **쇼핑몰** - 설정으로 켜는 옵션이고, 정산 로직은 건드리지 않고 붙였습니다.",
+        "insert-before #### 로그는 NoSQL인 MongoDB에 분리해서 저장했습니다"
+      ]
     },
     {
       "output": "ai-case.json",
