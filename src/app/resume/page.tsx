@@ -9,7 +9,7 @@ import { getResume, getResumePage } from "@/lib/content";
 import { nextPage } from "@/lib/nav";
 import { pageMetadata } from "@/lib/site-meta";
 
-// 이력서 (docs/02-ia.md /resume). 머리 → 목차 → 원문 열 절 → 끝 사진. 원문 문장은 고치지 않는다.
+// 이력서 (docs/02-ia.md /resume). 머리 → 목차 → 원문의 절 → 끝 사진. 원문 문장은 고치지 않는다.
 // 인쇄하면 헤더, 푸터, 목차, 버튼이 빠지고 한 줄 소개와 이름부터 A4로 나온다(globals.css @media print).
 const page = getResumePage();
 
@@ -29,7 +29,8 @@ export default function ResumePage() {
         <div className="pt-10 lg:pt-18 print:pt-0">
           <ResumeHead label={page.label} tagline={resume.tagline} name={resume.name} print={page.print} />
         </div>
-        <ResumeIndex sections={page.sections} />
+        {/* 목차는 열 칸을 유지한다. index: false인 절(대외활동)은 본문에만 있다. */}
+        <ResumeIndex sections={page.sections.filter((section) => section.index !== false)} />
         <MarkdownText
           className="md-resume mt-10 max-w-[47.5rem] lg:mt-16 print:mt-[1.125rem] print:max-w-none print:border-t print:border-line-soft print:pt-[1.125rem]"
           breaks
@@ -37,6 +38,7 @@ export default function ResumePage() {
           chips
           headingIds={headingIds}
           reviews={page.reviews}
+          band={page.band}
           stackTables
         >
           {resume.body}

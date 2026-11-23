@@ -97,6 +97,51 @@ export function rehypeReviews({ label, quotes = [] }) {
 }
 
 /**
+ * 한 절의 목록에서 정해 둔 글(text)이 든 항목을 띠(li.md-band)로 그린다 (rehype). rehypeHeadingIds 뒤에 쓴다.
+ * 홈 AI 섹션의 대회 결과 띠와 같은 모양이다(docs/03-design.md "홈 AI 섹션 띠에서 정한 값"). 모양은 globals.css의 .md-band가 정한다.
+ * 원문 글은 고치지 않는다. 항목의 " | " 앞을 첫 줄(.md-band-title), 뒤를 둘째 줄(.md-band-detail)로 나누고 구분 글자만 뺀다.
+ * " | "가 없으면 모두 첫 줄이다. 오른쪽에 버튼 링크(cta, href)를 붙인다. linkClass는 버튼 모양 클래스다.
+ * section은 절 제목(h2)의 id다. 그 절에서 글이 든 항목을 못 찾으면 예외를 던져 빌드를 멈춘다.
+ */
+export function rehypeBand({ section, text: needle, cta, href, linkClass = "" }) {
+  const text = (node) => (node.type === "text" ? node.value : (node.children ?? []).map(text).join(""));
+  const el = (tagName, className, children) => ({ type: "element", tagName, properties: { className: [className] }, children });
+  const SEP = " | ";
+  const toBand = (li) => {
+    const at = li.children.findIndex((c) => c.type === "text" && c.value.includes(SEP));
+    let title = li.children;
+    let detail = [];
+    if (at >= 0) {
+      const { value } = li.children[at];
+      const cut = value.indexOf(SEP);
+      title = [...li.children.slice(0, at), { type: "text", value: value.slice(0, cut) }];
+      detail = [{ type: "text", value: value.slice(cut + SEP.length) }, ...li.children.slice(at + 1)];
+    }
+    const lines = [el("span", "md-band-title", title)];
+    if (detail.length) lines.push(el("span", "md-band-detail", detail));
+    const link = { type: "element", tagName: "a", properties: { href, className: linkClass.split(" ").filter(Boolean) }, children: [{ type: "text", value: cta }] };
+    li.properties = { ...li.properties, className: ["md-band"] };
+    li.children = [el("div", "md-band-text", lines), link];
+  };
+  return (tree) => {
+    let inSection = false;
+    let found = false;
+    for (const node of tree.children) {
+      if (node.type !== "element") continue;
+      if (node.tagName === "h2") inSection = node.properties?.id === section;
+      else if (inSection && node.tagName === "ul") {
+        const items = node.children.filter((c) => c.type === "element" && c.tagName === "li" && text(c).includes(needle));
+        if (!items.length) continue;
+        items.forEach(toBand);
+        node.properties = { ...node.properties, className: ["md-bands"] };
+        found = true;
+      }
+    }
+    if (!found) throw new Error(`${section} 절에서 띠로 그릴 항목을 찾지 못했습니다: ${needle}`);
+  };
+}
+
+/**
  * 좁은 화면에서 넘치는 이력서 표를 행마다 상자로 그릴 수 있게 표시한다 (docs/guide/UI_모바일_표_20261017.md).
  * 네 칸 이상이거나 본문 행이 하나뿐인 표(연락처, 학력)를 고른다. 여러 행에 세 칸 이하인 표(수상)는 그대로 둔다.
  * 모양은 globals.css의 .md-stack이 정한다. CSS의 :has() 안에는 :has()를 못 써서, 고르는 일은 여기서 한다.

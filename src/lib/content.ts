@@ -174,7 +174,10 @@ export type ResumePage = {
   description: string;
   print: string;
   endPhotoAlt: string;
-  sections: { id: string; title: string }[];
+  /** 원문의 절(h2) 전부, 순서대로. index: false인 절은 맨 위 목차에 싣지 않는다 */
+  sections: { id: string; title: string; index?: boolean }[];
+  /** section 절의 목록에서 text가 든 항목을 홈 AI 섹션과 같은 띠로 그린다 (rehypeBand) */
+  band: { section: string; text: string; cta: string; href: string };
   reviews: { label: string; quotes: { id: string; text: string }[] };
 };
 

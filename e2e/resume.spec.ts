@@ -12,14 +12,18 @@ type ResumePage = {
   label: string;
   print: string;
   endPhotoAlt: string;
-  sections: { id: string; title: string }[];
+  sections: { id: string; title: string; index?: boolean }[];
+  band: { section: string; text: string; cta: string; href: string };
 };
 
 const resumePage = parseFrontmatter(readFileSync("content/site/resume-page.md", "utf8"), "resume-page.md").data as ResumePage;
 const resume = splitResume(readFileSync("content/synced/resume.md", "utf8"));
 const home = parseFrontmatter(readFileSync("content/site/home.md", "utf8"), "home.md").data as {
   about: { title: string };
+  sections: { ai: { award: { href: string } } };
 };
+// 맨 위 목차에는 index: false인 절(대외활동)을 싣지 않는다
+const indexSections = resumePage.sections.filter((section) => section.index !== false);
 
 test("이력서가 열리고 콘솔 오류와 실패한 요청이 없다", async ({ page }) => {
   const errors = collectErrors(page);
@@ -97,14 +101,51 @@ test("연락처와 학력 표는 좁은 화면에서 행마다 상자로, 넓은
 test("목차 열 개가 해당 절로 간다", async ({ page }) => {
   await page.goto("/resume");
   const nav = page.getByRole("navigation", { name: "이력서 목차" });
-  await expect(nav.getByRole("link")).toHaveCount(resumePage.sections.length);
-  for (const section of resumePage.sections) {
+  expect(indexSections).toHaveLength(10);
+  await expect(nav.getByRole("link")).toHaveCount(indexSections.length);
+  await expect(nav.getByRole("link", { name: "대외활동" })).toHaveCount(0);
+  for (const section of indexSections) {
     await nav.getByRole("link", { name: section.title }).click();
     await expect(page).toHaveURL(new RegExp(`#${section.id}$`));
     const heading = page.getByRole("heading", { level: 2, name: section.title, exact: true });
     await expect(heading).toHaveAttribute("id", section.id);
     await expect(heading).toBeInViewport();
   }
+});
+
+test("대외활동 절의 항목은 홈 AI 섹션과 같은 띠이고, 오른쪽에 인증서 버튼이 있다", async ({ page }) => {
+  const { band } = resumePage;
+  const section = resumePage.sections.find((s) => s.id === band.section)!;
+  await page.goto("/resume");
+  // 절 제목은 다른 절처럼 남고, 목차에 없어도 id가 붙는다
+  const heading = page.getByRole("heading", { level: 2, name: section.title, exact: true });
+  await expect(heading).toHaveAttribute("id", section.id);
+  const item = page.locator(".md-resume .md-band");
+  await expect(item).toHaveCount(1);
+  await expect(item).toContainText(band.text);
+  // 원문 한 줄의 " | " 앞이 첫 줄, 뒤가 둘째 줄이다. 글은 원문 그대로다
+  const line = resume.body.split("\n").find((l) => l.startsWith("- ") && l.includes(band.text))!;
+  const [first, second] = line.slice(2).replaceAll("**", "").split(" | ");
+  await expect(item.locator(".md-band-title")).toHaveText(first);
+  await expect(item.locator(".md-band-detail")).toHaveText(second);
+  const link = item.getByRole("link", { name: new RegExp(band.cta) });
+  await expect(link).toHaveAttribute("href", band.href);
+  await expect(link).toHaveAttribute("target", "_blank");
+  expect(band.href).toBe(home.sections.ai.award.href);
+  // 띠는 대외활동 제목 아래에 있고, 테두리가 있으며 목록 점이 없다
+  const box = (await item.boundingBox())!;
+  expect(box.y).toBeGreaterThan((await heading.boundingBox())!.y);
+  const style = await item.evaluate((el) => ({ border: getComputedStyle(el).borderTopWidth, list: getComputedStyle(el).listStyleType }));
+  expect(style).toEqual({ border: "1px", list: "none" });
+  // 버튼은 띠의 오른쪽 끝에 붙는다 (375에서는 다음 줄로 내려간다)
+  const linkBox = (await link.boundingBox())!;
+  const titleBox = (await item.locator(".md-band-title").boundingBox())!;
+  expect(box.x + box.width - (linkBox.x + linkBox.width)).toBeLessThan(30);
+  if (page.viewportSize()!.width < 500) expect(linkBox.y).toBeGreaterThan(titleBox.y + titleBox.height);
+  // 인쇄에서는 버튼이 빠지고 글은 남는다
+  await page.emulateMedia({ media: "print" });
+  await expect(link).toBeHidden();
+  await expect(item.locator(".md-band-title")).toBeVisible();
 });
 
 test("홈 About의 이력서 보기로 오면 이력서가 열린다", async ({ page }) => {

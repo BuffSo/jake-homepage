@@ -1,6 +1,6 @@
 import type { ResumePage } from "@/lib/content";
 
-// /resume 목차 (docs/02-ia.md /resume). 원문의 절 열 개다. 화면에 고정하지 않고, 인쇄에서는 숨긴다.
+// /resume 목차 (docs/02-ia.md /resume). 원문의 절 가운데 열 개다(대외활동은 본문에만 있다). 화면에 고정하지 않고, 인쇄에서는 숨긴다.
 // 목차가 화면 위로 사라지면 맨 위로 버튼이 보이고, 누르면 목차에 초점이 온다(back-to-top.tsx).
 // 모바일은 두 칸 다섯 줄, 데스크톱은 다섯 칸 두 줄이다. 선은 /ai 목차와 같다(위 선만 fg, 칸 사이는 line-soft).
 
