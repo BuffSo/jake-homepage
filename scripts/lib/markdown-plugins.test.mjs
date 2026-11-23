@@ -5,7 +5,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  rehypeBand,
   rehypeChipLists,
   rehypeDropStyle,
   rehypeGroupTitles,
@@ -96,36 +95,6 @@ describe("rehypeReviews", () => {
     const both = [...quotes, { id: "lead", text: "리드를 잘" }];
     const md = "**Peer Review**\n\n> 리드를 잘 하셨습니다\n> 늘 겸손히 소통";
     assert.throws(() => render(md, reviews({ quotes: both })), /둘 이상 걸렸습니다/);
-  });
-});
-
-describe("rehypeBand", () => {
-  const ids = { 활동: "activities", 교육: "training" };
-  const options = { section: "activities", text: "대회", cta: "인증서 보기", href: "https://example.com/cert", linkClass: "btn right" };
-  const band = (md, extra = {}) => render(md, { rehype: [[rehypeHeadingIds, { ids }], [rehypeBand, { ...options, ...extra }]] });
-
-  test("절의 목록에서 글이 든 항목을 띠로 그리고, 구분 글자 앞뒤를 두 줄로 나눠 버튼 링크를 붙인다", () => {
-    const html = band("## 활동\n\n- 대회 **상위** (참가자) | 주최 (2026.11)\n- 다른 항목\n\n## 교육\n\n- 대회 준비 과정");
-    assert.ok(html.includes('<ul class="md-bands">'));
-    assert.ok(
-      html.includes(
-        '<li class="md-band"><div class="md-band-text"><span class="md-band-title">대회 <strong>상위</strong> (참가자)</span>' +
-          '<span class="md-band-detail">주최 (2026.11)</span></div><a href="https://example.com/cert" class="btn right">인증서 보기</a></li>',
-      ),
-    );
-    // 글이 없는 항목과 다른 절의 항목은 그대로 둔다
-    assert.ok(html.includes("<li>다른 항목</li>"));
-    assert.ok(html.includes("<li>대회 준비 과정</li>"));
-    assert.equal((html.match(/md-band"/g) ?? []).length, 1);
-  });
-
-  test("구분 글자가 없으면 모두 첫 줄이다", () => {
-    const html = band("## 활동\n\n- 대회 상위");
-    assert.ok(html.includes('<div class="md-band-text"><span class="md-band-title">대회 상위</span></div>'));
-  });
-
-  test("절에 글이 든 항목이 없으면 멈춘다", () => {
-    assert.throws(() => band("## 활동\n\n- 다른 항목\n\n## 교육\n\n- 대회 준비"), /activities 절에서 띠로 그릴 항목을 찾지 못했습니다: 대회/);
   });
 });
 

@@ -3,7 +3,6 @@ import rehypeRaw from "rehype-raw";
 import remarkCjkFriendly from "remark-cjk-friendly";
 import remarkGfm from "remark-gfm";
 import {
-  rehypeBand,
   rehypeChipLists,
   rehypeDropStyle,
   rehypeGroupTitles,
@@ -13,7 +12,6 @@ import {
   remarkSoftBreaks,
 } from "@/lib/markdown-plugins.mjs";
 import { TECH_LOGOS } from "@/lib/tech-logos.mjs";
-import { buttonClass } from "./button-link";
 import { ExternalLink } from "./external-link";
 
 // 포트폴리오와 이력서 원문을 그린다 (ADR-0009). 서버 컴포넌트에서만 쓴다. 모양은 globals.css의 .md가 정한다.
@@ -22,10 +20,9 @@ import { ExternalLink } from "./external-link";
 
 const components: Components = {
   // 다른 사이트로 가는 링크는 새 창으로 열고 ↗를 붙인다 (docs/03-design.md).
-  // className은 플러그인이 붙인 버튼 모양(rehypeBand)만 온다.
-  a: ({ href = "", children, className }) =>
+  a: ({ href = "", children }) =>
     /^https?:\/\//.test(href) ? (
-      <ExternalLink href={href} className={className}>
+      <ExternalLink href={href}>
         {children}
         <span aria-hidden="true"> ↗</span>
       </ExternalLink>
@@ -47,7 +44,6 @@ const components: Components = {
  * bare면 바깥 div 없이 그린다. 이미 .md 안에서 다른 요소와 섞어 쓸 때 쓴다.
  * breaks면 문단 안의 줄바꿈을 살리고, headingIds(절 제목 → id)를 주면 h2에 id를 붙인다.
  * reviews({ label, quotes })를 주면 머리글 뒤의 인용을 동료 평가 상자로 묶고, 정해 둔 글이 든 상자에 id를 붙인다.
- * band({ section, text, cta, href })를 주면 그 절(headingIds의 id)의 목록에서 글이 든 항목을 홈 AI 섹션과 같은 띠로 그린다. headingIds와 함께 쓴다.
  * stackTables면 좁은 화면에서 넘치는 표(연락처, 학력)를 모바일에서 행마다 상자로 그린다.
  * groupTitles면 목록 바로 앞의 굵은 글씨만 있는 줄을 그 목록의 묶음 제목으로 붙여 그린다.
  * chips면 인라인 코드만 늘어선 줄(스킬, 프로젝트 스택)을 단색 로고가 든 칩 목록으로 그린다. 다섯 다 지금은 이력서만 쓴다.
@@ -59,7 +55,6 @@ export function MarkdownText({
   breaks = false,
   headingIds,
   reviews,
-  band,
   stackTables = false,
   groupTitles = false,
   chips = false,
@@ -70,7 +65,6 @@ export function MarkdownText({
   breaks?: boolean;
   headingIds?: Record<string, string>;
   reviews?: { label: string; quotes: { id: string; text: string }[] };
-  band?: { section: string; text: string; cta: string; href: string };
   stackTables?: boolean;
   groupTitles?: boolean;
   chips?: boolean;
@@ -80,8 +74,6 @@ export function MarkdownText({
   const rehypePlugins: Options["rehypePlugins"] = [rehypeRaw, rehypeDropStyle];
   if (headingIds) rehypePlugins.push([rehypeHeadingIds, { ids: headingIds }]);
   if (reviews) rehypePlugins.push([rehypeReviews, reviews]);
-  // 버튼은 ButtonLink의 테두리 버튼과 같은 모양이다. 인쇄에서는 다른 버튼처럼 뺀다.
-  if (band) rehypePlugins.push([rehypeBand, { ...band, linkClass: buttonClass("outline", "md-band-link ml-auto print:hidden") }]);
   if (stackTables) rehypePlugins.push(rehypeStackTables);
   if (groupTitles) rehypePlugins.push(rehypeGroupTitles);
   if (chips) rehypePlugins.push([rehypeChipLists, { logos: TECH_LOGOS }]);

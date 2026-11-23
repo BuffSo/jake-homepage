@@ -39,7 +39,7 @@ export type Home = {
   layers: Layer[];
   sections: {
     work: SectionText;
-    /** award는 홈 AI 섹션의 머리와 카드 사이 띠다. 대회 결과 한 줄과 공개 인증서 링크 (docs/02-ia.md 홈 3) */
+    /** award는 홈 AI 섹션의 머리와 카드 사이 띠이고, /resume 머리 아래에서도 같은 값을 쓴다. 대회 결과 한 줄과 공개 인증서 링크 (docs/02-ia.md 홈 3) */
     ai: SectionText & { award: { title: string; detail: string; cta: string; href: string } };
   };
   about: {
@@ -174,10 +174,10 @@ export type ResumePage = {
   description: string;
   print: string;
   endPhotoAlt: string;
+  /** 머리와 목차 사이 띠의 첫 줄 앞에 다는 뱃지 글자. 띠의 문구와 링크는 home.md의 sections.ai.award다 */
+  awardBadge: string;
   /** 원문의 절(h2) 전부, 순서대로. index: false인 절은 맨 위 목차에 싣지 않는다 */
   sections: { id: string; title: string; index?: boolean }[];
-  /** section 절의 목록에서 text가 든 항목을 홈 AI 섹션과 같은 띠로 그린다 (rehypeBand) */
-  band: { section: string; text: string; cta: string; href: string };
   reviews: { label: string; quotes: { id: string; text: string }[] };
 };
 

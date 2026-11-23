@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { AwardBand } from "@/components/award-band";
 import { ButtonLink } from "@/components/button-link";
 import { assetImage } from "@/lib/asset-images";
 import { getHome, getHomeAiWorks, type AiVideo, type AiWork } from "@/lib/content";
@@ -57,16 +58,8 @@ export function AiCards() {
   return (
     <section aria-labelledby="ai-title" className="mt-14 border-t border-line py-14 lg:mt-24 lg:py-24">
       <SectionHead id="ai-title" label={ai.label} title={ai.title} intro={ai.intro} />
-      {/* 대회 결과 띠 (docs/03-design.md 홈 AI 섹션 띠). 좁은 화면에서는 버튼이 다음 줄로 내려가 오른쪽에 붙는다. */}
-      <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[0.625rem] border border-line px-[1.125rem] py-4 lg:mb-8 lg:rounded-xl lg:px-6">
-        <div className="flex flex-col gap-1">
-          <p className="text-lg leading-[1.4] font-bold">{ai.award.title}</p>
-          <p className="text-xs leading-[1.6] text-subtle">{ai.award.detail}</p>
-        </div>
-        <ButtonLink href={ai.award.href} className="ml-auto">
-          {ai.award.cta}
-        </ButtonLink>
-      </div>
+      {/* 대회 결과 띠. 띠와 카드 격자 사이는 카드 사이 간격과 같다. */}
+      <AwardBand {...ai.award} className="mb-5 lg:mb-8" />
       <div className="grid gap-5 md:grid-cols-2 lg:gap-8">
         {works.map((work) => {
           // 머리글의 영문 이름은 고정폭, 한글 설명은 본문 글꼴로 쓴다 (globals.css 글꼴 순서)
