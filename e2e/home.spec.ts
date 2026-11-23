@@ -600,9 +600,11 @@ test.describe("아래 섹션", () => {
       expect(box.y).toBeGreaterThan(head.y + head.height);
       expect(box.y + box.height).toBeLessThan(first.y);
     }
-    // 버튼은 띠의 오른쪽에 붙는다
+    // 버튼은 띠의 오른쪽에 붙는다. 제목이 꺾여 띠 폭을 다 채우면 버튼 오른쪽 끝이 제목 오른쪽 끝과 같아진다
     const titleBox = (await title.boundingBox())!;
-    expect(linkBox.x + linkBox.width).toBeGreaterThan(titleBox.x + titleBox.width);
+    const bandBox = (await page.getByRole("note", { name: award.title }).boundingBox())!;
+    expect(linkBox.x + linkBox.width).toBeGreaterThanOrEqual(titleBox.x + titleBox.width - 1);
+    expect(linkBox.x).toBeGreaterThan(bandBox.x + bandBox.width / 2);
   });
 
   test("영상 카드는 두 영상의 썸네일을 겹치고, 나중 영상이 앞 오른쪽 아래에 있다", async ({ page }) => {

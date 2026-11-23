@@ -134,9 +134,15 @@ test("머리와 목차 사이에 NEW 뱃지가 달린 대회 결과 띠가 있�
   expect(box.y).toBeGreaterThan(name.y + name.height);
   expect(box.y + box.height).toBeLessThan(nav.y + 1);
   // 뱃지는 첫 줄 앞에 있고, 강조색 바탕에 강조 위 글자색이다 (docs/03-design.md 색)
+  // 제목이 두 줄로 꺾이면 제목 상자가 줄 머리에서 시작하므로, 제목의 첫 줄 조각과 견준다
   const badgeBox = (await badge.boundingBox())!;
-  const titleBox = (await title.boundingBox())!;
-  expect(badgeBox.x).toBeLessThan(titleBox.x);
+  const firstLine = await title.evaluate((el) => {
+    const r = el.getClientRects()[0];
+    return { x: r.x, y: r.y, height: r.height };
+  });
+  expect(badgeBox.x + badgeBox.width).toBeLessThanOrEqual(firstLine.x);
+  expect(badgeBox.y + badgeBox.height / 2).toBeGreaterThan(firstLine.y);
+  expect(badgeBox.y + badgeBox.height / 2).toBeLessThan(firstLine.y + firstLine.height);
   // 빌드한 CSS는 색을 줄여 쓰므로(#fff) 토큰 값을 글자로 읽지 않고, 토큰을 입힌 요소의 색과 견준다
   const token = (name: string) =>
     page.evaluate((n) => {

@@ -25,9 +25,11 @@ export function AwardBand({
       className={`flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[0.625rem] border border-line px-[1.125rem] py-4 lg:rounded-xl lg:px-6 ${className}`}
     >
       <div className="flex flex-col gap-1">
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg leading-[1.4] font-bold">
+        {/* 뱃지는 글줄 안에 둔다. 제목이 길어 꺾여도 뱃지가 첫 줄 앞에 남고, 제목은 뱃지 바로 뒤에서 이어진다.
+            꺾일 때 "상위 / 5% 성적"처럼 끝 낱말만 넘어가지 않게 줄 길이를 고르게 나눈다(text-balance) */}
+        <p className="text-lg leading-[1.4] font-bold text-balance">
           {badge && (
-            <span className="inline-flex h-5 items-center rounded-full bg-accent px-2 font-mono text-[0.625rem] leading-none font-medium tracking-[0.04em] text-on-accent">
+            <span className="mr-2 inline-flex h-5 items-center rounded-full bg-accent px-2 align-middle font-mono text-[0.625rem] leading-none font-medium tracking-[0.04em] text-on-accent">
               {badge}
             </span>
           )}
