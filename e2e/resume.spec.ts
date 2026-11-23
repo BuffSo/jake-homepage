@@ -133,15 +133,22 @@ test("머리와 목차 사이에 NEW 뱃지가 달린 대회 결과 띠가 있�
   const nav = (await page.getByRole("navigation", { name: "이력서 목차" }).boundingBox())!;
   expect(box.y).toBeGreaterThan(name.y + name.height);
   expect(box.y + box.height).toBeLessThan(nav.y + 1);
-  // 뱃지는 첫 줄 앞에 있고, 바탕이 글자색으로 채워져 있다
+  // 뱃지는 첫 줄 앞에 있고, 강조색 바탕에 강조 위 글자색이다 (docs/03-design.md 색)
   const badgeBox = (await badge.boundingBox())!;
   const titleBox = (await title.boundingBox())!;
   expect(badgeBox.x).toBeLessThan(titleBox.x);
-  const colors = await badge.evaluate((el) => ({
-    background: getComputedStyle(el).backgroundColor,
-    fg: getComputedStyle(document.body).color,
-  }));
-  expect(colors.background).toBe(colors.fg);
+  // 빌드한 CSS는 색을 줄여 쓰므로(#fff) 토큰 값을 글자로 읽지 않고, 토큰을 입힌 요소의 색과 견준다
+  const token = (name: string) =>
+    page.evaluate((n) => {
+      const probe = document.body.appendChild(document.createElement("span"));
+      probe.style.color = `var(${n})`;
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    }, name);
+  const colors = await badge.evaluate((el) => ({ background: getComputedStyle(el).backgroundColor, text: getComputedStyle(el).color }));
+  expect(colors).toEqual({ background: await token("--accent"), text: await token("--on-accent") });
+  expect(colors.background).not.toBe(await token("--fg"));
   // 버튼은 띠의 오른쪽 끝에 붙는다
   const linkBox = (await link.boundingBox())!;
   expect(box.x + box.width - (linkBox.x + linkBox.width)).toBeLessThan(30);
