@@ -17,12 +17,14 @@ sections:
     title: 업무 경험
   - id: projects
     title: 프로젝트
+  - id: activities
+    title: 대외활동
   - id: training
     title: 교육
-  - id: awards
-    title: 수상
   - id: talks
     title: 강의·특강
+  - id: awards
+    title: 수상
   - id: certificates
     title: 자격증
 reviews:
