@@ -19,8 +19,12 @@ type Site = {
   stack: string[];
   wide?: boolean;
 };
-type Chapter = { slug: string; head: { name: string; url: string; lead: string; stack: string[] }; ai: { title: string } | null };
-type Work = { title: string; sites: { title: string }; chapters: unknown[] };
+type Chapter = {
+  slug: string;
+  head: { name: string; links: { url: string; label: string | null }[]; lead: string; stack: string[] };
+  after: { id: string; title: string } | null;
+};
+type Work = { title: string; sites: { title: string }; chapters: { slug: string; imageAlt?: string }[] };
 
 const read = (file: string) => parseFrontmatter(readFileSync(file, "utf8"), file).data;
 const readDir = <T extends { order: number }>(dir: string) =>
@@ -32,7 +36,9 @@ const work = read("content/site/work.md") as Work;
 const projects = readDir<Project>("content/site/projects");
 const sites = readDir<Site>("content/site/sites");
 const chapters = composeChapters(readFileSync("content/synced/portfolio.md", "utf8"), work.chapters) as Chapter[];
-const projectOf = (slug: string) => projects.find((p) => p.slug === slug)!;
+// 서비스 글(content/site/projects/)이 없는 챕터(Jake English)는 work.md의 챕터 설정에서 읽는다. 페이지와 같은 규칙이다.
+const projectOf = (slug: string) => projects.find((p) => p.slug === slug);
+const imageAltOf = (slug: string) => projectOf(slug)?.imageAlt ?? work.chapters.find((c) => c.slug === slug)!.imageAlt!;
 
 test("포트폴리오가 열리고 콘솔 오류와 실패한 요청이 없다", async ({ page }) => {
   const errors = collectErrors(page);
@@ -80,42 +86,94 @@ test("홈 카드의 자세히 보기가 해당 챕터로 간다", async ({ page 
   }
 });
 
-test("챕터마다 원문의 이름, 첫 줄, 화면, 서비스 링크, 보시는 방법, AI 절이 있다", async ({ page }) => {
+test("챕터마다 원문의 이름, 첫 줄, 화면, 링크 버튼, 보시는 방법, 뒤에 붙는 절이 있다", async ({ page }) => {
   await page.goto("/work");
+  expect(chapters.map((c) => c.slug)).toEqual(["recueve", "prowith", "lotto-ai", "jake-english"]);
   for (const chapter of chapters) {
-    const project = projectOf(chapter.slug);
     const section = page.getByRole("region", { name: chapter.head.name, exact: true });
     await expect(section).toHaveAttribute("id", chapter.slug);
-    // 첫 줄은 원문 인용이고, ProWith는 work.md 규칙으로 홈 소개와 같은 문장이다.
+    // 첫 줄은 원문 인용이고, ProWith는 한눈에 보기 표의 문장이다(work.md의 lead).
     await expect(section.getByText(chapter.head.lead, { exact: true })).toBeVisible();
-    await expect(section.getByRole("img", { name: project.imageAlt })).toBeVisible();
-    const live = section.getByRole("link", { name: new RegExp(project.liveLabel ?? "서비스 열기") });
-    await expect(live).toHaveAttribute("href", chapter.head.url);
-    await expect(live).toHaveAttribute("target", "_blank");
-    await expect(section.getByText("보시는 방법", { exact: true })).toBeVisible();
-    if (chapter.ai) {
-      // /ai의 짧은 카드가 /work#slug-ai로 이 제목을 가리킨다
-      const aiHeading = section.getByRole("heading", { level: 3, name: chapter.ai.title, exact: true });
-      await expect(aiHeading).toBeVisible();
-      await expect(aiHeading).toHaveAttribute("id", `${chapter.slug}-ai`);
+    await expect(section.getByRole("img", { name: imageAltOf(chapter.slug), exact: true })).toBeVisible();
+    // 버튼은 원문 주소 줄의 주소마다 하나다. 이름이 없는 주소는 "서비스 열기"(ProWith는 "데모 열기")다.
+    for (const link of chapter.head.links) {
+      const label = link.label ?? projectOf(chapter.slug)?.liveLabel ?? "서비스 열기";
+      const button = section.getByRole("link", { name: new RegExp(`^${label}`) });
+      await expect(button).toHaveAttribute("href", link.url);
+      await expect(button).toHaveAttribute("target", "_blank");
     }
+    await expect(section.getByText("보시는 방법", { exact: true })).toBeVisible();
+    if (chapter.after) {
+      // /ai의 짧은 카드가 /work#prowith-ai, /work#recueve-ai로 이 제목을 가리킨다
+      const heading = section.getByRole("heading", { level: 3, name: chapter.after.title, exact: true });
+      await expect(heading).toBeVisible();
+      await expect(heading).toHaveAttribute("id", chapter.after.id);
+    }
+  }
+  expect(chapters.map((c) => c.after?.id ?? null)).toEqual(["recueve-ai", "prowith-ai", "lotto-ai-performance", null]);
+});
+
+test("Jake English 챕터는 소개 영상과 공개 저장소 버튼을 둔다", async ({ page }) => {
+  await page.goto("/work#jake-english");
+  const section = page.getByRole("region", { name: "Jake English", exact: true });
+  await expect(section.getByText("04 / 04 · JAKE ENGLISH")).toBeVisible();
+  await expect(section.getByRole("link", { name: /^소개 영상/ })).toHaveAttribute("href", /youtu\.be\/SrAWg5lS0lQ$/);
+  await expect(section.getByRole("link", { name: /^공개 저장소/ })).toHaveAttribute("href", "https://github.com/BuffSo/jake-english");
+});
+
+test("사이트에서 고친 문장이 보이고, 원문 이미지와 인쇄용 규칙은 싣지 않는다", async ({ page }) => {
+  await page.goto("/work");
+  const main = page.getByRole("main");
+  await expect(main.getByText("잡았습니다(아래 성능 개선)", { exact: false })).toBeVisible();
+  await expect(main).not.toContainText("앞의 하네스가");
+  await expect(main).not.toContainText("(5-1)");
+  await expect(main.locator('img[src*="assets/"]')).toHaveCount(0);
+  await expect(main.locator("style")).toHaveCount(0);
+});
+
+test("그림은 다섯 장이고, 좁은 화면에서는 상자 안에서만 옆으로 넘긴다", async ({ page }, testInfo) => {
+  await page.goto("/work");
+  const figures = page.locator("main .md-figure");
+  await expect(figures).toHaveCount(5);
+  await expect(page.getByRole("region", { name: "Recueve 구성도", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Jake English 구성도", exact: true })).toBeVisible();
+  for (let i = 0; i < 5; i++) {
+    const figure = figures.nth(i);
+    await expect(figure.locator("svg")).toHaveCount(1);
+    await expect(figure).toHaveAttribute("tabindex", "0");
+    const scrolls = await figure.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(scrolls).toBe(testInfo.project.name === "mobile");
+  }
+  // 설명 줄은 넘기지 않고 화면 폭 안에 둔다
+  const captions = page.locator("main .fig sub");
+  await expect(captions).toHaveCount(5);
+  const viewport = page.viewportSize()!.width;
+  for (let i = 0; i < 5; i++) {
+    const box = (await captions.nth(i).boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(viewport);
   }
 });
 
-test("사이트에서 고친 문장이 보이고, 원문 이미지는 싣지 않는다", async ({ page }) => {
+test("사이트에만 남긴 상세가 보이고, 첫 칸이 문장인 표는 첫 칸도 줄을 바꾼다", async ({ page }) => {
   await page.goto("/work");
-  const main = page.getByRole("main");
-  await expect(main.getByText("아래 AI 활용 - 제품 참조", { exact: false })).toBeVisible();
-  await expect(main).not.toContainText("앞의 하네스가");
-  await expect(main).not.toContainText("3절 참조");
-  await expect(main.locator('img[src*="assets/"]')).toHaveCount(0);
+  for (const slug of ["recueve", "prowith"]) {
+    const heading = page.locator(`#${slug}`).getByRole("heading", { level: 3, name: "기술적 결정", exact: true });
+    await expect(heading).toBeVisible();
+  }
+  const lotto = page.locator("#lotto-ai");
+  await expect(lotto.getByRole("heading", { level: 3, name: "로그는 NoSQL인 MongoDB에 분리해서 저장했습니다" })).toBeVisible();
+  await expect(lotto.getByRole("heading", { level: 3, name: "개발 모드에서 등급별 계정을 선택해 바로 테스트하게 했습니다" })).toBeVisible();
+  const tables = page.locator("main .md-table.md-long-first");
+  await expect(tables).toHaveCount(2);
+  await expect(tables.first().locator("td").first()).toHaveCSS("white-space", "normal");
 });
 
-test("보시는 방법의 굵게 표시가 한글 조사 앞에서도 닫힌다", async ({ page }) => {
+test("보시는 방법은 한눈에 보기 표의 안내를 그대로 그린다", async ({ page }) => {
   await page.goto("/work");
-  // 원문: **`로그인` → `DEMO Login`**에서 (닫는 ** 뒤에 조사가 붙는다)
-  const note = page.locator("#prowith .md-note");
-  await expect(note.locator("strong").filter({ hasText: "DEMO Login" })).toHaveCount(1);
+  // 원문 칸의 <code>와 링크가 그대로 보인다
+  await expect(page.locator("#prowith .md-note code").filter({ hasText: "DEMO Login" })).toHaveCount(1);
+  await expect(page.locator("#jake-english .md-note").getByRole("link", { name: /소개 영상/ })).toHaveAttribute("target", "_blank");
 });
 
 test("의뢰받아 만든 작업 카드는 사이트 링크가 있거나 없는 이유를 쓰고, 소스 링크는 없다", async ({ page }) => {
