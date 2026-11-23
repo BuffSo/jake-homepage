@@ -95,6 +95,11 @@ sections:
     label: AI
     title: AI로 일하는 방식
     intro: AI가 기준을 벗어나지 않게 하네스를 먼저 갖추고, 그 위에서 빠르게 구현합니다. 개발 업무가 아닌 작업에도 같은 방식을 씁니다.
+    award:
+      title: AX인재전쟁 온라인 상위 5%
+      detail: 1회차 삼일PwC 과제 · 참가자 2,916명 중 · 2026.11
+      cta: 인증서 보기
+      href: https://axacademy.ai/axwar/cert/dxN6SEBhEGU6n1JU1brdfPa0
 about:
   label: ABOUT
   title: 안녕하세요, 소재희입니다.
@@ -138,4 +143,5 @@ ProWith는 프리랜서 프로젝트, GENYS Lotto AI는 개인 프로젝트로 �
 About의 "지금은 그 경험 위에 AI 에이전트를 더해 서비스를 만듭니다."는 본인이 확인한 사실이다(2026-10-28, ADR-0003). 원본 자기소개가 줄며 같은 문장이 빠졌지만,
 새 자기소개의 "AI로 구현하고 검증하는 하네스 엔지니어링으로, 기획부터 개발, 배포까지"와 어긋나지 않는다.
 About의 "벤처기업 개발팀으로 시작해"는 본인이 확인한 사실이다(2026-10-28, ADR-0003). 이력서의 첫 경력(기술연구소 연구원)과 어긋나지 않는다.
+AI 섹션 띠(sections.ai.award)의 대회 결과. 출처: 이력서 대외활동(content/synced/resume.md), 인증서 페이지(href).
 -->

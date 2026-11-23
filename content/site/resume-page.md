@@ -3,6 +3,7 @@ label: RESUME
 title: 이력서
 description: 다양한 비즈니스 과제를 AI 워크플로우로 해결하는 풀스택 개발자
 print: 인쇄 · PDF로 저장
+awardBadge: NEW
 endPhotoAlt: 바닷가 그네에 앉아 바다를 보는 모습
 sections:
   - id: contact
@@ -17,12 +18,15 @@ sections:
     title: 업무 경험
   - id: projects
     title: 프로젝트
+  - id: activities
+    title: 대외활동
+    index: false
   - id: training
     title: 교육
-  - id: awards
-    title: 수상
   - id: talks
     title: 강의·특강
+  - id: awards
+    title: 수상
   - id: certificates
     title: 자격증
 reviews:
@@ -41,6 +45,8 @@ sources:
 <!--
 /resume 페이지의 머리와 목차 (docs/02-ia.md /resume). 본문은 content/synced/resume.md를 그대로 그린다.
 sections는 원문의 절(h2) 제목과 순서까지 같아야 한다. 원문의 절이 바뀌면 빌드와 테스트가 멈추므로 여기를 맞춘다.
+index: false인 절은 원문과의 대조와 절 id에는 쓰고 맨 위 목차에는 싣지 않는다. 목차는 열 칸(다섯 칸 두 줄)을 유지한다(2026-11-23).
+awardBadge는 머리와 목차 사이 띠의 첫 줄 앞에 다는 뱃지 글자다. 띠의 문구와 링크는 홈 AI 섹션 띠와 같은 값(home.md의 sections.ai.award)을 쓴다.
 description은 브라우저 설명이고, 이력서 첫 줄(한 줄 소개)을 그대로 쓴다(sources).
 endPhotoAlt는 본문 끝 사진(src/assets/resume-sea.jpg)의 대체 텍스트다. 사진에는 캡션을 달지 않는다.
 reviews는 원문에서 머리글(label) 바로 뒤의 인용을 동료 평가 상자로 묶는다(rehypeReviews). 글은 고치지 않고 모양만 바꾼다.

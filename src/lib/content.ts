@@ -30,12 +30,18 @@ export type Link = { label: string; href: string };
 export type LayerItem = { name: string; usedBy: ProjectSlug[]; detailOnly?: boolean };
 export type Layer = { name: string; items: LayerItem[] };
 
+type SectionText = { label: string; title: string; intro: string };
+
 export type Home = {
   headline: string;
   lines: [string, string];
   contact: { email: string; github: string };
   layers: Layer[];
-  sections: Record<"work" | "ai", { label: string; title: string; intro: string }>;
+  sections: {
+    work: SectionText;
+    /** award는 홈 AI 섹션의 머리와 카드 사이 띠이고, /resume 머리 아래에서도 같은 값을 쓴다. 대회 결과 한 줄과 공개 인증서 링크 (docs/02-ia.md 홈 3) */
+    ai: SectionText & { award: { title: string; detail: string; cta: string; href: string } };
+  };
   about: {
     label: string;
     title: string;
@@ -168,7 +174,10 @@ export type ResumePage = {
   description: string;
   print: string;
   endPhotoAlt: string;
-  sections: { id: string; title: string }[];
+  /** 머리와 목차 사이 띠의 첫 줄 앞에 다는 뱃지 글자. 띠의 문구와 링크는 home.md의 sections.ai.award다 */
+  awardBadge: string;
+  /** 원문의 절(h2) 전부, 순서대로. index: false인 절은 맨 위 목차에 싣지 않는다 */
+  sections: { id: string; title: string; index?: boolean }[];
   reviews: { label: string; quotes: { id: string; text: string }[] };
 };
 
