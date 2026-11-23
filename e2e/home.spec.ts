@@ -31,6 +31,7 @@ const home = read("content/site/home.md") as {
   lines: string[];
   contact: { email: string; github: string };
   layers: Layer[];
+  sections: { ai: { title: string; award: { title: string; detail: string; cta: string; href: string } } };
   about: { title: string; body: string[]; reviewsTitle: string; reviews: { quote: string; by: string; href: string }[] };
 };
 const readDir = <T extends { order: number }>(dir: string) =>
@@ -577,6 +578,31 @@ test.describe("아래 섹션", () => {
     // {adrCount} 같은 자리가 그대로 남지 않았는지
     await expect(section).not.toContainText("{");
     await expect(section).toContainText(/ADR \d+개/);
+  });
+
+  test("AI 섹션 머리와 카드 사이의 띠에 대회 결과 두 줄과 인증서 링크가 있다", async ({ page }) => {
+    await page.goto("/");
+    const { award } = home.sections.ai;
+    const section = page.getByRole("region", { name: home.sections.ai.title });
+    const title = section.getByText(award.title, { exact: true });
+    const detail = section.getByText(award.detail, { exact: true });
+    await expect(title).toBeVisible();
+    await expect(detail).toBeVisible();
+    const link = section.getByRole("link", { name: new RegExp(award.cta) });
+    await expect(link).toHaveCount(1);
+    await expect(link).toHaveAttribute("href", award.href);
+    await expect(link).toHaveAttribute("target", "_blank");
+    // 띠는 섹션 머리(소개 문장) 아래, 첫 카드 위에 있다
+    const head = (await section.getByRole("heading", { level: 2 }).boundingBox())!;
+    const first = (await section.getByRole("article").first().boundingBox())!;
+    const linkBox = (await link.boundingBox())!;
+    for (const box of [(await title.boundingBox())!, (await detail.boundingBox())!, linkBox]) {
+      expect(box.y).toBeGreaterThan(head.y + head.height);
+      expect(box.y + box.height).toBeLessThan(first.y);
+    }
+    // 버튼은 띠의 오른쪽에 붙는다
+    const titleBox = (await title.boundingBox())!;
+    expect(linkBox.x + linkBox.width).toBeGreaterThan(titleBox.x + titleBox.width);
   });
 
   test("영상 카드는 두 영상의 썸네일을 겹치고, 나중 영상이 앞 오른쪽 아래에 있다", async ({ page }) => {

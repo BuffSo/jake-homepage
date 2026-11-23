@@ -5,7 +5,7 @@ import { getHome, getHomeAiWorks, type AiVideo, type AiWork } from "@/lib/conten
 import { CARD_FRAME, CARD_FRAME_STEPS, HermesFlow, SiteSteps, WikiFlow } from "@/components/ai-figures";
 import { Metric, SectionHead } from "@/components/section-head";
 
-// AI로 일하는 방식 (docs/02-ia.md 홈 3). 카드 네 장, 자세한 내용은 /ai의 해당 항목(/ai#slug)에서 보여 준다.
+// AI로 일하는 방식 (docs/02-ia.md 홈 3). 머리와 카드 사이에 대회 결과 띠 한 줄, 그 아래 카드 네 장. 자세한 내용은 /ai의 해당 항목(/ai#slug)에서 보여 준다.
 
 function Figure({ work }: { work: AiWork }) {
   switch (work.figure) {
@@ -56,7 +56,17 @@ export function AiCards() {
 
   return (
     <section aria-labelledby="ai-title" className="mt-14 border-t border-line py-14 lg:mt-24 lg:py-24">
-      <SectionHead id="ai-title" {...ai} />
+      <SectionHead id="ai-title" label={ai.label} title={ai.title} intro={ai.intro} />
+      {/* 대회 결과 띠 (docs/03-design.md 홈 AI 섹션 띠). 좁은 화면에서는 버튼이 다음 줄로 내려가 오른쪽에 붙는다. */}
+      <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[0.625rem] border border-line px-[1.125rem] py-4 lg:mb-8 lg:rounded-xl lg:px-6">
+        <div className="flex flex-col gap-1">
+          <p className="text-lg leading-[1.4] font-bold">{ai.award.title}</p>
+          <p className="text-xs leading-[1.6] text-subtle">{ai.award.detail}</p>
+        </div>
+        <ButtonLink href={ai.award.href} className="ml-auto">
+          {ai.award.cta}
+        </ButtonLink>
+      </div>
       <div className="grid gap-5 md:grid-cols-2 lg:gap-8">
         {works.map((work) => {
           // 머리글의 영문 이름은 고정폭, 한글 설명은 본문 글꼴로 쓴다 (globals.css 글꼴 순서)
