@@ -7,6 +7,8 @@ import remarkGfm from "remark-gfm";
 import {
   rehypeChipLists,
   rehypeDropStyle,
+  rehypeFigures,
+  rehypeLongFirstColumn,
   rehypeGroupTitles,
   rehypeHeadingIds,
   rehypeReviews,
@@ -103,6 +105,54 @@ describe("rehypeDropStyle", () => {
     const tree = { type: "root", children: [{ type: "element", properties: { style: "color:red", id: "a" }, children: [] }] };
     rehypeDropStyle()(tree);
     assert.deepEqual(tree.children[0].properties, { id: "a" });
+  });
+});
+
+describe("rehypeDropStyle (style 요소)", () => {
+  test("원문의 인쇄용 style 요소를 버리고 뒤의 요소는 남긴다", () => {
+    const el = (tagName, children = []) => ({ type: "element", tagName, properties: {}, children });
+    const tree = { type: "root", children: [el("style", [{ type: "text", value: ".fig p{}" }]), el("p"), el("div", [el("style"), el("span")])] };
+    rehypeDropStyle()(tree);
+    assert.deepEqual(tree.children.map((c) => c.tagName), ["p", "div"]);
+    assert.deepEqual(tree.children[1].children.map((c) => c.tagName), ["span"]);
+  });
+});
+
+describe("rehypeFigures", () => {
+  const el = (tagName, properties = {}, children = []) => ({ type: "element", tagName, properties, children });
+  const run = (tree) => {
+    rehypeFigures()(tree);
+    return tree;
+  };
+
+  test("그림 묶음(.fig) 안의 svg를 옆으로 넘길 수 있는 상자로 감싼다", () => {
+    const svg = el("svg", { ariaLabel: "Recueve 구성도: Vercel 프론트, EC2 한 대" });
+    const caption = el("p", {}, [el("sub")]);
+    const tree = run({ type: "root", children: [el("div", { className: ["fig"] }, [svg, caption])] });
+    const [box, rest] = tree.children[0].children;
+    assert.equal(box.tagName, "div");
+    assert.deepEqual(box.properties, { className: ["md-figure"], role: "region", ariaLabel: "Recueve 구성도", tabIndex: 0 });
+    assert.equal(box.children[0], svg);
+    assert.equal(rest, caption);
+  });
+
+  test("이름이 없는 그림은 그림이라고 부르고, 묶음 밖의 svg는 그대로 둔다", () => {
+    const outside = el("svg");
+    const tree = run({ type: "root", children: [el("div", { className: ["fig"] }, [el("svg")]), el("p", {}, [outside])] });
+    assert.equal(tree.children[0].children[0].properties.ariaLabel, "그림");
+    assert.equal(tree.children[1].children[0], outside);
+  });
+});
+
+describe("rehypeLongFirstColumn", () => {
+  const html = (rows) =>
+    render(["| 결정 | 이유 |", "|---|---|", ...rows.map((r) => `| ${r[0]} | ${r[1]} |`)].join("\n"), { rehype: [rehypeLongFirstColumn] });
+
+  test("첫 칸의 글이 긴 표에만 표시를 붙인다", () => {
+    assert.match(html([["EC2 한 대에 **업체별 백엔드 컨테이너**, RDS 한 대에서 Database만 분리", "이유"]]), /<table class="md-long-first">/);
+    assert.doesNotMatch(html([["**긴 자막의 비용**", "이유"], ["분류할 카테고리가 없음", "이유"]]), /md-long-first/);
+    // 이름과 명령어를 줄바꿈으로 나눈 칸(스킬 표)은 글자를 이으면 20자가 넘지만 이름표다
+    assert.doesNotMatch(html([["**업체 로고 생성**<br>`build-tenant-logo`", "하는 일"]]), /md-long-first/);
   });
 });
 

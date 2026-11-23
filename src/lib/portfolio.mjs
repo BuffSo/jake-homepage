@@ -54,12 +54,14 @@ export function findSection(md, heading, until) {
   return { level: start.level, title: start.text, body: trimLines(lines.slice(start.index + 1, end)).join("\n") };
 }
 
-const META = /^\*\*(.+?)\*\*\s*\|\s*(.+?)\s*\|\s*🔗\s*(https?:\/\/\S+)\s*$/;
+const META = /^(.+?)\s*\|\s*(.+?)\s*\|\s*🔗\s*(https?:\/\/.+)$/;
+const LINK = /^(https?:\/\/\S+)(?:\s+\((.+)\))?$/;
 const STACK = /^(?:`[^`]+`\s*)+$/;
 const LEAD = /^>\s*(.+)$/;
 
 /**
- * "4. 프로젝트 상세"의 절 하나. 제목, 기간·역할·주소 줄, 스택 줄, 인용 한 줄이 차례로 와야 한다.
+ * "2. 프로젝트 상세"의 절 하나. 제목, 기간·역할·주소 줄, 스택 줄, 인용 한 줄이 차례로 와야 한다.
+ * 주소는 가운뎃점으로 여럿을 이을 수 있고, 주소 뒤 괄호의 글은 그 링크의 이름이다.
  * @param {{ title: string, body: string }} section
  */
 export function parseDetail(section) {
@@ -71,7 +73,12 @@ export function parseDetail(section) {
   const filled = lines.map((line, index) => ({ line: line.trim(), index })).filter((l) => l.line !== "");
   const [meta, stack, lead] = filled;
   const m = META.exec(meta?.line ?? "");
-  if (!m) throw new PortfolioError(`기간·역할·주소 줄을 읽지 못했습니다: ${section.title}`);
+  if (!m || m[1].includes("*")) throw new PortfolioError(`기간·역할·주소 줄을 읽지 못했습니다: ${section.title}`);
+  const links = m[3].split(/\s+·\s+/).map((part) => {
+    const link = LINK.exec(part.trim());
+    if (!link) throw new PortfolioError(`주소를 읽지 못했습니다: ${section.title}`);
+    return { url: link[1], label: link[2] ?? null };
+  });
   if (!STACK.test(stack?.line ?? "")) throw new PortfolioError(`스택 줄을 읽지 못했습니다: ${section.title}`);
   const l = LEAD.exec(lead?.line ?? "");
   if (!l) throw new PortfolioError(`인용 한 줄을 읽지 못했습니다: ${section.title}`);
@@ -81,23 +88,27 @@ export function parseDetail(section) {
     subtitle: title.slice(dash + 3),
     period: m[1],
     role: m[2],
-    url: m[3],
+    links,
     stack: [...stack.line.matchAll(/`([^`]+)`/g)].map((s) => s[1]),
     lead: l[1],
     body: trimLines(lines.slice(lead.index + 1)).join("\n"),
   };
 }
 
-/** "보시는 방법" 표에서 그 서비스의 안내. 첫 조각(주소)은 버튼이 있으므로 뺀다. */
-export function howToView(md, service) {
-  const rows = findSection(md, "보시는 방법")
+const GLANCE_ROW = /^<tr><td><a href="[^"]+"><strong>(.+?)<\/strong><\/a>.*?<\/td><td>(.*?)<\/td><td>(.*)<\/td><\/tr>$/;
+
+/**
+ * "1. 한눈에 보기" 표에서 그 프로젝트의 줄. 표는 HTML이고 한 줄이 한 프로젝트다(프로젝트 · 무엇인가 · 보시는 방법).
+ * @returns {{ what: string, howToView: string }} what은 "무엇인가" 칸의 첫 줄, howToView는 셋째 칸(HTML 그대로)
+ */
+export function glance(md, project) {
+  const rows = findSection(md, "1. 한눈에 보기")
     .body.split("\n")
-    .filter((line) => line.startsWith(`| **${service}** |`));
-  exactlyOne(rows.length, `"보시는 방법"의 ${service} 줄`);
-  const cells = rows[0].split("|").map((c) => c.trim());
-  const [url, ...rest] = cells[2].split(/<br\s*\/?>/);
-  if (!/^https?:\/\//.test(url.trim())) throw new PortfolioError(`"보시는 방법"의 ${service} 줄이 주소로 시작하지 않습니다`);
-  return rest.join(" ").trim();
+    .map((line) => GLANCE_ROW.exec(line.trim()))
+    .filter((m) => m && m[1] === project);
+  exactlyOne(rows.length, `"한눈에 보기"의 ${project} 줄`);
+  const [, , what, how] = rows[0];
+  return { what: what.split(/<br\s*\/?>/)[0].trim(), howToView: how.trim() };
 }
 
 /**
@@ -136,22 +147,38 @@ export function shiftHeadings(text, delta) {
   return lines.join("\n");
 }
 
+/** 절 제목 앞의 번호("3. ", "5-1. ")를 뗀다 */
+const unnumber = (title) => title.replace(/^[\d-]+\.\s+/, "");
+
+/** 코드 블록 밖의 제목에서 번호를 뗀다 */
+function unnumberHeadings(text) {
+  const lines = text.split("\n");
+  for (const h of headings(lines)) lines[h.index] = `${"#".repeat(h.level)} ${unnumber(h.text)}`;
+  return lines.join("\n");
+}
+
 /**
  * content/site/work.md의 chapters로 챕터를 만든다.
- * 페이지에서 챕터 이름은 h2, AI 절 제목은 h3이므로 본문 제목은 h3부터, AI 절 안의 제목은 h4부터 쓴다.
+ * 페이지에서 챕터 이름은 h2, 이어 붙인 절 제목은 h3이므로 본문 제목은 h3부터, 이어 붙인 절 안의 제목은 h4부터 쓴다.
+ * lead가 "glance"면 큰 글씨 첫 줄을 "한눈에 보기" 표의 "무엇인가"에서 가져오고, 원문 인용은 본문 맨 앞에 그대로 둔다.
  */
 export function composeChapters(md, chapters) {
   return chapters.map((chapter) => {
     const detail = findSection(md, chapter.detail);
     const { body: detailBody, ...head } = parseDetail(detail);
-    const ai = chapter.ai ? findSection(md, chapter.ai, chapter.aiUntil) : null;
-    const [body, aiBody, lead] = applyRules([detailBody, ai?.body ?? "", head.lead], chapter, { replaceOnly: [2] });
+    const row = glance(md, head.name);
+    const after = chapter.after ? findSection(md, chapter.after.section, chapter.after.until) : null;
+    const fromGlance = chapter.lead === "glance";
+    const fullBody = fromGlance ? `> ${head.lead}\n\n${detailBody}` : detailBody;
+    const [body, afterBody, lead] = applyRules([fullBody, after?.body ?? "", fromGlance ? row.what : head.lead], chapter, { replaceOnly: [2] });
     return {
       slug: chapter.slug,
       head: { ...head, lead },
-      howToView: howToView(md, chapter.howToView),
+      howToView: row.howToView,
       body: shiftHeadings(body, 3 - (detail.level + 1)),
-      ai: ai ? { title: ai.title.replace(/^\d+\.\s+/, ""), body: shiftHeadings(aiBody, 4 - (ai.level + 1)) } : null,
+      after: after
+        ? { id: chapter.after.id, title: unnumber(after.title), body: unnumberHeadings(shiftHeadings(afterBody, 4 - (after.level + 1))) }
+        : null,
     };
   });
 }

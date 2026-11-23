@@ -4,7 +4,7 @@ import {
   applyRules,
   composeChapters,
   findSection,
-  howToView,
+  glance,
   parseDetail,
   PortfolioError,
   shiftHeadings,
@@ -15,40 +15,31 @@ import {
 const MD = [
   "# 포트폴리오",
   "",
+  "<style>.fig p { text-align: center; }</style>",
+  "",
   "## 1. 한눈에 보기",
   "",
-  "### 보시는 방법",
+  "프로젝트 두 개입니다.",
   "",
-  "| 서비스 | 안내 |",
-  "|---|---|",
-  "| **Alpha** | https://alpha.example.com<br>회원가입하시면 **바로** 보실 수 있습니다 |",
-  "| **Beta** | 주소 없이 시작하는 줄 |",
+  '<table class="glance">',
+  "<thead><tr><th>프로젝트</th><th>무엇인가</th><th>보시는 방법</th></tr></thead>",
+  "<tbody>",
+  '<tr><td><a href="https://alpha.example.com"><strong>Alpha</strong></a><br>풀스택<br>2026.01</td><td>첫 소개<br><strong>숫자</strong></td><td>가입 후 <code>로그인</code></td></tr>',
+  '<tr><td><a href="https://a.example.com"><strong>Beta</strong></a><br>풀스택<br>2026.03</td><td>둘째 소개</td><td><a href="https://a.example.com">소개 영상</a>으로 보실 수 있습니다</td></tr>',
+  "</tbody>",
+  "</table>",
   "",
-  "## 2. AI 활용 - 개발",
+  "## 2. 프로젝트 상세",
   "",
-  "앞의 절을 가리키는 문장입니다.",
+  "### 2-1. Alpha - 첫 서비스",
   "",
-  "### 자동화",
-  "",
-  "본문",
-  "",
-  "### 개발 외의 일 - 영상",
-  "",
-  "다른 페이지로 갈 내용",
-  "",
-  "---",
-  "",
-  "## 4. 프로젝트 상세",
-  "",
-  "### 4-1. Alpha - 첫 서비스",
-  "",
-  "**2026.01 ~ 현재** | 개인 프로젝트 (풀스택) | 🔗 https://alpha.example.com",
+  "2026.01 ~ 2026.02 | 개인 프로젝트 (풀스택) | 🔗 https://alpha.example.com",
   "",
   "`Next.js` `PostgreSQL`",
   "",
   "> 한 줄 소개",
   "",
-  "**구성** - 2절 참조",
+  "- 성능 - 병목을 잡았습니다(5-1)",
   "",
   "#### 성능",
   "",
@@ -56,70 +47,116 @@ const MD = [
   "# 코드 블록 안의 줄",
   "```",
   "",
-  "<img src=\"assets/a.png\" alt=\"\">",
+  "### 2-2. Beta - 둘째 서비스",
   "",
-  "---",
-  "",
-  "### 4-2. Beta - 둘째 서비스",
-  "",
-  "**2025.01 ~ 2025.02** | 프리랜서 프로젝트 (풀스택) | 🔗 https://beta.example.com",
+  "2026.03 | 개인 프로젝트 | 🔗 https://a.example.com (소개 영상) · https://b.example.com (공개 저장소)",
   "",
   "`NestJS`",
   "",
   "> 둘째 소개",
   "",
+  "---",
+  "",
+  "## 3. AI 활용 - 개발",
+  "",
+  "**앞의 절을 가리키는 문장입니다.**",
+  "",
+  "### 3-1. Alpha - 스킬",
+  "",
+  "본문",
+  "",
+  "#### 무엇을",
+  "",
+  "표",
+  "",
+  "### 3-2. Beta - 앱",
+  "",
+  "다른 챕터로 갈 내용",
+  "",
+  "---",
+  "",
+  "## 5. 성능",
+  "",
+  "### 5-1. Alpha 성능 개선 - 세 번",
+  "",
+  "성능 본문",
+  "",
 ].join("\n");
+
+/** MD의 한 줄을 바꾼 글 */
+const swap = (from, to) => {
+  assert.ok(MD.includes(from));
+  return MD.replace(from, to);
+};
 
 describe("findSection", () => {
   test("같거나 높은 단계의 다음 제목에서 멈추고, 끝의 구분선은 뗀다", () => {
-    const section = findSection(MD, "4-1. Alpha");
+    const section = findSection(MD, "2-2. Beta");
     assert.equal(section.level, 3);
-    assert.equal(section.title, "4-1. Alpha - 첫 서비스");
-    assert.ok(section.body.includes("#### 성능"));
-    assert.ok(!section.body.includes("4-2. Beta"));
-    assert.ok(!section.body.trimEnd().endsWith("---"));
+    assert.equal(section.title, "2-2. Beta - 둘째 서비스");
+    assert.ok(section.body.endsWith("> 둘째 소개"));
+    const alpha = findSection(MD, "2-1. Alpha");
+    assert.ok(alpha.body.includes("# 코드 블록 안의 줄"));
+    assert.ok(!alpha.body.includes("2-2. Beta"));
   });
 
   test("until을 주면 그 제목 전까지만 쓴다", () => {
-    const section = findSection(MD, "2. AI 활용 - 개발", "개발 외의 일");
-    assert.ok(section.body.includes("### 자동화"));
-    assert.ok(!section.body.includes("다른 페이지로 갈 내용"));
+    const section = findSection(MD, "3. AI 활용 - 개발", "3-2. Beta");
+    assert.ok(section.body.includes("### 3-1. Alpha - 스킬"));
+    assert.ok(!section.body.includes("다른 챕터로 갈 내용"));
   });
 
   test("제목을 못 찾거나 두 번 이상 찾으면 멈춘다", () => {
     assert.throws(() => findSection(MD, "없는 제목"), PortfolioError);
-    assert.throws(() => findSection(MD, "4-"), PortfolioError);
+    assert.throws(() => findSection(MD, "2-"), PortfolioError);
+    assert.throws(() => findSection(MD, "3. AI 활용 - 개발", "없는 제목"), PortfolioError);
   });
 });
 
 describe("parseDetail", () => {
   test("제목, 기간·역할·주소, 스택, 인용 한 줄을 읽고 나머지를 본문으로 둔다", () => {
-    const detail = parseDetail(findSection(MD, "4-1. Alpha"));
+    const detail = parseDetail(findSection(MD, "2-1. Alpha"));
     assert.equal(detail.name, "Alpha");
     assert.equal(detail.subtitle, "첫 서비스");
-    assert.equal(detail.period, "2026.01 ~ 현재");
+    assert.equal(detail.period, "2026.01 ~ 2026.02");
     assert.equal(detail.role, "개인 프로젝트 (풀스택)");
-    assert.equal(detail.url, "https://alpha.example.com");
+    assert.deepEqual(detail.links, [{ url: "https://alpha.example.com", label: null }]);
     assert.deepEqual(detail.stack, ["Next.js", "PostgreSQL"]);
     assert.equal(detail.lead, "한 줄 소개");
-    assert.ok(detail.body.startsWith("**구성**"));
+    assert.ok(detail.body.startsWith("- 성능 - 병목을"));
+  });
+
+  test("주소가 여럿이면 가운뎃점으로 나누고, 괄호의 글을 링크 이름으로 읽는다", () => {
+    const detail = parseDetail(findSection(MD, "2-2. Beta"));
+    assert.equal(detail.period, "2026.03");
+    assert.deepEqual(detail.links, [
+      { url: "https://a.example.com", label: "소개 영상" },
+      { url: "https://b.example.com", label: "공개 저장소" },
+    ]);
   });
 
   test("머리 형식이 다르면 멈춘다", () => {
-    const broken = { title: "4-9. Gamma - 셋째", body: "`Next.js`\n\n> 소개" };
-    assert.throws(() => parseDetail(broken), PortfolioError);
-    assert.throws(() => parseDetail({ title: "4-9. Gamma", body: "" }), PortfolioError);
+    const meta = "2026.01 ~ 2026.02 | 개인 프로젝트 (풀스택) | 🔗 https://alpha.example.com";
+    const broken = (to) => () => parseDetail(findSection(swap(meta, to), "2-1. Alpha"));
+    assert.throws(broken("**2026.01 ~ 2026.02** | 개인 프로젝트 (풀스택) | 🔗 https://alpha.example.com"), PortfolioError);
+    assert.throws(broken("2026.01 ~ 2026.02 | 개인 프로젝트 (풀스택)"), PortfolioError);
+    assert.throws(broken("2026.01 | 개인 | 🔗 https://a.example.com https://b.example.com"), PortfolioError);
+    assert.throws(broken("2026.01 | 개인 | 🔗 https://a.example.com · 주소 아님"), PortfolioError);
+    assert.throws(() => parseDetail(findSection(swap("`Next.js` `PostgreSQL`", "Next.js"), "2-1. Alpha")), PortfolioError);
+    assert.throws(() => parseDetail(findSection(swap("> 한 줄 소개", "한 줄 소개"), "2-1. Alpha")), PortfolioError);
+    assert.throws(() => parseDetail({ title: "2-9. 부제 없는 제목", body: "" }), PortfolioError);
   });
 });
 
-describe("howToView", () => {
-  test("보시는 방법 줄에서 주소 조각을 빼고 안내만 남긴다", () => {
-    assert.equal(howToView(MD, "Alpha"), "회원가입하시면 **바로** 보실 수 있습니다");
+describe("glance", () => {
+  test("한눈에 보기 표에서 무엇인가의 첫 줄과 보시는 방법 칸을 읽는다", () => {
+    assert.deepEqual(glance(MD, "Alpha"), { what: "첫 소개", howToView: "가입 후 <code>로그인</code>" });
+    assert.equal(glance(MD, "Beta").howToView, '<a href="https://a.example.com">소개 영상</a>으로 보실 수 있습니다');
   });
 
-  test("줄이 없거나 주소로 시작하지 않으면 멈춘다", () => {
-    assert.throws(() => howToView(MD, "Gamma"), PortfolioError);
-    assert.throws(() => howToView(MD, "Beta"), PortfolioError);
+  test("줄이 없거나 둘 이상이면 멈춘다", () => {
+    assert.throws(() => glance(MD, "Gamma"), PortfolioError);
+    assert.throws(() => glance(swap("<strong>Beta</strong>", "<strong>Alpha</strong>"), "Alpha"), PortfolioError);
   });
 });
 
@@ -155,23 +192,43 @@ describe("shiftHeadings", () => {
 });
 
 describe("composeChapters", () => {
-  test("본문 제목은 h3부터, AI 절 안의 제목은 h4부터 쓴다", () => {
-    const [chapter] = composeChapters(MD, [
-      {
-        slug: "alpha",
-        detail: "4-1. Alpha",
-        ai: "2. AI 활용 - 개발",
-        aiUntil: "개발 외의 일",
-        howToView: "Alpha",
-        drop: ["<img src=\"assets/a.png\"", "앞의 절을"],
-        replace: [{ find: "2절 참조", to: "아래 참조" }],
-      },
-    ]);
+  const ALPHA = {
+    slug: "alpha",
+    detail: "2-1. Alpha",
+    after: { section: "3. AI 활용 - 개발", until: "3-2. Beta", id: "alpha-ai" },
+    drop: ["**앞의 절을"],
+    replace: [{ find: "잡았습니다(5-1)", to: "잡았습니다(아래 성능 개선)" }],
+  };
+
+  test("본문 제목은 h3부터, 붙는 절 안의 제목은 h4부터 쓰고 번호를 뗀다", () => {
+    const [chapter] = composeChapters(MD, [ALPHA]);
     assert.equal(chapter.head.name, "Alpha");
+    assert.equal(chapter.head.lead, "한 줄 소개");
+    assert.equal(chapter.howToView, "가입 후 <code>로그인</code>");
     assert.ok(chapter.body.includes("### 성능"));
-    assert.ok(chapter.body.includes("아래 참조"));
-    assert.ok(!chapter.body.includes("<img"));
-    assert.equal(chapter.ai.title, "AI 활용 - 개발");
-    assert.ok(chapter.ai.body.startsWith("#### 자동화"));
+    assert.ok(chapter.body.includes("잡았습니다(아래 성능 개선)"));
+    assert.deepEqual(
+      { id: chapter.after.id, title: chapter.after.title },
+      { id: "alpha-ai", title: "AI 활용 - 개발" },
+    );
+    assert.ok(chapter.after.body.startsWith("#### Alpha - 스킬"));
+    assert.ok(chapter.after.body.includes("##### 무엇을"));
+    assert.doesNotMatch(chapter.after.body, /3-1\.|3-2|앞의 절을/);
+  });
+
+  test("붙는 절이 하위 절이면 그 제목에서 번호만 뗀다", () => {
+    const [chapter] = composeChapters(MD, [
+      { slug: "alpha", detail: "2-1. Alpha", after: { section: "5-1. Alpha 성능 개선", id: "alpha-performance" }, replace: ALPHA.replace },
+    ]);
+    assert.equal(chapter.after.title, "Alpha 성능 개선 - 세 번");
+    assert.equal(chapter.after.body, "성능 본문");
+  });
+
+  test("lead가 glance면 큰 글씨는 표의 문장이고, 원문 인용은 본문 맨 앞에 남는다", () => {
+    const [chapter] = composeChapters(MD, [{ slug: "beta", detail: "2-2. Beta", lead: "glance" }]);
+    assert.equal(chapter.head.lead, "둘째 소개");
+    assert.ok(chapter.body.startsWith("> 둘째 소개"));
+    assert.equal(chapter.after, null);
+    assert.equal(chapter.head.links.length, 2);
   });
 });

@@ -5,8 +5,10 @@ import remarkGfm from "remark-gfm";
 import {
   rehypeChipLists,
   rehypeDropStyle,
+  rehypeFigures,
   rehypeGroupTitles,
   rehypeHeadingIds,
+  rehypeLongFirstColumn,
   rehypeReviews,
   rehypeStackTables,
   remarkSoftBreaks,
@@ -15,7 +17,8 @@ import { TECH_LOGOS } from "@/lib/tech-logos.mjs";
 import { ExternalLink } from "./external-link";
 
 // 포트폴리오와 이력서 원문을 그린다 (ADR-0009). 서버 컴포넌트에서만 쓴다. 모양은 globals.css의 .md가 정한다.
-// 원문 HTML(<br>, <span>)은 rehype-raw로 읽고, 원문이 정한 style 속성은 버린다.
+// 원문 HTML(<br>, <span>, 그림의 <svg>)은 rehype-raw로 읽고, 원문이 정한 style 속성과 인쇄용 style 요소는 버린다.
+// 원문의 그림(div.fig 안의 svg)은 좁은 화면에서 상자 안에서만 옆으로 넘긴다(rehypeFigures).
 // remark-cjk-friendly는 한글 조사 앞의 닫는 **도 강조로 읽게 한다. 예: **`DEMO Login`**에서
 
 const components: Components = {
@@ -36,7 +39,7 @@ const components: Components = {
       <table role={role}>{children}</table>
     </div>
   ),
-  // 원문 이미지는 확인한 것만 싣는다. 지금은 content/site/work.md가 모두 빼므로 그리지 않는다.
+  // 원문의 <img>는 그리지 않는다. 지금 원문에는 없고, 생기면 눈으로 확인한 것만 싣는다(인라인 svg 그림은 그대로 그린다).
   img: () => null,
 };
 
@@ -71,7 +74,7 @@ export function MarkdownText({
 }) {
   const remarkPlugins: Options["remarkPlugins"] = [remarkGfm, remarkCjkFriendly];
   if (breaks) remarkPlugins.push(remarkSoftBreaks);
-  const rehypePlugins: Options["rehypePlugins"] = [rehypeRaw, rehypeDropStyle];
+  const rehypePlugins: Options["rehypePlugins"] = [rehypeRaw, rehypeDropStyle, rehypeFigures, rehypeLongFirstColumn];
   if (headingIds) rehypePlugins.push([rehypeHeadingIds, { ids: headingIds }]);
   if (reviews) rehypePlugins.push([rehypeReviews, reviews]);
   if (stackTables) rehypePlugins.push(rehypeStackTables);
