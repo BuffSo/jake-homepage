@@ -22,7 +22,7 @@ superpowers 플러그인은 이 프로젝트에만 설치했다(`.claude/setting
    - brainstorming은 카드의 feature 브랜치에서 시작한다(아래 "세션과 worktree"). superpowers는 설계와 계획을 지금 브랜치에 커밋하므로, 설계, 계획, 구현이 PR 하나에 들어간다.
    - 이 저장소는 공개라 설계와 계획도 공개된다. `CLAUDE.local.md`와 `docs/private/`의 내용은 쓰지 않는다.
 3. 되돌리기 어려운 결정(구조, 의존성 추가, 외부 서비스, 데이터 저장)은 ADR 초안을 먼저 쓰고 승인받는다.
-4. **구현 계획은 superpowers writing-plans로 쓴다**(`docs/superpowers/plans/`). 바꿀 파일, 방법, 검증 명령, 커밋 나누기를 보여 주고 승인받은 뒤 구현한다. 파일 하나를 고치는 작은 수정은 설계와 계획 없이 한다.
+4. **구현 계획은 superpowers writing-plans로 쓴다**(`docs/superpowers/plans/`). 바꿀 파일, 방법, 검증 명령, 커밋 나누기를 보여 주고 승인받은 뒤 구현한다. 작은 변경은 설계 문서, 계획 문서, 계획 승인 없이 바로 구현한다. 파일 하나를 고치는 수정, 그리고 생김새와 문구를 비교판이나 대화에서 이미 정했고 새 페이지, 새 컴포넌트, 의존성이 없는 변경이 해당한다. 이때도 feature 브랜치, `npm run verify`, PR, IA와 `docs/design/` 캡처, devlog는 지금 규칙대로 하고, 카드는 PR을 연 뒤 한 번만 알린다.
    - finishing-a-development-branch에서는 묻지 않고 "push하고 PR 열기"를 고른다. 머지는 아래 "브랜치와 PR"을 따른다.
 5. 구현한 뒤 `npm run verify`를 통과시킨다. 실패하면 마지막 요약 표와 실패 내용을 그대로 보고한다. 로컬 전용 검사가 건너뛰어졌으면 그것도 밝힌다.
 6. 기능 하나가 끝났을 때, 또는 그 사이에 AI 제안과 판단이 갈린 일이 있었을 때 `docs/devlog/`에 요약을 남긴다. 형식은 `docs/devlog/README.md`를 따른다.
