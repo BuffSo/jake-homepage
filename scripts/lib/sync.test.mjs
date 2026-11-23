@@ -16,6 +16,7 @@ import {
   sameContent,
   SyncError,
 } from "./sync.mjs";
+import config from "../sync.config.mjs";
 
 // 전화번호 모양의 값이 파일에 그대로 있으면 민감정보 검사에 걸리므로 실행할 때 만든다.
 const PHONE = ["010", "0000", "0000"].join("-");
@@ -307,5 +308,54 @@ describe("허용 목록 밖은 읽지 않는다", () => {
     writeFileSync(path.join(careerDir, "비공개", "메모.md"), "비공개");
     const { outputs } = buildOutputs({ careerDir, config: CONFIG, privateTerms: [] });
     assert.deepEqual([...outputs.keys()], ["resume.md", MANIFEST]);
+  });
+});
+
+describe("포트폴리오 동기화 규칙 (scripts/sync.config.mjs)", () => {
+  const rules = config.files.find((f) => f.output === "portfolio.md").transforms;
+  const SOURCE = [
+    "### 2-1. Recueve - 하나",
+    "",
+    "본문 하나",
+    "",
+    "### 2-2. ProWith - 둘",
+    "",
+    "본문 둘",
+    "",
+    "### 2-3. GENYS Lotto AI - 셋",
+    "",
+    "본문 셋",
+    "",
+    "### 2-4. Jake English - 넷",
+    "",
+    "본문 넷",
+    "",
+  ].join("\n");
+
+  test("빠진 상세를 프로젝트마다 다음 제목 앞에 끼운다", () => {
+    const lines = applyTransforms(SOURCE, rules).split("\n");
+    const at = (prefix, from = 0) => lines.findIndex((l, i) => i >= from && l.startsWith(prefix));
+    const decisions = lines.flatMap((l, i) => (l === "#### 기술적 결정" ? [i] : []));
+    assert.equal(decisions.length, 2);
+    assert.ok(decisions[0] > at("본문 하나") && decisions[0] < at("### 2-2. ProWith"));
+    assert.ok(decisions[1] > at("본문 둘") && decisions[1] < at("### 2-3. GENYS Lotto AI"));
+    assert.ok(at("**쇼핑몰** - 설정으로 켜는 옵션") > at("본문 둘") && at("**쇼핑몰** - 설정으로 켜는 옵션") < decisions[1]);
+    const mongo = at("#### 로그는 NoSQL인 MongoDB에 분리해서 저장했습니다");
+    assert.ok(mongo > at("본문 셋") && mongo < at("### 2-4. Jake English"));
+    assert.ok(at("#### 개발 모드에서 등급별 계정을 선택해 바로 테스트하게 했습니다") > mongo);
+  });
+
+  test("끼운 글에 원문 이미지와 인쇄용 묶음이 없다", () => {
+    const out = applyTransforms(SOURCE, rules);
+    assert.doesNotMatch(out, /<img|assets\/|<sub>|class="split"/);
+  });
+
+  test("끼울 자리가 없거나 끼울 글의 첫 줄이 원본에 이미 있으면 멈춘다", () => {
+    assert.throws(() => applyTransforms(SOURCE.replace("### 2-3. GENYS Lotto AI - 셋", "### 다른 제목"), rules), SyncError);
+    assert.throws(() => applyTransforms(SOURCE.replace("본문 하나", "#### 기술적 결정"), rules), SyncError);
+  });
+
+  test("규칙마다 이유가 있다", () => {
+    for (const rule of rules) assert.ok(rule.reason, `${rule.type}: reason 없음`);
   });
 });
