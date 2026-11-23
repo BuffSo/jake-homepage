@@ -22,7 +22,7 @@ const home = parseFrontmatter(readFileSync("content/site/home.md", "utf8"), "hom
   about: { title: string };
   sections: { ai: { award: { title: string; detail: string; cta: string; href: string } } };
 };
-// 맨 위 목차에는 index: false인 절(대외활동)을 싣지 않는다
+// 맨 위 목차에는 index: false인 절(자격증)을 싣지 않는다
 const indexSections = resumePage.sections.filter((section) => section.index !== false);
 
 test("이력서가 열리고 콘솔 오류와 실패한 요청이 없다", async ({ page }) => {
@@ -103,7 +103,8 @@ test("목차 열 개가 해당 절로 간다", async ({ page }) => {
   const nav = page.getByRole("navigation", { name: "이력서 목차" });
   expect(indexSections).toHaveLength(10);
   await expect(nav.getByRole("link")).toHaveCount(indexSections.length);
-  await expect(nav.getByRole("link", { name: "대외활동" })).toHaveCount(0);
+  await expect(nav.getByRole("link", { name: "자격증" })).toHaveCount(0);
+  await expect(nav.getByRole("link", { name: "대외활동" })).toHaveCount(1);
   for (const section of indexSections) {
     await nav.getByRole("link", { name: section.title }).click();
     await expect(page).toHaveURL(new RegExp(`#${section.id}$`));

@@ -20,7 +20,6 @@ sections:
     title: 프로젝트
   - id: activities
     title: 대외활동
-    index: false
   - id: training
     title: 교육
   - id: talks
@@ -29,6 +28,7 @@ sections:
     title: 수상
   - id: certificates
     title: 자격증
+    index: false
 reviews:
   label: Peer Review
   quotes:

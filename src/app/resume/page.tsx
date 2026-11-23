@@ -33,7 +33,7 @@ export default function ResumePage() {
         {/* 대회 결과 띠. 문구와 링크는 홈 AI 섹션 띠와 같은 값이고, 여기서는 NEW 뱃지를 단다.
             인쇄에서는 뺀다. 같은 사실이 본문 자기소개와 대외활동 절에 글자로 있다. */}
         <AwardBand {...getHome().sections.ai.award} badge={page.awardBadge} className="mb-6 lg:mb-10 print:hidden" />
-        {/* 목차는 열 칸을 유지한다. index: false인 절(대외활동)은 본문에만 있다. */}
+        {/* 목차는 열 칸을 유지한다. index: false인 절(자격증)은 본문에만 있다. */}
         <ResumeIndex sections={page.sections.filter((section) => section.index !== false)} />
         <MarkdownText
           className="md-resume mt-10 max-w-[47.5rem] lg:mt-16 print:mt-[1.125rem] print:max-w-none print:border-t print:border-line-soft print:pt-[1.125rem]"
