@@ -98,7 +98,9 @@ test("챕터마다 원문의 이름, 첫 줄, 화면, 링크 버튼, 보시는 �
     // 버튼은 원문 주소 줄의 주소마다 하나다. 이름이 없는 주소는 "서비스 열기"(ProWith는 "데모 열기")다.
     for (const link of chapter.head.links) {
       const label = link.label ?? projectOf(chapter.slug)?.liveLabel ?? "서비스 열기";
-      const button = section.getByRole("link", { name: new RegExp(`^${label}`) });
+      // 보시는 방법의 글에도 같은 이름의 링크가 있을 수 있어(Jake English의 소개 영상) 버튼만 본다
+      const button = section.locator("a.rounded-full").filter({ hasText: new RegExp(`^${label}`) });
+      await expect(button).toHaveCount(1);
       await expect(button).toHaveAttribute("href", link.url);
       await expect(button).toHaveAttribute("target", "_blank");
     }
@@ -117,8 +119,12 @@ test("Jake English 챕터는 소개 영상과 공개 저장소 버튼을 둔다"
   await page.goto("/work#jake-english");
   const section = page.getByRole("region", { name: "Jake English", exact: true });
   await expect(section.getByText("04 / 04 · JAKE ENGLISH")).toBeVisible();
-  await expect(section.getByRole("link", { name: /^소개 영상/ })).toHaveAttribute("href", /youtu\.be\/SrAWg5lS0lQ$/);
-  await expect(section.getByRole("link", { name: /^공개 저장소/ })).toHaveAttribute("href", "https://github.com/BuffSo/jake-english");
+  const buttons = section.locator("a.rounded-full");
+  await expect(buttons).toHaveCount(2);
+  await expect(buttons.nth(0)).toHaveText(/^소개 영상/);
+  await expect(buttons.nth(0)).toHaveAttribute("href", /youtu\.be\/SrAWg5lS0lQ$/);
+  await expect(buttons.nth(1)).toHaveText(/^공개 저장소/);
+  await expect(buttons.nth(1)).toHaveAttribute("href", "https://github.com/BuffSo/jake-english");
 });
 
 test("사이트에서 고친 문장이 보이고, 원문 이미지와 인쇄용 규칙은 싣지 않는다", async ({ page }) => {
