@@ -2,12 +2,12 @@ import { readdirSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { collectErrors } from "./helpers";
 
-// 홈의 짧은 주소 열 개 (docs/superpowers/specs/2026-11-17-home-alias-paths-design.md, docs/02-ia.md 페이지).
-// 열 개 모두 주소 그대로 홈과 같은 화면을 200으로 돌려주고, 대표 주소와 공유 정보는 홈의 것이다.
+// 홈의 짧은 주소 열한 개 (구조는 docs/superpowers/specs/2026-11-17-home-alias-paths-design.md, docs/02-ia.md 페이지).
+// 열한 개 모두 주소 그대로 홈과 같은 화면을 200으로 돌려주고, 대표 주소와 공유 정보는 홈의 것이다.
 // 정하지 않은 주소는 지금처럼 404다. 화면 폭과 관계없는 값이라 데스크톱에서만 돌린다.
 
 const SITE = "https://jakeso.dev";
-const ALIASES = ["/about", "/intro", "/hello", "/me", "/profile", "/welcome", "/start", "/info", "/home", "/main"];
+const ALIASES = ["/about", "/intro", "/hello", "/me", "/profile", "/welcome", "/start", "/info", "/home", "/main", "/bio"];
 const BOT = "facebookexternalhit/1.1;kakaotalk-scrap/1.0";
 
 // 모바일 프로젝트만 hasTouch가 켜져 있다 (playwright.config.ts).
@@ -26,7 +26,7 @@ async function snapshot(page: Page): Promise<Record<string, string | null>> {
   };
 }
 
-test("짧은 주소 폴더가 정한 열 개와 같다", () => {
+test("짧은 주소 폴더가 정한 열한 개와 같다", () => {
   const dirs = readdirSync("src/app/(home-aliases)", { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => `/${entry.name}`);
@@ -75,7 +75,7 @@ test("끝 슬래시와 쿼리가 붙어도 그 주소로 열린다", async ({ pa
 
 // 미리보기·검색 봇에게는 미리 만든 페이지 대신 요청마다 서버에서 새로 그린다. 그 렌더가 되는지 본다.
 // Vercel에서만 나는 파일 추적 누락(검색과 공유 가이드의 봇에게만 500)은 로컬 next start로는 잡히지 않아, 배포 뒤 운영 주소로 본다.
-test("미리보기 봇에게도 열 개 모두 200이고 대표 주소가 홈이다", async ({ request }) => {
+test("미리보기 봇에게도 열한 개 모두 200이고 대표 주소가 홈이다", async ({ request }) => {
   for (const path of ALIASES) {
     const response = await request.get(path, { headers: { "user-agent": BOT } });
     expect(response.status(), path).toBe(200);
