@@ -122,12 +122,13 @@ test("헤더에 지금 보는 페이지가 표시된다", async ({ page }, testI
   const open = async () => {
     if (mobile) await page.locator("header summary").click();
   };
-  // 메뉴 아래의 페이지(/ai/case, /ai/jake-english)는 밑줄은 같고, 화면 읽기 프로그램에는 "true"로 알린다.
+  // 메뉴 아래의 페이지(/ai/case, /ai/jake-english, /ai/axwar)는 밑줄은 같고, 화면 읽기 프로그램에는 "true"로 알린다.
   for (const [path, label, state] of [
     ["/work", "Work", "page"],
     ["/ai", "AI", "page"],
     ["/ai/case", "AI", "true"],
     ["/ai/jake-english", "AI", "true"],
+    ["/ai/axwar", "AI", "true"],
     ["/resume", "Resume", "page"],
   ]) {
     await page.goto(path);
@@ -580,7 +581,7 @@ test.describe("아래 섹션", () => {
     await expect(section).toContainText(/ADR \d+개/);
   });
 
-  test("AI 섹션 머리와 카드 사이의 띠에 대회 결과 두 줄과 인증서 링크가 있다", async ({ page }) => {
+  test("AI 섹션 머리와 카드 사이의 띠에 대회 결과 두 줄과 /ai/axwar로 가는 버튼이 있다", async ({ page }) => {
     await page.goto("/");
     const { award } = home.sections.ai;
     const section = page.getByRole("region", { name: home.sections.ai.title });
@@ -588,10 +589,13 @@ test.describe("아래 섹션", () => {
     const detail = section.getByText(award.detail, { exact: true });
     await expect(title).toBeVisible();
     await expect(detail).toBeVisible();
-    const link = section.getByRole("link", { name: new RegExp(award.cta) });
+    // 버튼 글(자세히 보기)이 아래 카드의 버튼과 같아 띠 안에서 찾는다
+    const link = section.getByRole("note", { name: award.title }).getByRole("link", { name: award.cta });
     await expect(link).toHaveCount(1);
-    await expect(link).toHaveAttribute("href", award.href);
-    await expect(link).toHaveAttribute("target", "_blank");
+    // 사이트 안의 /ai/axwar로 같은 창에서 간다. 인증서는 그 페이지 위쪽에 있다(2026-11-27)
+    await expect(link).toHaveAttribute("href", "/ai/axwar");
+    await expect(link).not.toHaveAttribute("target", "_blank");
+    await expect(link).not.toContainText("↗");
     // 띠는 섹션 머리(소개 문장) 아래, 첫 카드 위에 있다
     const head = (await section.getByRole("heading", { level: 2 }).boundingBox())!;
     const first = (await section.getByRole("article").first().boundingBox())!;
@@ -605,6 +609,8 @@ test.describe("아래 섹션", () => {
     const bandBox = (await page.getByRole("note", { name: award.title }).boundingBox())!;
     expect(linkBox.x + linkBox.width).toBeGreaterThanOrEqual(titleBox.x + titleBox.width - 1);
     expect(linkBox.x).toBeGreaterThan(bandBox.x + bandBox.width / 2);
+    await link.click();
+    await expect(page).toHaveURL(/\/ai\/axwar$/);
   });
 
   test("영상 카드는 두 영상의 썸네일을 겹치고, 나중 영상이 앞 오른쪽 아래에 있다", async ({ page }) => {

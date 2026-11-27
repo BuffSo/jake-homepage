@@ -1,7 +1,7 @@
 import { ButtonLink } from "@/components/button-link";
 
 // 대회 결과 띠 (docs/03-design.md "홈 AI 섹션 띠에서 정한 값"). 홈 AI 섹션과 /resume 머리 아래에서 같은 문구와 링크로 쓴다.
-// 왼쪽에 두 줄, 오른쪽에 바깥 링크 버튼 하나. 글이 버튼과 한 줄에 들지 않으면 버튼이 다음 줄로 내려가 오른쪽에 붙는다.
+// 왼쪽에 두 줄, 오른쪽에 버튼 하나(대회 결과 페이지 /ai/axwar로). 글이 버튼과 한 줄에 들지 않으면 버튼이 다음 줄로 내려가 오른쪽에 붙는다.
 // badge를 주면 첫 줄 앞에 뱃지를 단다(/resume의 NEW). 새 색 없이 강조색 바탕에 강조 위 글자색이다(docs/03-design.md 색).
 export function AwardBand({
   title,

@@ -39,7 +39,7 @@ export type Home = {
   layers: Layer[];
   sections: {
     work: SectionText;
-    /** award는 홈 AI 섹션의 머리와 카드 사이 띠이고, /resume 머리 아래에서도 같은 값을 쓴다. 대회 결과 한 줄과 공개 인증서 링크 (docs/02-ia.md 홈 3) */
+    /** award는 홈 AI 섹션의 머리와 카드 사이 띠이고, /resume 머리 아래에서도 같은 값을 쓴다. 대회 결과 두 줄과 /ai/axwar로 가는 버튼 (docs/02-ia.md 홈 3) */
     ai: SectionText & { award: { title: string; detail: string; cta: string; href: string } };
   };
   about: {
@@ -214,6 +214,24 @@ export type JakeEnglish = {
   stack: JakeEnglishStack[];
 };
 
+/** AX인재전쟁 대회 결과 사이트 전용 글 (content/site/axwar.md, /ai/axwar). 홈과 /resume의 대회 결과 띠가 이 페이지로 온다 */
+export type Axwar = {
+  /** 브라우저와 공유 제목의 앞부분(뒤에 " · 소재희") */
+  title: string;
+  /** 제목(h1)의 첫 줄. 대회 이름, 회차, 과제 */
+  contest: string;
+  /** 제목(h1)의 둘째 줄. 크게 보이는 결과 */
+  result: string;
+  participants: string;
+  date: string;
+  /** 참가자 줄 아래의 덧붙임 한 줄(개조식) */
+  extra: string;
+  /** 공개 인증서. 머리 아래의 미리보기 카드 하나(그림, 제목, 도메인)로 보여 준다. 그림은 src/assets/ai/axwar/cert.png */
+  cert: { href: string; title: string; domain: string };
+  /** 본문 문단. 첫 문단은 검색과 공유 설명으로도 쓴다 */
+  body: string[];
+};
+
 /** content/site/ 아래의 글 하나 */
 function read<T>(relative: string): T {
   const text = readFileSync(path.join(SITE_DIR, relative), "utf8");
@@ -297,4 +315,9 @@ export function getAiCase(): AiCase {
 /** Jake English 글. content/site/ai/ 밖에 두어 /ai의 항목 목록에는 잡히지 않는다. */
 export function getJakeEnglish(): JakeEnglish {
   return read<JakeEnglish>("jake-english.md");
+}
+
+/** AX인재전쟁 대회 결과 글 (/ai/axwar) */
+export function getAxwar(): Axwar {
+  return read<Axwar>("axwar.md");
 }
