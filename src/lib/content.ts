@@ -39,7 +39,7 @@ export type Home = {
   layers: Layer[];
   sections: {
     work: SectionText;
-    /** award는 홈 AI 섹션의 머리와 카드 사이 띠이고, /resume 머리 아래에서도 같은 값을 쓴다. 대회 결과 한 줄과 공개 인증서 링크 (docs/02-ia.md 홈 3) */
+    /** award는 홈 AI 섹션의 머리와 카드 사이 띠이고, /resume 머리 아래에서도 같은 값을 쓴다. 대회 결과 두 줄과 /ai/axwar로 가는 버튼 (docs/02-ia.md 홈 3) */
     ai: SectionText & { award: { title: string; detail: string; cta: string; href: string } };
   };
   about: {

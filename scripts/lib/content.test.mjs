@@ -337,3 +337,12 @@ test("Jake English 기술 스택은 묶음마다 이름과 기술이 있고, 한
     }
   }
 });
+
+test("대회 결과 띠는 /ai/axwar로 가고, 둘째 줄에 기간을 쓰지 않는다", () => {
+  // 이력서 자기소개는 날짜로 센 이틀 만에, /ai/axwar 본문은 시간으로 센 하루 남짓이다.
+  // 띠에 기간을 쓰면 /resume 안에서나 누르고 들어간 페이지에서 말이 어긋나 뺐다(2026-11-27 비교판).
+  const { award } = home.sections.ai;
+  assert.equal(award.href, "/ai/axwar");
+  assert.equal(award.cta, "자세히 보기");
+  assert.doesNotMatch(award.detail, /이틀|하루/);
+});

@@ -126,8 +126,10 @@ test("머리와 목차 사이에 NEW 뱃지가 달린 대회 결과 띠가 있�
   await expect(title).toBeVisible();
   await expect(band.getByText(award.detail, { exact: true })).toBeVisible();
   const link = band.getByRole("link", { name: new RegExp(award.cta) });
-  await expect(link).toHaveAttribute("href", award.href);
-  await expect(link).toHaveAttribute("target", "_blank");
+  // 홈 띠와 같이 사이트 안의 /ai/axwar로 같은 창에서 간다(2026-11-27)
+  await expect(link).toHaveAttribute("href", "/ai/axwar");
+  await expect(link).not.toHaveAttribute("target", "_blank");
+  await expect(link).not.toContainText("↗");
   // 띠는 이름(h1) 아래, 목차 위에 있다
   const box = (await band.boundingBox())!;
   const name = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
