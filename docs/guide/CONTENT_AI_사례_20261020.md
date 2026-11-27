@@ -1,9 +1,9 @@
 # AI 사례와 Jake English 페이지
 
-> 정함: 2026-10-20 (커리어 저장소에서 PDF로 만든 AI 도구 활용 사례를 `/ai/case`로 실음), 2026-11-11 (공개한 영상으로 Jake English 페이지 `/ai/jake-english`를 만듦, 같은 날 기술 스택 절을 더하고 슬라이드를 사이트 폭에 맞춰 다시 찍음, `/ai` 영상 제작 항목에 영상 목록을 둠, 홈 영상 카드가 목록의 두 편을 겹쳐 보임)
-> 코드: `scripts/sync.config.mjs`(사례 세 파일), `scripts/lib/sync.mjs`(그림 동기화), `src/lib/ai-case.mjs`(읽기와 칸 자르기), `src/components/ai/case-panel.tsx`, `src/components/ai/ai-entry.tsx`(`/ai` 맨 위 띠 둘이 같이 씀), `src/app/ai/case/page.tsx`, `src/app/ai/jake-english/page.tsx`, `src/lib/jake-english-images.ts`, `content/site/jake-english.md`, `src/assets/ai/jake-english/`, `content/site/ai/video.md`(영상 목록), `src/components/ai/ai-videos.tsx`, `src/lib/asset-images.ts`(그림을 경로로 찾기, `/ai` 영상 목록과 홈 영상 카드가 같이 씀), `src/components/home/ai-cards.tsx`(홈 영상 카드)
-> 확인: `e2e/ai-case.spec.ts`, `scripts/lib/ai-case.test.mjs`, `scripts/lib/sync.test.mjs`, `e2e/ai-jake-english.spec.ts`, `e2e/ai.spec.ts`의 두 입구와 영상 칸, `scripts/lib/content.test.mjs`의 Jake English 글과 영상 목록, `e2e/home.spec.ts`의 홈 영상 카드
-> 캡처: [design/ai-case](../design/ai-case/), [design/ai-jake-english](../design/ai-jake-english/), [design/ai-video](../design/ai-video/), [design/home-ai-cards](../design/home-ai-cards/)
+> 정함: 2026-10-20 (커리어 저장소에서 PDF로 만든 AI 도구 활용 사례를 `/ai/case`로 실음), 2026-11-11 (공개한 영상으로 Jake English 페이지 `/ai/jake-english`를 만듦, 같은 날 기술 스택 절을 더하고 슬라이드를 사이트 폭에 맞춰 다시 찍음, `/ai` 영상 제작 항목에 영상 목록을 둠, 홈 영상 카드가 목록의 두 편을 겹쳐 보임), 2026-11-27 (대회 결과 페이지 `/ai/axwar`에 공개 인증서를 링크 카드로 보임)
+> 코드: `scripts/sync.config.mjs`(사례 세 파일), `scripts/lib/sync.mjs`(그림 동기화), `src/lib/ai-case.mjs`(읽기와 칸 자르기), `src/components/ai/case-panel.tsx`, `src/components/ai/ai-entry.tsx`(`/ai` 맨 위 띠 둘이 같이 씀), `src/app/ai/case/page.tsx`, `src/app/ai/jake-english/page.tsx`, `src/lib/jake-english-images.ts`, `content/site/jake-english.md`, `src/assets/ai/jake-english/`, `content/site/ai/video.md`(영상 목록), `src/components/ai/ai-videos.tsx`, `src/lib/asset-images.ts`(그림을 경로로 찾기, `/ai` 영상 목록과 홈 영상 카드가 같이 씀), `src/components/home/ai-cards.tsx`(홈 영상 카드), `content/site/axwar.md`(`cert`), `src/app/ai/axwar/page.tsx`, `src/assets/ai/axwar/cert.png`
+> 확인: `e2e/ai-case.spec.ts`, `scripts/lib/ai-case.test.mjs`, `scripts/lib/sync.test.mjs`, `e2e/ai-jake-english.spec.ts`, `e2e/ai.spec.ts`의 두 입구와 영상 칸, `scripts/lib/content.test.mjs`의 Jake English 글과 영상 목록, `e2e/home.spec.ts`의 홈 영상 카드, `e2e/ai-axwar.spec.ts`의 인증서 카드
+> 캡처: [design/ai-case](../design/ai-case/), [design/ai-jake-english](../design/ai-jake-english/), [design/ai-video](../design/ai-video/), [design/home-ai-cards](../design/home-ai-cards/), [design/ai-axwar](../design/ai-axwar/)
 
 다른 곳에서 만든 문서(PDF 같은 결과물)를 사이트 페이지로 옮길 때의 기준입니다. 사례가 늘거나 다른 사이트에서 같은 일을 할 때 따릅니다. 옮기며 겪은 문제도 함께 둡니다.
 
@@ -170,3 +170,24 @@
 - `import.meta.glob`은 Turbopack에서만 됩니다. 이 저장소는 개발 서버와 빌드 모두 Turbopack(Next.js 16 기본)입니다. webpack으로 빌드하도록 바꾸면 이 코드가 동작하지 않습니다.
 - 글의 경로에 그림이 없으면 화면 코드가 오류를 내 빌드가 멈춥니다. 내용 시험이 먼저 같은 것을 잡습니다.
 - 홈 영상 카드처럼 높이가 정해진 칸에 그림 여러 장을 퍼센트 자리로 겹칠 때는, 자리를 칸 너비가 아니라 고정 비율 무대(여기서는 2:1) 기준으로 잡습니다. 칸 너비 기준이면 그림 높이가 너비를 따라 커져, 휴대폰보다 넓은 한 칸 화면(약 490~767px)에서 칸 높이를 넘어 잘립니다. 시안을 375와 1280에서만 찍으면 이 폭을 보지 못하므로, 그 사이 폭(600, 744, 800)도 찍거나 E2E로 봅니다(2026-11-11, 설계 검토에서 찾음).
+
+## 바깥 증빙을 링크 카드로 보여 줄 때 (AX인재전쟁, 2026-11-27)
+
+다른 사이트에 있는 증빙(대회 인증서 같은 공개 페이지)을 사이트 안에서 미리보기 카드로 보여 줄 때의 기준입니다. `/ai/axwar` 머리 아래의 인증서 카드를 만들며 정했습니다.
+
+### 정한 것
+
+| 항목 | 정한 것 | 이유 |
+|---|---|---|
+| 그림 | 그 페이지의 공유 그림(og:image)을 받아 저장소에 둡니다(`src/assets/ai/axwar/cert.png`). 바깥 주소의 그림을 바로 불러오지 않습니다 | 상대 사이트가 페이지를 비공개로 돌리거나 주소를 바꿔도 카드가 깨지지 않습니다. 그림 안의 글(이름, 발급일, 인증 번호, 발급처)은 모두 공개 페이지에 있는 내용입니다 |
+| 카드 제목 | 그림 설명(og:image:alt)처럼 사람 이름이 없는 문구를 씁니다 | 그 페이지의 제목(og:title)은 이름에 "님"을 붙인 3인칭이라, 1인칭으로 쓰는 사이트 글과 맞지 않습니다 |
+| 모양 | 링크드인 게시물의 링크 카드처럼 그림 전체 폭, 아래에 제목과 도메인(↗)을 둡니다. 카드 전체가 링크 하나이고 새 창으로 엽니다 | 증빙의 글이 읽혀 무엇을 증명하는지 바로 보입니다. 가로형(작은 썸네일)은 375에서 그림 안 글이 읽히지 않았습니다 |
+| 대체 텍스트 | 카드 그림은 비웁니다 | 바로 아래 카드 제목이 같은 것을 말합니다. 위 "대체 텍스트"와 같은 규칙입니다 |
+| 출처 기록 | 글 끝 주석에 원래 주소, 그림을 받은 날짜, 제목을 어디서 가져왔는지 적습니다 | 그림이 저장소에 있어 원본이 바뀌어도 모를 수 있습니다. 언제의 것인지 남깁니다 |
+
+### 만드는 방법
+
+- 그 페이지를 로그인 없이 열어, 머리의 `og:image`와 `og:image:alt`를 읽습니다. 예: `curl -s <주소> | grep -o '<meta property="og:image[^>]*>'`. 그림은 `og:image` 주소에서 받아 그대로 둡니다(크기를 바꾸지 않음, `next/image`가 줄여 보냄).
+- 글에는 주소, 제목, 도메인을 두고(`cert: { href, title, domain }`), 그림은 화면 코드에서 정적 import로 불러 크기 정보를 그대로 씁니다.
+- 같은 곳으로 가는 버튼을 카드 바로 근처에 또 두지 않습니다. 같은 링크가 두 번 보여 어느 것을 누를지 망설이게 됩니다. 본문을 다 읽은 끝 버튼 줄처럼 떨어진 자리에는 둘 수 있습니다(`/ai/axwar`는 끝 줄에 채운 버튼 "인증서 보기"를 둡니다).
+- 확인: `e2e/ai-axwar.spec.ts`가 카드(그림이 든 링크)가 하나인지, 그림을 다 불러오고 1200:630 비율인지, 제목과 도메인이 있는지, 새 창으로 여는지, 첫 화면 안에 드는지 봅니다. 같은 주소의 링크가 둘이면 카드는 그림이 든 링크(`a[href=…]:has(img)`)로 찾습니다.
