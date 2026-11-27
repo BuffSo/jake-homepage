@@ -8,7 +8,7 @@ import { getAxwar, getHome } from "@/lib/content";
 import { pageMetadata } from "@/lib/site-meta";
 
 // AX인재전쟁 대회 결과 (docs/02-ia.md /ai/axwar). 돌아가기 링크 → 머리(대회 이름, 결과, 참가자, 인증서 카드, 덧붙임) → 본문 → 끝 버튼 줄(인증서 보기, AI로 일하는 방식) 순서다.
-// 글은 사이트 전용 글(content/site/axwar.md)이다. 홈과 /resume의 대회 결과 띠, /ai 맨 끝 대회 참가 결과 묶음의 카드가 이 페이지로 온다.
+// 글은 사이트 전용 글(content/site/axwar.md)이다. 홈과 /resume의 대회 결과 띠, /ai 맨 끝 대회 참가 묶음의 카드가 이 페이지로 온다.
 // 머리는 결과를 크게 보여 주는 이 페이지만의 모양이라 SectionHead를 쓰지 않는다. 메신저에서 링크를 열면
 // 첫 화면 안에 결과, 인증서 카드, 덧붙임이 다 들어오게 한 배치다(설계 배치 B, 카드는 2026-11-27 비교판 B).
 // 목차가 없는 서브페이지라 /ai/case, /ai/jake-english처럼 맨 위로 버튼과 다음 페이지 버튼은 두지 않는다.

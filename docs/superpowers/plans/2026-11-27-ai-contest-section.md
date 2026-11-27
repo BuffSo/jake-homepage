@@ -1,8 +1,8 @@
-# `/ai` 다섯째 묶음 "대회 참가 결과" 구현 계획
+# `/ai` 다섯째 묶음 "대회 참가" 구현 계획
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** `/ai` 맨 끝에 다섯째 묶음 "대회 참가 결과"를 더하고 AX인재전쟁 카드 하나를 두어 `/ai/axwar`로 보내며, `/ai/axwar` 끝 줄의 인증서 버튼을 되살리고, PR #69의 후속 작업 네 가지를 함께 끝냅니다.
+**Goal:** `/ai` 맨 끝에 다섯째 묶음 "대회 참가"를 더하고 AX인재전쟁 카드 하나를 두어 `/ai/axwar`로 보내며, `/ai/axwar` 끝 줄의 인증서 버튼을 되살리고, PR #69의 후속 작업 네 가지를 함께 끝냅니다.
 
 **Architecture:** 다른 항목처럼 항목 글 `content/site/ai/axwar.md`(짧은 카드, `group: contest`)를 더하고 `ai-page.md`에 묶음을 더하면 지금 `/ai` 코드가 그대로 그립니다. 바뀌는 코드는 목차의 데스크톱 칸 수(네 칸 → 다섯 칸)와 형(`AiGroup`)뿐입니다. 카드의 숫자와 문장이 `/ai/axwar` 글과 어긋나지 않는지는 내용 시험이 봅니다.
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- 묶음: id `contest`, 이름 `대회 참가 결과`, 맨 끝(`05 / 05`).
+- 묶음: id `contest`, 이름 `대회 참가`, 맨 끝(`05 / 05`).
 - 카드: slug `axwar`, order `10`, 짧은 카드(`more: /ai/axwar`), `links: []`. 글은 설계 문서 "카드" 표의 초안 그대로입니다. 문구 확인은 PR 때 따로 받습니다.
 - 카드에 새 사실을 쓰지 않습니다. 대회 기간("하루 남짓", "이틀", "N일", "N시간")도 쓰지 않습니다.
 - 홈과 `/resume`의 띠, `/ai` 맨 위 입구 상자 두 개는 바꾸지 않습니다. `/ai/axwar`는 끝 버튼 줄만 바꿉니다(Task 2). 머리와 인증서 카드는 그대로입니다.
@@ -39,7 +39,7 @@ Run: `npx playwright test -c .superpowers/pw-dev.config.ts <spec> [-g <이름>]`
 
 ## Review Focus
 
-- 가장 좁은 데스크톱 폭(1024)에서 목차 다섯 칸이 한 줄에 있고, "대회 참가 결과"가 꺾이지 않아야 합니다(사용자 조건). → Task 1의 목차 E2E
+- 가장 좁은 데스크톱 폭(1024)에서 목차 다섯 칸이 한 줄에 있고, "대회 참가"가 꺾이지 않아야 합니다(사용자 조건). → Task 1의 목차 E2E
 - 카드의 "자세히 보기"는 사이트 안 링크라 같은 창에서 열리고 ↗가 없어야 합니다. → Task 1의 짧은 카드 E2E
 - `/ai/axwar` 글의 결과나 참가자 수가 바뀌면 카드 숫자도 같이 바뀌어야 합니다. → Task 1의 내용 시험
 - 375와 320에서 카드가 가로 스크롤을 만들지 않아야 합니다. → `e2e/ai.spec.ts`의 기존 가로 스크롤 시험(지금 폭)
@@ -57,7 +57,7 @@ Run: `npx playwright test -c .superpowers/pw-dev.config.ts <spec> [-g <이름>]`
 - Modify: `src/components/ai/ai-index.tsx` (`lg:grid-cols-4` → `lg:grid-cols-5`, 주석의 "네 칸")
 - Modify: `src/components/ai/ai-short.tsx` (주석: 원문이 다른 페이지, `/work`의 절이나 `/ai` 아래 페이지에 있는 항목)
 - Modify: `src/app/ai/page.tsx` (주석의 "네 묶음")
-- Modify: `src/app/ai/axwar/page.tsx` (주석 "/ai에는 입구가 없다" → `/ai` 맨 끝 대회 참가 결과 카드도 이 페이지로 온다)
+- Modify: `src/app/ai/axwar/page.tsx` (주석 "/ai에는 입구가 없다" → `/ai` 맨 끝 대회 참가 카드도 이 페이지로 온다)
 - Modify: `content/site/axwar.md` (주석의 들어오는 길에 `/ai` 카드)
 - Test: `scripts/lib/content.test.mjs`, `e2e/ai.spec.ts`
 
@@ -69,11 +69,11 @@ Run: `npx playwright test -c .superpowers/pw-dev.config.ts <spec> [-g <이름>]`
   - "sources의 문장은 …" 시험: 항목의 `more`가 `/ai/axwar`이면 원문 대신 `squash(axwar.body.join(" "))`에서 찾습니다. 시험 이름은 "sources의 문장은 원문(동기화한 이력서, 포트폴리오, 카드가 가리키는 페이지 글)에 그대로 있다"로 바꿉니다.
   - "AI 작업 글 …" 시험: `more`는 `/^(\/work#[a-z-]+-ai|\/ai\/[a-z-]+)$/`에 맞아야 합니다.
   - "짧은 카드가 가리키는 /work의 절은 실제로 있다" → "짧은 카드가 가리키는 곳은 실제로 있다": `/work#…`는 지금처럼 절을, `/ai/<이름>`은 `src/app/ai/<이름>/page.tsx`가 있는지 봅니다.
-  - 새 시험 "대회 참가 결과 카드는 /ai/axwar로 가고, 숫자는 그 페이지 글과 같다":
+  - 새 시험 "대회 참가 카드는 /ai/axwar로 가고, 숫자는 그 페이지 글과 같다":
 
 ```js
 const card = aiWorks.find((w) => w.data.group === "contest" && w.data.more === "/ai/axwar");
-assert.ok(card, "대회 참가 결과에 /ai/axwar 카드가 없음");
+assert.ok(card, "대회 참가에 /ai/axwar 카드가 없음");
 assert.equal(card.data.metric.value, axwar.result);
 assert.equal(card.data.metric.label, `${axwar.participants} · ${axwar.date}`);
 assert.ok(card.data.sources?.length > 0, "sources 없음");
@@ -88,7 +88,7 @@ assert.doesNotMatch(Object.values(card.data).filter((v) => typeof v === "string"
 - [ ] **Step 3: 빨강 확인**
 
 Run: `node --test scripts/lib/content.test.mjs`
-Expected: "대회 참가 결과 카드는 …" 실패(카드 없음)
+Expected: "대회 참가 카드는 …" 실패(카드 없음)
 
 - [ ] **Step 4: 시험 커밋**
 
@@ -99,7 +99,7 @@ test(app): cover the contest section on /ai
 EOF
 ```
 
-- [ ] **Step 5: 글 더하기** `content/site/ai-page.md`의 groups 끝에 `{ id: contest, title: 대회 참가 결과 }`, `content/site/ai/axwar.md`는 설계 문서 "카드" 표의 초안과 `sources`. 글 끝 주석에 출처(`content/site/axwar.md`의 어느 칸과 문단인지), 숫자는 내용 시험이 페이지 글과 맞춰 본다는 것, 기간을 쓰지 않는 이유, 대회가 늘면 이 묶음에 글을 하나씩 더한다는 것을 씁니다.
+- [ ] **Step 5: 글 더하기** `content/site/ai-page.md`의 groups 끝에 `{ id: contest, title: 대회 참가 }`, `content/site/ai/axwar.md`는 설계 문서 "카드" 표의 초안과 `sources`. 글 끝 주석에 출처(`content/site/axwar.md`의 어느 칸과 문단인지), 숫자는 내용 시험이 페이지 글과 맞춰 본다는 것, 기간을 쓰지 않는 이유, 대회가 늘면 이 묶음에 글을 하나씩 더한다는 것을 씁니다.
 
 - [ ] **Step 6: 목차가 꺾이는 것 확인 (빨강)**
 
@@ -218,7 +218,7 @@ EOF
 
 - [ ] **Step 2: 캡처** 비교판 그림(작업 폴더 밖 임시 폴더)을 1배로 줄여 `board-now-*`, `board-ga-*`, `board-na-*`(1280, 375), `board-index-now-*`, `board-index-five-*`(1280, 375, 1024)로 옮깁니다. 구현 캡처는 개발 서버에서 같은 스크립트 방식으로 찍습니다: `after-1280`, `after-375`, `after-1280-dark`, `after-375-dark`(넷째 묶음 끝부터 푸터까지), `index-1280`, `index-1024`, `index-375`. 한 장이 1MB를 넘지 않게 합니다.
 
-- [ ] **Step 3: 문서 고치기** 설계 문서 "함께 고칠 문서"를 따릅니다. 뒤집은 결정은 날짜(2026-11-27)와 이유(상세 페이지가 `/ai` 아래 생겨 헤더의 AI 밑줄과 `/ai` 페이지가 어긋남, 사용자)를 적고, 옛 문장은 "처음에는 …"으로 남깁니다. IA `/ai` 절의 묶음 표에 `대회 참가 결과 | AX인재전쟁 삼일PwC 과제(axwar) | 짧은 카드, /ai/axwar로` 행을 더하고, "짧은 카드" 설명에 `/ai` 아래 페이지로 가는 경우를 더합니다. 비교한 안(가, 나, 이름 세 안과 고른 이름, 1024 확인값)과 AI 판단 표시를 씁니다.
+- [ ] **Step 3: 문서 고치기** 설계 문서 "함께 고칠 문서"를 따릅니다. 뒤집은 결정은 날짜(2026-11-27)와 이유(상세 페이지가 `/ai` 아래 생겨 헤더의 AI 밑줄과 `/ai` 페이지가 어긋남, 사용자)를 적고, 옛 문장은 "처음에는 …"으로 남깁니다. IA `/ai` 절의 묶음 표에 `대회 참가 | AX인재전쟁 삼일PwC 과제(axwar) | 짧은 카드, /ai/axwar로` 행을 더하고, "짧은 카드" 설명에 `/ai` 아래 페이지로 가는 경우를 더합니다. 비교한 안(가, 나, 이름 세 안과 고른 이름, 1024 확인값)과 AI 판단 표시를 씁니다.
 
 - [ ] **Step 4: 확인과 커밋**
 
@@ -265,7 +265,7 @@ EOF
 Run: `npm run verify`
 Expected: 로컬 전용 검사 두 개(`sync --check`, `check:stack`)를 뺀 모든 줄 통과. 그 둘은 main에서도 나는 기존 실패입니다. 다른 실패가 있으면 요약 표와 실패 내용을 그대로 보고합니다. 끝나면 개발 서버를 다시 띄우고(`.next/dev` 지움) `/ai`의 CSS에 `grid-cols-5`가 있는지 봅니다.
 
-- [ ] **Step 2: devlog** `docs/devlog/2026-11-27-ai-contest-section.md` (`docs/devlog/README.md` 형식). 흐름 표: 띠를 `/ai`에 싣지 않던 결정을 뒤집음(사용자 지적), 모양 가(main 세션 추천, 승인), 이름(AI 추천 "대회 결과" → 사용자가 다른 대회도 담게 "대회 참가 결과"), 목차 다섯 칸(AI 판단), `/ai/axwar` 끝 인증서 버튼 되살림(사용자 요청). 검증에 verify 결과.
+- [ ] **Step 2: devlog** `docs/devlog/2026-11-27-ai-contest-section.md` (`docs/devlog/README.md` 형식). 흐름 표: 띠를 `/ai`에 싣지 않던 결정을 뒤집음(사용자 지적), 모양 가(main 세션 추천, 승인), 이름(AI 추천 "대회 결과" → 사용자가 다른 대회도 담게 "대회 참가"), 목차 다섯 칸(AI 판단), `/ai/axwar` 끝 인증서 버튼 되살림(사용자 요청). 검증에 verify 결과.
 
 ```bash
 git add docs/devlog/2026-11-27-ai-contest-section.md

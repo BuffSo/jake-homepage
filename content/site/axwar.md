@@ -19,7 +19,7 @@ body:
 
 <!--
 /ai/axwar 페이지의 글 (docs/02-ia.md, docs/superpowers/specs/2026-11-27-ai-axwar-design.md).
-사이트 전용 글이다(ADR-0003). 홈과 /resume의 대회 결과 띠(home.md의 sections.ai.award), /ai 맨 끝 대회 참가 결과 묶음의 카드(content/site/ai/axwar.md)가 이 페이지로 온다.
+사이트 전용 글이다(ADR-0003). 홈과 /resume의 대회 결과 띠(home.md의 sections.ai.award), /ai 맨 끝 대회 참가 묶음의 카드(content/site/ai/axwar.md)가 이 페이지로 온다.
 카드의 숫자 칸은 이 글의 result, participants, date를 그대로 쓰고, 문장은 body에서 줄인다. 이 글을 고치면 카드도 함께 본다(내용 시험이 숫자와 sources를 대조한다).
 - 대회 이름, 회차, 과제, 참가자 2,916명, 상위 5%, 2026.11의 출처는 이력서의 대외활동 절과 자기소개(content/synced/resume.md),
   공개 인증서 페이지(cert.href), 결과 발표 공지 https://axacademy.ai/axwar/notices/7 (참가자 수, 상위 1%·5%·10% 구간 표시)이다.

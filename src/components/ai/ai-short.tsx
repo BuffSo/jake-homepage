@@ -4,7 +4,7 @@ import type { AiWork } from "@/lib/content";
 import { Eyebrow, Facts } from "./ai-text";
 
 // /ai의 짧은 카드 (docs/02-ia.md /ai). 원문이 다른 페이지(/work의 AI 절이나 /ai 아래 페이지)에 있는 항목이라
-// 한 줄씩만 쓰고 그곳으로 보낸다. 대회 참가 결과의 카드는 /ai/axwar로 간다.
+// 한 줄씩만 쓰고 그곳으로 보낸다. 대회 참가의 카드는 /ai/axwar로 간다.
 // 같은 글을 두 페이지에 싣지 않는다.
 export function AiShort({ work }: { work: AiWork }) {
   const titleId = `${work.slug}-title`;

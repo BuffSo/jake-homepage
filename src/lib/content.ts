@@ -214,7 +214,7 @@ export type JakeEnglish = {
   stack: JakeEnglishStack[];
 };
 
-/** AX인재전쟁 대회 결과 사이트 전용 글 (content/site/axwar.md, /ai/axwar). 홈과 /resume의 대회 결과 띠, /ai 맨 끝 대회 참가 결과 묶음의 카드가 이 페이지로 온다 */
+/** AX인재전쟁 대회 결과 사이트 전용 글 (content/site/axwar.md, /ai/axwar). 홈과 /resume의 대회 결과 띠, /ai 맨 끝 대회 참가 묶음의 카드가 이 페이지로 온다 */
 export type Axwar = {
   /** 브라우저와 공유 제목의 앞부분(뒤에 " · 소재희") */
   title: string;

@@ -21,7 +21,7 @@ sources:
 ---
 
 <!--
-/ai 맨 끝 묶음 "대회 참가 결과"의 카드다 (docs/02-ia.md /ai, docs/superpowers/specs/2026-11-27-ai-contest-section-design.md).
+/ai 맨 끝 묶음 "대회 참가"의 카드다 (docs/02-ia.md /ai, docs/superpowers/specs/2026-11-27-ai-contest-section-design.md).
 원문은 /ai/axwar의 글(content/site/axwar.md)이라 짧은 카드로 두고 그 페이지로 보낸다. 새 사실을 쓰지 않는다.
 - 문제와 만든 것은 본문 셋째, 넷째 문단, 결과는 첫 문단과 덧붙임 줄(extra)을 줄인 것이다. sources는 그 본문과 덧붙임 줄에서 찾는다(scripts/lib/content.test.mjs).
 - 결과의 결과물 심사 상위 100명 보상은 /ai/axwar 글의 extra와 같은 사실이다. 출처는 공지 https://axacademy.ai/axwar/notices/5 (결과물 심사 상위 100명에게 100장, 한 사람당 1개)와
