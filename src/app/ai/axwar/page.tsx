@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import ogAxwar from "@/assets/og-axwar.png";
 import { ButtonLink } from "@/components/button-link";
 import { getAxwar, getHome } from "@/lib/content";
 import { pageMetadata } from "@/lib/site-meta";
@@ -17,8 +16,6 @@ export const metadata: Metadata = pageMetadata({
   title: `${ax.title} · 소재희`,
   description: ax.body[0],
   path: "/ai/axwar",
-  // 공유하려고 만든 페이지라 전용 그림을 쓴다(docs/guide/SEO_검색과_공유_정책_20261017.md). npm run og:image가 이 글로 만든다.
-  image: { src: ogAxwar, alt: `${ax.contest} ${ax.result}, ${ax.participants}. 소재희 · jakeso.dev` },
 });
 
 export default function AxwarPage() {

@@ -7,8 +7,6 @@ import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 
 const SITE = "https://jakeso.dev";
 const PAGES = ["/", "/work", "/ai", "/ai/case", "/ai/jake-english", "/ai/axwar", "/resume"];
-// 공유 그림은 모든 페이지가 같은 한 장이고, 공유하려고 만든 /ai/axwar만 전용 그림을 쓴다(2026-11-27)
-const IMAGE: Record<string, string> = { "/ai/axwar": "og-axwar" };
 const home = parseFrontmatter(readFileSync("content/site/home.md", "utf8"), "home.md").data as {
   lines: string[];
   contact: { github: string };
@@ -36,9 +34,9 @@ for (const path of PAGES) {
     expect(await meta(page, "property", "og:locale")).toBe("ko_KR");
     expect(await meta(page, "name", "twitter:card")).toBe("summary_large_image");
 
-    // 페이지마다 정한 그림이 붙는다. 하위 페이지의 openGraph가 그림을 덮어 홈에만 붙은 적이 있다.
+    // 모든 페이지가 같은 그림 한 장을 쓴다. 하위 페이지의 openGraph가 그림을 덮어 홈에만 붙은 적이 있다.
     const image = await meta(page, "property", "og:image");
-    expect(image).toMatch(new RegExp(`^${SITE}/_next/static/media/${IMAGE[path] ?? "og-image"}\\.[^/]+\\.png$`));
+    expect(image).toMatch(new RegExp(`^${SITE}/_next/static/media/og-image\\.[^/]+\\.png$`));
     expect(await meta(page, "property", "og:image:width")).toBe("1200");
     expect(await meta(page, "property", "og:image:height")).toBe("630");
     expect(await meta(page, "name", "twitter:image")).toBe(image);
