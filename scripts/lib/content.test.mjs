@@ -36,7 +36,8 @@ const aiWorks = readDir("content/site/ai");
 const sites = readDir("content/site/sites");
 const axwar = read("content/site/axwar.md");
 // /ai 아래 페이지로 보내는 짧은 카드의 원문. 카드의 sources는 이 글에서 찾는다.
-const pageText = { "/ai/axwar": squash(axwar.body.join(" ")) };
+// /ai/axwar는 본문 네 문단과 덧붙임 줄(결과물 심사 상위 100명 보상)이다.
+const pageText = { "/ai/axwar": squash([axwar.extra, ...axwar.body].join(" ")) };
 
 test("sources의 문장은 원문(동기화한 이력서와 포트폴리오, 카드가 보내는 페이지의 글)에 그대로 있다", () => {
   const owners = [
