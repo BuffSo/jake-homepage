@@ -1,5 +1,5 @@
 // 사이트 전용 글의 사실 검사 (ADR-0003, CLAUDE.md 콘텐츠)
-// - sources의 문장은 동기화한 이력서나 포트폴리오에 그대로 있어야 한다.
+// - sources의 문장은 동기화한 이력서나 포트폴리오에 그대로 있어야 한다. /ai 아래 페이지로 보내는 짧은 카드는 그 페이지 글에 있어야 한다.
 // - 기술 층의 기술 이름은 scripts/stack.config.mjs의 표지 이름과 같고, 서비스 항목에 이름이 나오는 기술은 그 서비스에 표시한다(ADR-0010).
 // - 저장소에서 세는 숫자의 자리 표시는 아는 이름만 쓴다.
 
@@ -34,8 +34,12 @@ const work = read("content/site/work.md");
 const projects = readDir("content/site/projects");
 const aiWorks = readDir("content/site/ai");
 const sites = readDir("content/site/sites");
+const axwar = read("content/site/axwar.md");
+// /ai 아래 페이지로 보내는 짧은 카드의 원문. 카드의 sources는 이 글에서 찾는다.
+// /ai/axwar는 본문 네 문단과 덧붙임 줄(결과물 심사 상위 100명 보상)이다.
+const pageText = { "/ai/axwar": squash([axwar.extra, ...axwar.body].join(" ")) };
 
-test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대로 있다", () => {
+test("sources의 문장은 원문(동기화한 이력서와 포트폴리오, 카드가 보내는 페이지의 글)에 그대로 있다", () => {
   const owners = [
     { name: "home.md", data: home },
     { name: "work.md", data: work },
@@ -44,8 +48,9 @@ test("sources의 문장은 동기화한 이력서나 포트폴리오에 그대�
     ...aiWorks.map((w) => ({ name: `ai/${w.file}`, data: w.data })),
   ];
   for (const { name, data } of owners) {
+    const source = pageText[data.more] ?? synced;
     for (const quote of data.sources ?? []) {
-      assert.ok(synced.includes(squash(quote)), `${name}: 원문에 없는 문장 "${quote}"`);
+      assert.ok(source.includes(squash(quote)), `${name}: 원문에 없는 문장 "${quote}"`);
     }
   }
 });
@@ -149,8 +154,8 @@ test("AI 작업 글은 항목에 필요한 값을 모두 갖고, 순서가 겹�
     assert.ok(data.metric?.value && data.metric?.label, `${file}: metric 없음`);
     assert.ok(Array.isArray(data.links), `${file}: links 없음`);
     if (data.more) {
-      // 짧은 카드: 원문이 /work에 있는 항목. 그림과 결과는 /work에 있다.
-      assert.match(data.more, /^\/work#[a-z-]+-ai$/, `${file}: more는 /work의 AI 절이어야 함`);
+      // 짧은 카드: 원문이 /work의 AI 절이나 /ai 아래 페이지에 있는 항목. 그림과 결과는 그곳에 있다.
+      assert.match(data.more, /^(\/work#[a-z-]+-ai|\/ai\/[a-z-]+)$/, `${file}: more는 /work의 AI 절이나 /ai 아래 페이지여야 함`);
     } else {
       assert.ok(data.headline, `${file}: headline 없음`);
       assert.ok(figures.has(data.figure), `${file}: 모르는 figure ${data.figure}`);
@@ -209,11 +214,27 @@ test("홈 AI 카드는 네 장이고, 카드에 필요한 값을 갖는다", () 
   }
 });
 
-test("짧은 카드가 가리키는 /work의 절은 실제로 있다", () => {
+test("짧은 카드가 가리키는 곳은 실제로 있다", () => {
   const anchors = new Set(work.chapters.filter((c) => c.after).map((c) => `/work#${c.after.id}`));
   for (const { file, data } of aiWorks.filter((w) => w.data.more)) {
-    assert.ok(anchors.has(data.more), `${file}: ${data.more}는 /work에 없는 절`);
+    if (data.more.startsWith("/ai/")) {
+      assert.ok(existsSync(path.join(ROOT, "src/app", data.more, "page.tsx")), `${file}: ${data.more} 페이지가 없음`);
+    } else {
+      assert.ok(anchors.has(data.more), `${file}: ${data.more}는 /work에 없는 절`);
+    }
   }
+});
+
+test("대회 참가 카드는 /ai/axwar로 가고, 숫자는 그 페이지 글과 같다", () => {
+  const card = aiWorks.find((w) => w.data.group === "contest" && w.data.more === "/ai/axwar");
+  assert.ok(card, "대회 참가에 /ai/axwar 카드가 없음");
+  // 숫자 칸은 /ai/axwar의 결과와 참가자 줄을 그대로 쓴다. 페이지 글이 바뀌면 여기서 멈춰 카드도 다시 보게 한다.
+  assert.equal(card.data.metric.value, axwar.result);
+  assert.equal(card.data.metric.label, `${axwar.participants} · ${axwar.date}`);
+  assert.ok(card.data.sources?.length > 0, `${card.file}: sources 없음`);
+  // 띠와 같은 까닭으로 기간을 쓰지 않는다. 이력서 자기소개는 날짜로 센 이틀 만에, /ai/axwar 본문은 시간으로 센 하루 남짓이다.
+  const text = Object.values(card.data).filter((v) => typeof v === "string").join(" ");
+  assert.doesNotMatch(text, /이틀|하루|\d+\s*(일|시간)/);
 });
 
 test("포트폴리오 챕터는 work.md의 구성대로 만들어지고, 서비스 글과 맞는다", () => {
@@ -338,11 +359,12 @@ test("Jake English 기술 스택은 묶음마다 이름과 기술이 있고, 한
   }
 });
 
-test("대회 결과 띠는 /ai/axwar로 가고, 둘째 줄에 기간을 쓰지 않는다", () => {
+test("대회 결과 띠는 /ai/axwar로 가고, 두 줄 모두 기간을 쓰지 않는다", () => {
   // 이력서 자기소개는 날짜로 센 이틀 만에, /ai/axwar 본문은 시간으로 센 하루 남짓이다.
   // 띠에 기간을 쓰면 /resume 안에서나 누르고 들어간 페이지에서 말이 어긋나 뺐다(2026-11-27 비교판).
+  // 첫 줄(title)도 함께 보고, 2일 만에나 31시간 만에처럼 숫자로 쓴 기간도 막는다.
   const { award } = home.sections.ai;
   assert.equal(award.href, "/ai/axwar");
   assert.equal(award.cta, "자세히 보기");
-  assert.doesNotMatch(award.detail, /이틀|하루/);
+  assert.doesNotMatch(`${award.title} ${award.detail}`, /이틀|하루|\d+\s*(일|시간)/);
 });

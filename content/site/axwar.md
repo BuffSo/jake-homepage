@@ -9,6 +9,7 @@ cert:
   href: https://axacademy.ai/axwar/cert/dxN6SEBhEGU6n1JU1brdfPa0
   title: AX인재전쟁 온라인 1회차 삼일PwC 상위 5% 인증서
   domain: axacademy.ai
+  cta: 인증서 보기
 body:
   - AX인재전쟁 온라인 1회차 삼일PwC 과제에서 참가자 2,916명 중 상위 5%에 들었습니다.
   - 대회 기간은 7일이었지만 마감 전날 저녁에야 시작해, 하루 남짓 만에 만들고 마감 6분 전에 제출했습니다.
@@ -18,7 +19,8 @@ body:
 
 <!--
 /ai/axwar 페이지의 글 (docs/02-ia.md, docs/superpowers/specs/2026-11-27-ai-axwar-design.md).
-사이트 전용 글이다(ADR-0003). 홈과 /resume의 대회 결과 띠(home.md의 sections.ai.award)가 이 페이지로 온다.
+사이트 전용 글이다(ADR-0003). 홈과 /resume의 대회 결과 띠(home.md의 sections.ai.award), /ai 맨 끝 대회 참가 묶음의 카드(content/site/ai/axwar.md)가 이 페이지로 온다.
+카드의 숫자 칸은 이 글의 result, participants, date를 그대로 쓰고, 문장은 body에서 줄인다. 이 글을 고치면 카드도 함께 본다(내용 시험이 숫자와 sources를 대조한다).
 - 대회 이름, 회차, 과제, 참가자 2,916명, 상위 5%, 2026.11의 출처는 이력서의 대외활동 절과 자기소개(content/synced/resume.md),
   공개 인증서 페이지(cert.href), 결과 발표 공지 https://axacademy.ai/axwar/notices/7 (참가자 수, 상위 1%·5%·10% 구간 표시)이다.
 - extra(결과물 심사 상위 100명 보상 수령)는 공지 https://axacademy.ai/axwar/notices/5 (결과물 심사 상위 100명에게 100장, 한 사람당 1개)와
@@ -30,5 +32,6 @@ body:
 - title은 브라우저와 공유 제목의 앞부분이다(뒤에 · 소재희). 화면의 h1은 contest와 result를 두 줄로 묶은 것이다.
 - cert는 머리 아래의 인증서 카드다(링크드인 게시물의 링크 카드 모양, 2026-11-27 비교판). 그림은 인증서 페이지의 공유 그림(og:image, cert.href 뒤에 /image)을
   2026-11-27에 받아 src/assets/ai/axwar/cert.png에 그대로 두었다. 대회 측이 인증서를 비공개로 돌리거나 주소를 바꿔도 카드가 깨지지 않게 하려는 것이다.
+  cert.cta는 본문 아래 끝 버튼 줄의 채운 버튼 문구다. 카드 하나로 줄였다가 같은 날 사용자 요청으로 끝 줄에만 되살렸다(2026-11-27). 카드 근처에는 버튼을 두지 않는다.
   cert.title은 인증서 페이지가 그림 설명(og:image:alt)으로 쓰는 문구다. 페이지 제목(og:title)은 이름에 님을 붙인 3인칭이라 쓰지 않는다. cert.domain은 인증서 페이지의 도메인이다.
 -->

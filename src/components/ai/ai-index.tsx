@@ -1,13 +1,14 @@
 import type { AiGroup, AiWork } from "@/lib/content";
 
-// /ai 목차 (docs/02-ia.md /ai). 데스크톱은 묶음 네 칸, 모바일은 묶음마다 한 줄이다. 화면에 고정하지 않는다.
+// /ai 목차 (docs/02-ia.md /ai). 데스크톱은 묶음 다섯 칸, 모바일은 묶음마다 한 줄이다. 화면에 고정하지 않는다.
+// 묶음을 더하면 칸 수(lg:grid-cols-5)도 고친다. 1024에서도 칸이 한 줄이고 묶음 이름이 꺾이지 않는지 E2E가 본다.
 // 목차가 화면 위로 사라지면 맨 위로 버튼이 보이고, 누르면 목차에 초점이 온다(back-to-top.tsx).
 type Group = { id: AiGroup; title: string; works: AiWork[] };
 
 export function AiIndex({ groups }: { groups: Group[] }) {
   return (
     <nav id="page-index" tabIndex={-1} aria-label="이 페이지의 목차" className="border-t border-b border-t-fg border-b-line">
-      <ul className="grid lg:grid-cols-4">
+      <ul className="grid lg:grid-cols-5">
         {groups.map((group, i) => (
           <li key={group.id} className={i > 0 ? "border-t border-line-soft lg:border-t-0 lg:border-l" : ""}>
             <div className={`flex flex-col gap-1 py-3.5 lg:h-full lg:gap-2.5 lg:pt-5 lg:pr-5 lg:pb-[1.375rem] ${i > 0 ? "lg:pl-5" : ""}`}>

@@ -7,8 +7,8 @@ import { ExternalLink } from "@/components/external-link";
 import { getAxwar, getHome } from "@/lib/content";
 import { pageMetadata } from "@/lib/site-meta";
 
-// AX인재전쟁 대회 결과 (docs/02-ia.md /ai/axwar). 돌아가기 링크 → 머리(대회 이름, 결과, 참가자, 인증서 카드, 덧붙임) → 본문 → 끝 링크 순서다.
-// 글은 사이트 전용 글(content/site/axwar.md)이다. 홈과 /resume의 대회 결과 띠가 이 페이지로 온다. /ai에는 입구가 없다.
+// AX인재전쟁 대회 결과 (docs/02-ia.md /ai/axwar). 돌아가기 링크 → 머리(대회 이름, 결과, 참가자, 인증서 카드, 덧붙임) → 본문 → 끝 버튼 줄(인증서 보기, AI로 일하는 방식) 순서다.
+// 글은 사이트 전용 글(content/site/axwar.md)이다. 홈과 /resume의 대회 결과 띠, /ai 맨 끝 대회 참가 묶음의 카드가 이 페이지로 온다.
 // 머리는 결과를 크게 보여 주는 이 페이지만의 모양이라 SectionHead를 쓰지 않는다. 메신저에서 링크를 열면
 // 첫 화면 안에 결과, 인증서 카드, 덧붙임이 다 들어오게 한 배치다(설계 배치 B, 카드는 2026-11-27 비교판 B).
 // 목차가 없는 서브페이지라 /ai/case, /ai/jake-english처럼 맨 위로 버튼과 다음 페이지 버튼은 두지 않는다.
@@ -77,8 +77,12 @@ export default function AxwarPage() {
         </div>
       </div>
 
-      {/* 끝 링크. 인증서는 머리 아래 카드 하나로만 간다(같은 버튼이 두 번 보이지 않게, 2026-11-27) */}
+      {/* 끝 버튼 줄. 본문을 다 읽은 뒤 인증서로 가는 채운 버튼과 /ai로 돌아가는 테두리 버튼이다.
+          인증서 버튼은 카드 하나로 줄였다가 같은 날 사용자 요청으로 되살렸다(2026-11-27). 카드 근처에는 버튼을 두지 않는다. */}
       <div className="mt-12 flex flex-wrap gap-2">
+        <ButtonLink href={ax.cert.href} variant="solid">
+          {ax.cert.cta}
+        </ButtonLink>
         <ButtonLink href="/ai">{ai.title}</ButtonLink>
       </div>
     </main>

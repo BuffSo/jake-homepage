@@ -13,7 +13,7 @@ const ax = parseFrontmatter(readFileSync("content/site/axwar.md", "utf8"), "axwa
   participants: string;
   date: string;
   extra: string;
-  cert: { href: string; title: string; domain: string };
+  cert: { href: string; title: string; domain: string; cta: string };
   body: string[];
 };
 
@@ -36,7 +36,8 @@ test("브라우저 제목, 머리글, 제목이 글과 같다", async ({ page })
 });
 
 // 인증서는 링크드인 게시물의 링크 카드처럼 그림, 제목, 도메인을 담은 카드 하나로 보여 준다(2026-11-27 비교판 B)
-const certCard = (page: Page) => page.locator("main").locator(`a[href="${ax.cert.href}"]`);
+// 끝 줄의 인증서 보기 버튼도 같은 주소라, 카드는 그림이 든 링크로 찾는다
+const certCard = (page: Page) => page.locator("main").locator(`a[href="${ax.cert.href}"]:has(img)`);
 
 test("제목 아래에 참가자 줄, 인증서 카드, 덧붙임 줄이 차례로 있다", async ({ page }) => {
   await page.goto(PATH);
@@ -96,15 +97,23 @@ test("첫 화면 안에 결과, 덧붙임, 인증서 카드가 다 보인다", a
   expect(Math.max(cert.y + cert.height, extra.y + extra.height)).toBeLessThanOrEqual(page.viewportSize()!.height);
 });
 
-test("돌아가기 링크와 끝 버튼은 /ai로 가고, 인증서로 가는 링크는 카드 하나뿐이다", async ({ page }) => {
+test("돌아가기 링크는 /ai로 가고, 끝 줄은 인증서 보기와 AI로 일하는 방식이다", async ({ page }) => {
   await page.goto(PATH);
   const main = page.locator("main");
   const back = main.getByRole("link", { name: "AI로 일하는 방식" });
   await expect(back).toHaveCount(2);
   for (const link of await back.all()) await expect(link).toHaveAttribute("href", "/ai");
-  // main의 링크는 돌아가기, 인증서 카드, 끝 버튼(AI로 일하는 방식) 셋이다. 인증서 버튼이 두 번 보이던 것을 카드 하나로 줄였다
+  // main의 링크는 돌아가기, 인증서 카드, 끝 줄의 인증서 보기와 AI로 일하는 방식 넷이다.
+  // 끝 줄의 인증서 버튼은 카드 하나로 줄였다가 사용자 요청으로 되살렸다(2026-11-27). 카드 근처에는 버튼을 두지 않는다
   const hrefs = await main.getByRole("link").evaluateAll((els) => els.map((a) => a.getAttribute("href")));
-  expect(hrefs).toEqual(["/ai", ax.cert.href, "/ai"]);
+  expect(hrefs).toEqual(["/ai", ax.cert.href, ax.cert.href, "/ai"]);
+  // 끝 줄의 인증서 버튼은 바깥 주소라 새 창으로 열고, 본문 마지막 문단보다 아래에 있다
+  const button = main.getByRole("link", { name: new RegExp(`^${ax.cert.cta}`) });
+  await expect(button).toHaveCount(1);
+  await expect(button).toHaveAttribute("target", "_blank");
+  const last = (await main.getByText(ax.body.at(-1)!, { exact: true }).boundingBox())!;
+  const box = (await button.boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(last.y + last.height);
 });
 
 test("가로 스크롤이 생기지 않는다 (지금 폭과 320)", async ({ page }) => {

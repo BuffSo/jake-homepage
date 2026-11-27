@@ -70,7 +70,7 @@ export type Project = {
   cardImageAlt?: string; // 홈 카드 캡처가 /work와 다를 때
 };
 
-export type AiGroup = "dev" | "product" | "beyond" | "personal";
+export type AiGroup = "dev" | "product" | "beyond" | "personal" | "contest";
 
 /** 영상 목록이 있는 항목(영상 제작)의 영상 한 편. thumbnail은 저장소 기준 그림 경로(src/assets/…)다. */
 export type AiVideo = {
@@ -84,7 +84,7 @@ export type AiVideo = {
 };
 
 /**
- * content/site/ai/의 글. 상세 항목은 그림과 결과(또는 쓰는 법)를, 짧은 카드는 more(/work#…)를 갖는다.
+ * content/site/ai/의 글. 상세 항목은 그림과 결과(또는 쓰는 법)를, 짧은 카드는 원문으로 가는 more(/work#…-ai나 /ai/axwar 같은 /ai 아래 페이지)를 갖는다.
  * videos가 있는 항목은 /ai에서 그림, 만든 것, 숫자, 링크를 영상마다 따로 보인다. 항목의 그림(videos)과 숫자는 홈 카드에만 쓴다.
  */
 export type AiWork = {
@@ -214,7 +214,7 @@ export type JakeEnglish = {
   stack: JakeEnglishStack[];
 };
 
-/** AX인재전쟁 대회 결과 사이트 전용 글 (content/site/axwar.md, /ai/axwar). 홈과 /resume의 대회 결과 띠가 이 페이지로 온다 */
+/** AX인재전쟁 대회 결과 사이트 전용 글 (content/site/axwar.md, /ai/axwar). 홈과 /resume의 대회 결과 띠, /ai 맨 끝 대회 참가 묶음의 카드가 이 페이지로 온다 */
 export type Axwar = {
   /** 브라우저와 공유 제목의 앞부분(뒤에 " · 소재희") */
   title: string;
@@ -224,10 +224,10 @@ export type Axwar = {
   result: string;
   participants: string;
   date: string;
-  /** 참가자 줄 아래의 덧붙임 한 줄(개조식) */
+  /** 인증서 카드 아래의 덧붙임 한 줄(개조식). 카드 테두리 밖에 띄워 둔다 */
   extra: string;
-  /** 공개 인증서. 머리 아래의 미리보기 카드 하나(그림, 제목, 도메인)로 보여 준다. 그림은 src/assets/ai/axwar/cert.png */
-  cert: { href: string; title: string; domain: string };
+  /** 공개 인증서. 머리 아래의 미리보기 카드(그림, 제목, 도메인)와 끝 버튼 줄의 채운 버튼(cta)으로 간다. 그림은 src/assets/ai/axwar/cert.png */
+  cert: { href: string; title: string; domain: string; cta: string };
   /** 본문 문단. 첫 문단은 검색과 공유 설명으로도 쓴다 */
   body: string[];
 };

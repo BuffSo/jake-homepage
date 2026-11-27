@@ -135,14 +135,40 @@ test("영상 칸은 데스크톱에서 두 칸씩 나란히, 모바일에서 위
   }
 });
 
-test("짧은 카드는 /work의 AI 절로 보낸다", async ({ page }) => {
+test("짧은 카드는 원문이 있는 곳으로 보낸다", async ({ page }) => {
+  // 원문은 /work의 AI 절(/work#…-ai)이나 /ai 아래 페이지(대회 참가의 /ai/axwar)에 있다
   for (const work of shorts) {
     await page.goto("/ai");
-    const link = page.locator(`article#${work.slug}`).getByRole("link", { name: "자세히 보기" });
+    const link = page.locator(`article#${work.slug}`).getByRole("link", { name: "자세히 보기", exact: true });
     await expect(link).toHaveAttribute("href", work.more!);
+    // 사이트 안 주소라 같은 창에서 열고 ↗를 붙이지 않는다
+    await expect(link).not.toHaveAttribute("target", "_blank");
     await link.click();
     await expect(page).toHaveURL(new RegExp(`${work.more}$`));
-    await expect(page.locator(work.more!.slice(work.more!.indexOf("#")))).toBeInViewport();
+    if (work.more!.includes("#")) await expect(page.locator(work.more!.slice(work.more!.indexOf("#")))).toBeInViewport();
+    else {
+      // 없는 페이지(404)도 h1을 그리므로, 가는 곳의 응답이 200인지 먼저 본다(docs/guide 검색과 공유의 "페이지를 더할 때" 5번)
+      expect((await page.request.get(work.more!)).status()).toBe(200);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    }
+  }
+});
+
+test("데스크톱 목차는 묶음이 한 줄에 나란히 있고, 묶음 이름이 꺾이지 않는다", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile", "모바일은 묶음마다 한 줄이다");
+  // 가장 좁은 데스크톱 폭(1024)에서도 다섯째 칸 "대회 참가"가 한 줄에 들어야 한다(2026-11-27 사용자 조건)
+  for (const width of [1024, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/ai");
+    const cells = page.locator("#page-index > ul > li");
+    await expect(cells).toHaveCount(groups.length);
+    const boxes = await cells.evaluateAll((els) =>
+      els.map((li) => ({ top: li.getBoundingClientRect().top, title: li.querySelector(":scope > div > a")!.getBoundingClientRect().height })),
+    );
+    for (const box of boxes) {
+      expect(Math.abs(box.top - boxes[0].top), `${width}px 칸 위치`).toBeLessThan(1);
+      expect(Math.abs(box.title - boxes[0].title), `${width}px 묶음 이름 높이`).toBeLessThan(1);
+    }
   }
 });
 
