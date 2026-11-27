@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { parseFrontmatter } from "../src/lib/frontmatter.mjs";
 import { capturePath, collectErrors } from "./helpers";
 
@@ -13,7 +13,7 @@ const ax = parseFrontmatter(readFileSync("content/site/axwar.md", "utf8"), "axwa
   participants: string;
   date: string;
   extra: string;
-  cert: { href: string; cta: string };
+  cert: { href: string; title: string; domain: string };
   body: string[];
 };
 
@@ -35,30 +35,41 @@ test("브라우저 제목, 머리글, 제목이 글과 같다", async ({ page })
   await expect(page.locator("main").getByText("AI / AWARD", { exact: true })).toBeVisible();
 });
 
-test("제목 아래에 참가자 줄, 덧붙임 줄, 인증서 버튼이 차례로 있다", async ({ page }) => {
+// 인증서는 링크드인 게시물의 링크 카드처럼 그림, 제목, 도메인을 담은 카드 하나로 보여 준다(2026-11-27 비교판 B)
+const certCard = (page: Page) => page.locator("main").locator(`a[href="${ax.cert.href}"]`);
+
+test("제목 아래에 참가자 줄, 덧붙임 줄, 인증서 카드가 차례로 있다", async ({ page }) => {
   await page.goto(PATH);
   const main = page.locator("main");
   const h1 = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
   const participants = (await main.getByText(`${ax.participants} · ${ax.date}`, { exact: true }).boundingBox())!;
   const extra = (await main.getByText(ax.extra, { exact: true }).boundingBox())!;
-  const cert = (await main.getByRole("link", { name: new RegExp(ax.cert.cta) }).first().boundingBox())!;
+  const cert = (await certCard(page).boundingBox())!;
   expect(participants.y).toBeGreaterThanOrEqual(h1.y + h1.height);
   expect(extra.y).toBeGreaterThanOrEqual(participants.y + participants.height);
   expect(cert.y).toBeGreaterThanOrEqual(extra.y + extra.height);
 });
 
-test("인증서 버튼은 새 창으로 인증서를 열고, 본문보다 위에 있다", async ({ page }) => {
+test("인증서는 카드 하나이고, 그림·제목·도메인을 담아 새 창으로 열고, 본문보다 위에 있다", async ({ page }) => {
   await page.goto(PATH);
-  const main = page.locator("main");
-  const links = main.getByRole("link", { name: new RegExp(ax.cert.cta) });
-  await expect(links).toHaveCount(2);
-  for (const link of await links.all()) {
-    await expect(link).toHaveAttribute("href", ax.cert.href);
-    await expect(link).toHaveAttribute("target", "_blank");
-  }
-  const cert = (await links.first().boundingBox())!;
-  const first = (await main.getByText(ax.body[0], { exact: true }).boundingBox())!;
-  expect(cert.y + cert.height).toBeLessThan(first.y);
+  const card = certCard(page);
+  await expect(card).toHaveCount(1);
+  await expect(card).toHaveAttribute("target", "_blank");
+  await expect(card.getByText(ax.cert.title, { exact: true })).toBeVisible();
+  await expect(card.getByText(ax.cert.domain)).toBeVisible();
+  // 그림은 저장소에 받아 둔 인증서 공유 그림(1200×630)이고 다 불러온다
+  const img = card.locator("img");
+  await expect(img).toHaveCount(1);
+  const size = await img.evaluate((el: HTMLImageElement) => ({ natural: el.naturalWidth, w: el.clientWidth, h: el.clientHeight }));
+  expect(size.natural).toBeGreaterThan(0);
+  expect(size.w / size.h).toBeCloseTo(1200 / 630, 1);
+  const box = (await card.boundingBox())!;
+  const first = (await page.locator("main").getByText(ax.body[0], { exact: true }).boundingBox())!;
+  expect(box.y + box.height).toBeLessThan(first.y);
+  // 데스크톱은 30rem까지, 모바일은 본문 폭 전체
+  const vw = page.viewportSize()!.width;
+  if (vw >= 1024) expect(box.width).toBeLessThanOrEqual(480);
+  else expect(box.width).toBeGreaterThan(vw - 64);
 });
 
 test("본문은 글의 네 문단 그대로이고 차례대로다", async ({ page }) => {
@@ -74,22 +85,22 @@ test("본문은 글의 네 문단 그대로이고 차례대로다", async ({ pag
   }
 });
 
-test("첫 화면 안에 결과, 덧붙임, 인증서 버튼이 다 보인다", async ({ page }) => {
+test("첫 화면 안에 결과, 덧붙임, 인증서 카드가 다 보인다", async ({ page }) => {
   // 카카오톡 같은 메신저에서 링크를 열었을 때 스크롤 없이 결과와 증빙이 보이게 하려는 배치다 (설계 배치 B)
   await page.goto(PATH);
-  const cert = (await page.locator("main").getByRole("link", { name: new RegExp(ax.cert.cta) }).first().boundingBox())!;
+  const cert = (await certCard(page).boundingBox())!;
   expect(cert.y + cert.height).toBeLessThanOrEqual(page.viewportSize()!.height);
 });
 
-test("돌아가기 링크와 끝 버튼은 /ai와 인증서로 간다", async ({ page }) => {
+test("돌아가기 링크와 끝 버튼은 /ai로 가고, 인증서로 가는 링크는 카드 하나뿐이다", async ({ page }) => {
   await page.goto(PATH);
   const main = page.locator("main");
   const back = main.getByRole("link", { name: "AI로 일하는 방식" });
   await expect(back).toHaveCount(2);
   for (const link of await back.all()) await expect(link).toHaveAttribute("href", "/ai");
-  // 끝 버튼 줄: 인증서 보기, AI로 일하는 방식 순서
+  // main의 링크는 돌아가기, 인증서 카드, 끝 버튼(AI로 일하는 방식) 셋이다. 인증서 버튼이 두 번 보이던 것을 카드 하나로 줄였다
   const hrefs = await main.getByRole("link").evaluateAll((els) => els.map((a) => a.getAttribute("href")));
-  expect(hrefs.slice(-2)).toEqual([ax.cert.href, "/ai"]);
+  expect(hrefs).toEqual(["/ai", ax.cert.href, "/ai"]);
 });
 
 test("가로 스크롤이 생기지 않는다 (지금 폭과 320)", async ({ page }) => {
