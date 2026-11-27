@@ -226,8 +226,8 @@ export type Axwar = {
   date: string;
   /** 참가자 줄 아래의 덧붙임 한 줄(개조식) */
   extra: string;
-  /** 공개 인증서. 머리 아래의 미리보기 카드 하나(그림, 제목, 도메인)로 보여 준다. 그림은 src/assets/ai/axwar/cert.png */
-  cert: { href: string; title: string; domain: string };
+  /** 공개 인증서. 머리 아래의 미리보기 카드(그림, 제목, 도메인)와 끝 버튼 줄의 채운 버튼(cta)으로 간다. 그림은 src/assets/ai/axwar/cert.png */
+  cert: { href: string; title: string; domain: string; cta: string };
   /** 본문 문단. 첫 문단은 검색과 공유 설명으로도 쓴다 */
   body: string[];
 };

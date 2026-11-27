@@ -77,8 +77,12 @@ export default function AxwarPage() {
         </div>
       </div>
 
-      {/* 끝 링크. 인증서는 머리 아래 카드 하나로만 간다(같은 버튼이 두 번 보이지 않게, 2026-11-27) */}
+      {/* 끝 버튼 줄. 본문을 다 읽은 뒤 인증서로 가는 채운 버튼과 /ai로 돌아가는 테두리 버튼이다.
+          인증서 버튼은 카드 하나로 줄였다가 같은 날 사용자 요청으로 되살렸다(2026-11-27). 카드 근처에는 버튼을 두지 않는다. */}
       <div className="mt-12 flex flex-wrap gap-2">
+        <ButtonLink href={ax.cert.href} variant="solid">
+          {ax.cert.cta}
+        </ButtonLink>
         <ButtonLink href="/ai">{ai.title}</ButtonLink>
       </div>
     </main>
