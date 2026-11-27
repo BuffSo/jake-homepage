@@ -224,7 +224,7 @@ export type Axwar = {
   result: string;
   participants: string;
   date: string;
-  /** 참가자 줄 아래의 덧붙임 한 줄(개조식) */
+  /** 인증서 카드 아래의 덧붙임 한 줄(개조식). 카드 테두리 밖에 띄워 둔다 */
   extra: string;
   /** 공개 인증서. 머리 아래의 미리보기 카드(그림, 제목, 도메인)와 끝 버튼 줄의 채운 버튼(cta)으로 간다. 그림은 src/assets/ai/axwar/cert.png */
   cert: { href: string; title: string; domain: string; cta: string };
