@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { StaticImageData } from "next/image";
 import ogImage from "@/assets/og-image.png";
 
 // 검색과 공유에 쓰는 메타데이터 (docs/guide/SEO_검색과_공유_정책_20261017.md).
@@ -6,7 +7,7 @@ import ogImage from "@/assets/og-image.png";
 export const SITE_URL = "https://jakeso.dev";
 export const SITE_NAME = "소재희";
 
-// 모든 페이지가 같은 미리보기 그림 한 장을 쓴다. npm run og:image가 만든다.
+// 페이지는 같은 미리보기 그림 한 장을 쓴다. 공유하려고 만든 /ai/axwar만 전용 그림을 준다(2026-11-27). 두 그림 모두 npm run og:image가 만든다.
 // 가져온 그림의 주소에는 내용 해시가 붙어, 그림을 바꾸면 주소도 바뀌어 메신저가 새 그림을 가져간다.
 const OG_IMAGE = { url: ogImage.src, width: ogImage.width, height: ogImage.height, alt: "Idea to production. 소재희 · jakeso.dev" };
 
@@ -15,12 +16,24 @@ const OG_IMAGE = { url: ogImage.src, width: ogImage.width, height: ogImage.heigh
  * Next의 메타데이터는 얕게 합쳐져서, 페이지가 openGraph를 정하면 레이아웃의 openGraph가 통째로 바뀐다.
  * 그래서 공통 필드(사이트 이름, 언어, 종류, 그림)도 여기서 매번 채운다.
  * 그림을 파일 규칙(app/opengraph-image.png)으로 두면 하위 페이지의 openGraph가 덮어 홈에만 붙었다.
+ * image를 주지 않으면 공통 그림이다.
  */
-export function pageMetadata({ title, description, path }: { title: string; description: string; path: string }): Metadata {
+export function pageMetadata({
+  title,
+  description,
+  path,
+  image,
+}: {
+  title: string;
+  description: string;
+  path: string;
+  image?: { src: StaticImageData; alt: string };
+}): Metadata {
+  const images = image ? [{ url: image.src.src, width: image.src.width, height: image.src.height, alt: image.alt }] : [OG_IMAGE];
   return {
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { type: "website", siteName: SITE_NAME, locale: "ko_KR", url: path, title, description, images: [OG_IMAGE] },
+    openGraph: { type: "website", siteName: SITE_NAME, locale: "ko_KR", url: path, title, description, images },
   };
 }
