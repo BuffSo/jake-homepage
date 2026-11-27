@@ -225,9 +225,9 @@ test("짧은 카드가 가리키는 곳은 실제로 있다", () => {
   }
 });
 
-test("대회 참가 결과 카드는 /ai/axwar로 가고, 숫자는 그 페이지 글과 같다", () => {
+test("대회 참가 카드는 /ai/axwar로 가고, 숫자는 그 페이지 글과 같다", () => {
   const card = aiWorks.find((w) => w.data.group === "contest" && w.data.more === "/ai/axwar");
-  assert.ok(card, "대회 참가 결과에 /ai/axwar 카드가 없음");
+  assert.ok(card, "대회 참가에 /ai/axwar 카드가 없음");
   // 숫자 칸은 /ai/axwar의 결과와 참가자 줄을 그대로 쓴다. 페이지 글이 바뀌면 여기서 멈춰 카드도 다시 보게 한다.
   assert.equal(card.data.metric.value, axwar.result);
   assert.equal(card.data.metric.label, `${axwar.participants} · ${axwar.date}`);
