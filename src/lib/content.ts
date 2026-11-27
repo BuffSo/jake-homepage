@@ -70,7 +70,7 @@ export type Project = {
   cardImageAlt?: string; // 홈 카드 캡처가 /work와 다를 때
 };
 
-export type AiGroup = "dev" | "product" | "beyond" | "personal";
+export type AiGroup = "dev" | "product" | "beyond" | "personal" | "contest";
 
 /** 영상 목록이 있는 항목(영상 제작)의 영상 한 편. thumbnail은 저장소 기준 그림 경로(src/assets/…)다. */
 export type AiVideo = {

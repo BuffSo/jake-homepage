@@ -12,7 +12,7 @@ import { STORY_IMAGES } from "@/lib/jake-english-images";
 import { nextPage } from "@/lib/nav";
 import { pageMetadata } from "@/lib/site-meta";
 
-// AI로 일하는 방식 (docs/02-ia.md /ai). 머리 → 입구 띠 둘 → 목차 → 네 묶음. 머리 글은 홈 섹션과 같다.
+// AI로 일하는 방식 (docs/02-ia.md /ai). 머리 → 입구 띠 둘 → 목차 → 다섯 묶음(맨 끝은 대회 참가 결과). 머리 글은 홈 섹션과 같다.
 const { ai } = getHome().sections;
 
 export const metadata: Metadata = pageMetadata({
