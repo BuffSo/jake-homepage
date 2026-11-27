@@ -38,7 +38,7 @@ test("브라우저 제목, 머리글, 제목이 글과 같다", async ({ page })
 // 인증서는 링크드인 게시물의 링크 카드처럼 그림, 제목, 도메인을 담은 카드 하나로 보여 준다(2026-11-27 비교판 B)
 const certCard = (page: Page) => page.locator("main").locator(`a[href="${ax.cert.href}"]`);
 
-test("제목 아래에 참가자 줄, 덧붙임 줄, 인증서 카드가 차례로 있다", async ({ page }) => {
+test("제목 아래에 참가자 줄, 인증서 카드, 덧붙임 줄이 차례로 있다", async ({ page }) => {
   await page.goto(PATH);
   const main = page.locator("main");
   const h1 = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
@@ -46,8 +46,11 @@ test("제목 아래에 참가자 줄, 덧붙임 줄, 인증서 카드가 차례�
   const extra = (await main.getByText(ax.extra, { exact: true }).boundingBox())!;
   const cert = (await certCard(page).boundingBox())!;
   expect(participants.y).toBeGreaterThanOrEqual(h1.y + h1.height);
-  expect(extra.y).toBeGreaterThanOrEqual(participants.y + participants.height);
-  expect(cert.y).toBeGreaterThanOrEqual(extra.y + extra.height);
+  expect(cert.y).toBeGreaterThanOrEqual(participants.y + participants.height);
+  // 덧붙임 줄은 카드 테두리 밖, 카드 아래에 띄워 둔다(모바일 1rem, 데스크톱 1.5rem, 2026-11-27 비교판).
+  // 카드의 설명 글처럼 붙어 보이면 인증서가 이 보상까지 증명하는 것으로 읽힐 수 있다
+  const gap = page.viewportSize()!.width >= 1024 ? 24 : 16;
+  expect(extra.y - (cert.y + cert.height)).toBeGreaterThanOrEqual(gap - 1);
 });
 
 test("인증서는 카드 하나이고, 그림·제목·도메인을 담아 새 창으로 열고, 본문보다 위에 있다", async ({ page }) => {
@@ -89,7 +92,8 @@ test("첫 화면 안에 결과, 덧붙임, 인증서 카드가 다 보인다", a
   // 카카오톡 같은 메신저에서 링크를 열었을 때 스크롤 없이 결과와 증빙이 보이게 하려는 배치다 (설계 배치 B)
   await page.goto(PATH);
   const cert = (await certCard(page).boundingBox())!;
-  expect(cert.y + cert.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+  const extra = (await page.locator("main").getByText(ax.extra, { exact: true }).boundingBox())!;
+  expect(Math.max(cert.y + cert.height, extra.y + extra.height)).toBeLessThanOrEqual(page.viewportSize()!.height);
 });
 
 test("돌아가기 링크와 끝 버튼은 /ai로 가고, 인증서로 가는 링크는 카드 하나뿐이다", async ({ page }) => {
