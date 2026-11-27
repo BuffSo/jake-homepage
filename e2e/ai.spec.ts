@@ -146,7 +146,11 @@ test("짧은 카드는 원문이 있는 곳으로 보낸다", async ({ page }) =
     await link.click();
     await expect(page).toHaveURL(new RegExp(`${work.more}$`));
     if (work.more!.includes("#")) await expect(page.locator(work.more!.slice(work.more!.indexOf("#")))).toBeInViewport();
-    else await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    else {
+      // 없는 페이지(404)도 h1을 그리므로, 가는 곳의 응답이 200인지 먼저 본다(docs/guide 검색과 공유의 "페이지를 더할 때" 5번)
+      expect((await page.request.get(work.more!)).status()).toBe(200);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    }
   }
 });
 
